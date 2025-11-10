@@ -1,0 +1,37 @@
+﻿@page
+@model SwissLohnSystem.UI.Pages.Firmen.IndexModel
+@{
+    ViewData["Title"] = "Firmen";
+}
+
+<h2>Firmen</h2>
+
+<a class="btn btn-primary mb-3" asp-page="Create">Neue Firma hinzufügen</a>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Firma</th>
+            <th>Adresse</th>
+            <th>Steuer-Nr.</th>
+            <th>Mitarbeiter</th>
+            <th>Aktionen</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var firma in Model.FirmenListe)
+        {
+            <tr>
+                <td>@firma.Name</td>
+                <td>@firma.Adresse</td>
+                <td>@firma.SteuerNummer</td>
+                <td>@firma.MitarbeiterCount</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-page="/Mitarbeiter/Index" asp-route-firmaId="@firma.Id">Seç</a>
+                    <a class="btn btn-sm btn-warning" asp-page="Edit" asp-route-id="@firma.Id">Düzenle</a>
+                    <a class="btn btn-sm btn-danger" asp-page="Delete" asp-route-id="@firma.Id">Sil</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

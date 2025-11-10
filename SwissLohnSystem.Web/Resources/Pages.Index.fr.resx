@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutText" xml:space="preserve">
+    <value>Nous proposons des services de comptabilité professionnels</value>
+  </data>
+  <data name="AboutTitle" xml:space="preserve">
+    <value>À propos de nous</value>
+  </data>
+  <data name="Address" xml:space="preserve">
+    <value>Pumpwerkstrasse 15, 8105 Regensdorf</value>
+  </data>
+  <data name="ContactTitle" xml:space="preserve">
+    <value>Contactez-nous</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>info@einzelberg.ch</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>Erreur lors de l'envoi du message.</value>
+  </data>
+  <data name="Feature1Text" xml:space="preserve">
+    <value>Ajoutez, modifiez ou supprimez les employés facilement.</value>
+  </data>
+  <data name="Feature1Title" xml:space="preserve">
+    <value>Gestion des employés</value>
+  </data>
+  <data name="Feature2Text" xml:space="preserve">
+    <value>Calcul automatique du brut, des heures supplémentaires, des congés et des déductions.</value>
+  </data>
+  <data name="Feature2Title" xml:space="preserve">
+    <value>Calcul des salaires</value>
+  </data>
+  <data name="Feature3Text" xml:space="preserve">
+    <value>Enregistrez facilement les heures de travail et les heures supplémentaires.</value>
+  </data>
+  <data name="FooterText" xml:space="preserve">
+    <value>Tous droits réservés</value>
+  </data>
+  <data name="FormEmail" xml:space="preserve">
+    <value>E-mail</value>
+  </data>
+  <data name="FormMessage" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="FormName" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="FormSubmit" xml:space="preserve">
+    <value>Envoyer</value>
+  </data>
+  <data name="HeroHeader" xml:space="preserve">
+    <value>Bienvenue chez Einzelberg Comptabilité</value>
+  </data>
+  <data name="HeroText" xml:space="preserve">
+    <value>Votre comptabilité simple et efficace</value>
+  </data>
+  <data name="MapEmbed" xml:space="preserve">
+    <value>&lt;iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2698.334391063418!2d8.4589719!3d47.444420799999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47900d1b1a66d875%3A0xaba4d582fdde72ee!2sEinzelberg%20Beratung!5e0!3m2!1str!2sch!4v1762432036887!5m2!1str!2sch" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"&gt;&lt;/iframe&gt;</value>
+  </data>
+  <data name="Phone" xml:space="preserve">
+    <value>078 830 55 85</value>
+  </data>
+  <data name="SuccessMessage" xml:space="preserve">
+    <value>Message envoyé avec succès !</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Einzelberg Comptabilité</value>
+  </data>
+</root>

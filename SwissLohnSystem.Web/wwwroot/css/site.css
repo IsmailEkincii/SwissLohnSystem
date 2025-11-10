@@ -1,0 +1,208 @@
+﻿/* 🌍 Genel ayarlar */
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    margin-bottom: 60px;
+    font-family: "Poppins", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f8f9fa;
+    color: #555;
+}
+
+/* 🔹 Navbar */
+.navbar {
+    padding: 1rem 2rem;
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* 🔹 Hero Bölümü */
+.hero {
+    position: relative;
+    background: url('../images/hero-bg.jpg') center/cover no-repeat;
+    color: white;
+    padding: 120px 20px;
+    text-align: center;
+    overflow: hidden;
+}
+
+    .hero::before, .hero::after {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 15px;
+        background: linear-gradient(90deg, #0d6efd 50%, #5bc0de 50%);
+        background-size: 50px 100%;
+        animation: wave 4s linear infinite;
+    }
+
+    .hero::before {
+        top: 15%;
+    }
+
+    .hero::after {
+        top: 35%;
+        animation-duration: 6s;
+    }
+
+@keyframes wave {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.hero h1 {
+    font-weight: 700;
+    font-size: 3rem;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+}
+
+/* 🔹 Feature / About Kartlar */
+.feature-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    border: none;
+    background-color: #fff;
+    padding: 30px;
+    text-align: center;
+}
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+    }
+
+    .feature-card i {
+        color: #0d6efd;
+        margin-bottom: 15px;
+        font-size: 2.5rem;
+    }
+
+/* 🔹 Contact */
+.contact-row {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.contact-form, .contact-map {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 25px;
+    background-color: #fff;
+    flex: 1 1 45%;
+}
+
+.contact-map {
+    min-height: 300px;
+}
+
+/* 🔹 Buttons */
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    transition: all 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-2px);
+    }
+
+/* 🔹 Alerts */
+.alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    animation: fadeOut 6s ease-in-out forwards;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #28a745, #4cd964);
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #dc3545, #ff6b6b);
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+        display: none;
+    }
+}
+
+/* 🔹 Footer */
+footer {
+    background: #222;
+    color: white;
+    padding: 30px 0;
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+/* 🔹 Responsive */
+@media (max-width: 991px) {
+    .contact-row {
+        display: block;
+    }
+
+    .contact-form, .contact-map {
+        flex: 1 1 100%;
+        margin-bottom: 20px;
+    }
+
+    .hero {
+        padding: 80px 15px;
+    }
+}
+
+@media (max-width: 575px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+}
