@@ -39,3 +39,10 @@ C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\obj\Debug\net8.0
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\obj\Debug\net8.0\ref\SwissLohnSystem.Web.dll
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\obj\Debug\net8.0\SwissLohnSystem.Web.Resources.Pages.Index.de.resources
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\obj\Debug\net8.0\SwissLohnSystem.Web.Resources.Pages.Index.fr.resources
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\bin\Debug\net8.0\OpenAI.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\bin\Debug\net8.0\System.ClientModel.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\bin\Debug\net8.0\System.Memory.Data.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\bin\Debug\net8.0\System.Net.ServerSentEvents.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.Web\obj\Debug\net8.0\SwissLohnSystem.Web.sourcelink.json

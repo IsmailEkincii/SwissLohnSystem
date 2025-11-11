@@ -1,0 +1,281 @@
+﻿@page "{id:int}"
+@model SwissLohnSystem.UI.Pages.Companies.DetailsModel
+@{
+    ViewData["Title"] = "Firmendetails";
+    Layout = "_Layout";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Firma: @(Model.Company?.Name ?? "—")</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="~/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="~/Companies">Firmen</a></li>
+                    <li class="breadcrumb-item active">Details</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between mb-2">
+            <a class="btn btn-secondary btn-sm" href="~/Companies">
+                <i class="fas fa-arrow-left"></i> Zurück
+            </a>
+
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-secondary btn-sm" href="~/Companies/Edit/@Model.Id">
+                    <i class="fas fa-edit"></i> Firma bearbeiten
+                </a>
+                <a class="btn btn-primary btn-sm" href="~/Employees/Create?companyId=@Model.Id">
+                    <i class="fas fa-user-plus"></i> Neue/r Mitarbeiter/in
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header p-2">
+                <ul class="nav nav-pills" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" data-bs-toggle="tab" href="#info" role="tab">Info</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#mitarbeiter" role="tab">Mitarbeiter</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#loehne" role="tab">Löhne</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#files" role="tab">Dateien &amp; Notizen</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" data-bs-toggle="tab" href="#settings" role="tab">Einstellungen</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body">
+                <div class="tab-content">
+
+                    <!-- Info -->
+                    <div class="tab-pane fade show active" id="info" role="tabpanel">
+                        <dl class="row">
+                            <dt class="col-sm-3">Name</dt>
+                            <dd class="col-sm-9">@Model.Company?.Name</dd>
+
+                            <dt class="col-sm-3">Kanton</dt>
+                            <dd class="col-sm-9">@Model.Company?.Canton</dd>
+
+                            <dt class="col-sm-3">Adresse</dt>
+                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Company?.Address) ? Model.Company!.Address : "—")</dd>
+
+                            <dt class="col-sm-3">E-Mail</dt>
+                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Company?.Email) ? Model.Company!.Email : "—")</dd>
+
+                            <dt class="col-sm-3">Telefon</dt>
+                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Company?.Phone) ? Model.Company!.Phone : "—")</dd>
+
+                            <dt class="col-sm-3">Steuernummer</dt>
+                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Company?.TaxNumber) ? Model.Company!.TaxNumber : "—")</dd>
+                        </dl>
+                    </div>
+
+                    <!-- Mitarbeiter -->
+                    <div class="tab-pane fade" id="mitarbeiter" role="tabpanel">
+                        <div class="mb-2">
+                            <a class="btn btn-primary btn-sm" href="~/Employees/Create?companyId=@Model.Id">
+                                <i class="fas fa-user-plus"></i> Mitarbeiter hinzufügen
+                            </a>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th style="width:60px;">#</th>
+                                        <th>Name</th>
+                                        <th>E-Mail</th>
+                                        <th>Position</th>
+                                        <th>Status</th>
+                                        <th style="width:200px;">Aktionen</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Employees?.Any() == true)
+                                    {
+                                        var i = 1;
+                                        foreach (var e in Model.Employees)
+                                        {
+                                            <tr>
+                                                <td>@i</td>
+                                                <td>@e.FirstName @e.LastName</td>
+                                                <td>@(string.IsNullOrWhiteSpace(e.Email) ? "—" : e.Email)</td>
+                                                <td>@(string.IsNullOrWhiteSpace(e.Position) ? "—" : e.Position)</td>
+                                                <td>
+                                                    @if (e.Active)
+                                                    {
+                                                        <span class="badge badge-success">Aktiv</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-secondary">Inaktiv</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-outline-info btn-sm" href="~/Employees/Details/@e.Id">
+                                                        <i class="fas fa-eye"></i> Details
+                                                    </a>
+                                                    <a class="btn btn-outline-secondary btn-sm" href="~/Employees/Edit/@e.Id">
+                                                        <i class="fas fa-edit"></i> Bearbeiten
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            i++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted p-4">Keine Mitarbeiter vorhanden.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Löhne -->
+                    <div class="tab-pane fade" id="loehne" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th style="width:60px;">#</th>
+                                        <th>Monat/Jahr</th>
+                                        <th>Brutto</th>
+                                        <th>Abzüge</th>
+                                        <th>Netto</th>
+                                        <th>Überstunden</th>
+                                        <th>Ferien</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (Model.Lohns?.Any() == true)
+                                    {
+                                        var i = 1;
+                                        foreach (var l in Model.Lohns)
+                                        {
+                                            <tr>
+                                                <td>@i</td>
+                                                <td>@l.Month.@l.Year</td>
+                                                <td>@l.BruttoSalary.ToString("N2")</td>
+                                                <td>@l.TotalDeductions.ToString("N2")</td>
+                                                <td><strong>@l.NetSalary.ToString("N2")</strong></td>
+                                                <td>@l.OvertimePay.ToString("N2")</td>
+                                                <td>@l.HolidayAllowance.ToString("N2")</td>
+                                            </tr>
+                                            i++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted p-4">Keine Löhne gefunden.</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="text-muted small mb-0">
+                            Hinweis: Diese Liste filtert alle Löhne anhand der Mitarbeiter dieser Firma.
+                            Für serverseitiges Filtern empfiehlt sich ein Endpoint wie <code>/api/Lohn/by-company/{companyId}</code>.
+                        </p>
+                    </div>
+
+                    <!-- Dateien & Notizen -->
+                    <div class="tab-pane fade" id="files" role="tabpanel">
+                        <div class="alert alert-warning">
+                            Datei-Upload ist noch nicht angebunden. UI ist bereit; Backend-Endpoint erforderlich.
+                        </div>
+
+                        <div class="form-group">
+                            <label>Notiz</label>
+                            <textarea class="form-control" rows="3" placeholder="Interne Notizen zur Firma..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Datei hochladen</label>
+                            <input type="file" class="form-control-file" />
+                        </div>
+
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-upload"></i> Hochladen (demnächst)
+                        </button>
+                    </div>
+
+                    <!-- Einstellungen -->
+                    <div class="tab-pane fade" id="settings" role="tabpanel">
+                        <div class="alert alert-info">
+                            Firmenspezifische Einstellungen können hier konfiguriert werden.
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Standard-Lohnart</label>
+                                <select class="form-control" disabled>
+                                    <option>Monthly</option>
+                                    <option>Hourly</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label>Standard-Pensum (%)</label>
+                                <input type="number" class="form-control" value="100" disabled />
+                            </div>
+                        </div>
+
+                        <button class="btn btn-secondary" disabled>
+                            <i class="fas fa-save"></i> Speichern (demnächst)
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            // Hash ile açılışta doğru sekmeyi göster
+            function showTabByEl(el) {
+                if (!el) return;
+                if (typeof $ !== 'undefined' && $.fn && $.fn.tab) { $(el).tab('show'); return; }
+                if (window.bootstrap && bootstrap.Tab) { new bootstrap.Tab(el).show(); return; }
+            }
+
+            if (window.location.hash) {
+                var sel = 'a[data-bs-toggle="tab"][href="' + window.location.hash + '"], a[data-toggle="tab"][href="' + window.location.hash + '"]';
+                showTabByEl(document.querySelector(sel));
+            }
+
+            // Tıklamada URL hash'ini güncelle (BS4 jQuery)
+            if (typeof $ !== 'undefined' && $.fn && $.fn.tab) {
+                $('a[data-toggle="tab"], a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                    var href = e.target.getAttribute('href');
+                    if (href) history.replaceState(null, '', href);
+                });
+            }
+        })();
+    </script>
+}

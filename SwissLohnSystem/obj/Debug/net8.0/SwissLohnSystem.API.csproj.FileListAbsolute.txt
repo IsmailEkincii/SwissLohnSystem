@@ -141,3 +141,6 @@ C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem\obj\Debug\net8.0\ref
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem\obj\Debug\net8.0\SwissLohnSystem.API.pdb
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem\obj\Debug\net8.0\SwissLohnSystem.API.genruntimeconfig.cache
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem\obj\Debug\net8.0\ref\SwissLohnSystem.API.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem\bin\Debug\net8.0\OpenAI.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem\bin\Debug\net8.0\System.Net.ServerSentEvents.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem\obj\Debug\net8.0\SwissLohnSystem.API.sourcelink.json

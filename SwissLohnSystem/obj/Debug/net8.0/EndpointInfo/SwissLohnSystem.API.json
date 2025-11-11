@@ -16,26 +16,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Admin"
-                  }
+                  "$ref": "#/components/schemas/AdminDtoIEnumerableApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Admin"
-                  }
+                  "$ref": "#/components/schemas/AdminDtoIEnumerableApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Admin"
-                  }
+                  "$ref": "#/components/schemas/AdminDtoIEnumerableApiResponse"
                 }
               }
             }
@@ -50,17 +41,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Admin"
+                "$ref": "#/components/schemas/AdminCreateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Admin"
+                "$ref": "#/components/schemas/AdminCreateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Admin"
+                "$ref": "#/components/schemas/AdminCreateDto"
               }
             }
           }
@@ -71,17 +62,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Admin"
+                  "$ref": "#/components/schemas/AdminDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Admin"
+                  "$ref": "#/components/schemas/AdminDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Admin"
+                  "$ref": "#/components/schemas/AdminDtoApiResponse"
                 }
               }
             }
@@ -111,17 +102,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Admin"
+                  "$ref": "#/components/schemas/AdminDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Admin"
+                  "$ref": "#/components/schemas/AdminDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Admin"
+                  "$ref": "#/components/schemas/AdminDtoApiResponse"
                 }
               }
             }
@@ -147,24 +138,41 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Admin"
+                "$ref": "#/components/schemas/AdminUpdateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Admin"
+                "$ref": "#/components/schemas/AdminUpdateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Admin"
+                "$ref": "#/components/schemas/AdminUpdateDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -185,7 +193,24 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -201,26 +226,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Company"
-                  }
+                  "$ref": "#/components/schemas/CompanyDtoIEnumerableApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Company"
-                  }
+                  "$ref": "#/components/schemas/CompanyDtoIEnumerableApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Company"
-                  }
+                  "$ref": "#/components/schemas/CompanyDtoIEnumerableApiResponse"
                 }
               }
             }
@@ -235,17 +251,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Company"
+                "$ref": "#/components/schemas/CompanyCreateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Company"
+                "$ref": "#/components/schemas/CompanyCreateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Company"
+                "$ref": "#/components/schemas/CompanyCreateDto"
               }
             }
           }
@@ -256,17 +272,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Company"
+                  "$ref": "#/components/schemas/CompanyDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Company"
+                  "$ref": "#/components/schemas/CompanyDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Company"
+                  "$ref": "#/components/schemas/CompanyDtoApiResponse"
                 }
               }
             }
@@ -296,17 +312,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Company"
+                  "$ref": "#/components/schemas/CompanyDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Company"
+                  "$ref": "#/components/schemas/CompanyDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Company"
+                  "$ref": "#/components/schemas/CompanyDtoApiResponse"
                 }
               }
             }
@@ -332,24 +348,41 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Company"
+                "$ref": "#/components/schemas/CompanyUpdateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Company"
+                "$ref": "#/components/schemas/CompanyUpdateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Company"
+                "$ref": "#/components/schemas/CompanyUpdateDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -370,7 +403,64 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Company/{id}/Employees": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -386,26 +476,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Employee"
-                  }
+                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Employee"
-                  }
+                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Employee"
-                  }
+                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
                 }
               }
             }
@@ -420,17 +501,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Employee"
+                "$ref": "#/components/schemas/EmployeeCreateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Employee"
+                "$ref": "#/components/schemas/EmployeeCreateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Employee"
+                "$ref": "#/components/schemas/EmployeeCreateDto"
               }
             }
           }
@@ -441,17 +522,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
                 }
               }
             }
@@ -481,17 +562,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Employee"
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
                 }
               }
             }
@@ -517,24 +598,41 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Employee"
+                "$ref": "#/components/schemas/EmployeeUpdateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Employee"
+                "$ref": "#/components/schemas/EmployeeUpdateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Employee"
+                "$ref": "#/components/schemas/EmployeeUpdateDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -555,7 +653,24 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -571,26 +686,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Lohn"
-                  }
+                  "$ref": "#/components/schemas/LohnDtoIEnumerableApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Lohn"
-                  }
+                  "$ref": "#/components/schemas/LohnDtoIEnumerableApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Lohn"
-                  }
+                  "$ref": "#/components/schemas/LohnDtoIEnumerableApiResponse"
                 }
               }
             }
@@ -620,17 +726,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Lohn"
+                  "$ref": "#/components/schemas/LohnDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Lohn"
+                  "$ref": "#/components/schemas/LohnDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Lohn"
+                  "$ref": "#/components/schemas/LohnDtoApiResponse"
                 }
               }
             }
@@ -643,49 +749,42 @@
         "tags": [
           "Lohn"
         ],
-        "parameters": [
-          {
-            "name": "employeeId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "month",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "year",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LohnCalculateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LohnCalculateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LohnCalculateDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Lohn"
+                  "$ref": "#/components/schemas/LohnDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Lohn"
+                  "$ref": "#/components/schemas/LohnDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Lohn"
+                  "$ref": "#/components/schemas/LohnDtoApiResponse"
                 }
               }
             }
@@ -704,26 +803,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Setting"
-                  }
+                  "$ref": "#/components/schemas/SettingDtoIEnumerableApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Setting"
-                  }
+                  "$ref": "#/components/schemas/SettingDtoIEnumerableApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Setting"
-                  }
+                  "$ref": "#/components/schemas/SettingDtoIEnumerableApiResponse"
                 }
               }
             }
@@ -738,17 +828,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Setting"
+                "$ref": "#/components/schemas/SettingCreateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Setting"
+                "$ref": "#/components/schemas/SettingCreateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Setting"
+                "$ref": "#/components/schemas/SettingCreateDto"
               }
             }
           }
@@ -759,17 +849,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Setting"
+                  "$ref": "#/components/schemas/SettingDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Setting"
+                  "$ref": "#/components/schemas/SettingDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Setting"
+                  "$ref": "#/components/schemas/SettingDtoApiResponse"
                 }
               }
             }
@@ -799,17 +889,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Setting"
+                  "$ref": "#/components/schemas/SettingDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Setting"
+                  "$ref": "#/components/schemas/SettingDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Setting"
+                  "$ref": "#/components/schemas/SettingDtoApiResponse"
                 }
               }
             }
@@ -835,24 +925,41 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Setting"
+                "$ref": "#/components/schemas/SettingUpdateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/Setting"
+                "$ref": "#/components/schemas/SettingUpdateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/Setting"
+                "$ref": "#/components/schemas/SettingUpdateDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -873,7 +980,24 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -939,26 +1063,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WorkDay"
-                  }
+                  "$ref": "#/components/schemas/WorkDayDtoIEnumerableApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WorkDay"
-                  }
+                  "$ref": "#/components/schemas/WorkDayDtoIEnumerableApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WorkDay"
-                  }
+                  "$ref": "#/components/schemas/WorkDayDtoIEnumerableApiResponse"
                 }
               }
             }
@@ -975,17 +1090,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkDay"
+                "$ref": "#/components/schemas/WorkDayCreateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkDay"
+                "$ref": "#/components/schemas/WorkDayCreateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkDay"
+                "$ref": "#/components/schemas/WorkDayCreateDto"
               }
             }
           }
@@ -996,17 +1111,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkDay"
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkDay"
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkDay"
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
                 }
               }
             }
@@ -1015,6 +1130,44 @@
       }
     },
     "/api/WorkDay/{id}": {
+      "get": {
+        "tags": [
+          "WorkDay"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "WorkDay"
@@ -1034,24 +1187,41 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkDay"
+                "$ref": "#/components/schemas/WorkDayUpdateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkDay"
+                "$ref": "#/components/schemas/WorkDayUpdateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/WorkDay"
+                "$ref": "#/components/schemas/WorkDayUpdateDto"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -1072,7 +1242,24 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -1080,17 +1267,13 @@
   },
   "components": {
     "schemas": {
-      "Admin": {
+      "AdminCreateDto": {
         "required": [
           "passwordHash",
           "username"
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
           "username": {
             "minLength": 1,
             "type": "string"
@@ -1102,9 +1285,187 @@
         },
         "additionalProperties": false
       },
-      "Company": {
+      "AdminDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/AdminDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminDtoIEnumerableApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "AdminUpdateDto": {
+        "required": [
+          "id",
+          "passwordHash",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "passwordHash": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyCreateDto": {
         "required": [
           "canton",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "canton": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/CompanyDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyDtoIEnumerableApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompanyDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyUpdateDto": {
+        "required": [
+          "canton",
+          "id",
           "name"
         ],
         "type": "object",
@@ -1117,19 +1478,32 @@
             "minLength": 1,
             "type": "string"
           },
+          "canton": {
+            "minLength": 1,
+            "type": "string"
+          },
           "address": {
             "type": "string",
             "nullable": true
           },
-          "canton": {
-            "minLength": 1,
-            "type": "string"
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "Employee": {
+      "EmployeeCreateDto": {
         "required": [
+          "companyId",
           "firstName",
           "lastName",
           "salaryType",
@@ -1137,16 +1511,9 @@
         ],
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
           "companyId": {
             "type": "integer",
             "format": "int32"
-          },
-          "company": {
-            "$ref": "#/components/schemas/Company"
           },
           "firstName": {
             "minLength": 1,
@@ -1156,9 +1523,18 @@
             "minLength": 1,
             "type": "string"
           },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
           "birthDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
           },
           "maritalStatus": {
             "type": "string",
@@ -1193,21 +1569,365 @@
             "format": "date-time",
             "nullable": true
           },
-          "workedHours": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "overtimeHours": {
-            "type": "integer",
-            "format": "int32"
-          },
           "active": {
             "type": "boolean"
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
+            "type": "string",
+            "nullable": true
+          },
+          "pensumPercent": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "overtimeRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "Lohn": {
+      "EmployeeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "companyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "maritalStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "childCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "salaryType": {
+            "type": "string",
+            "nullable": true
+          },
+          "hourlyRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthlyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bruttoSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
+            "type": "string",
+            "nullable": true
+          },
+          "pensumPercent": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "overtimeRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "EmployeeDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/EmployeeDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "EmployeeDtoIEnumerableApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "EmployeeUpdateDto": {
+        "required": [
+          "companyId",
+          "firstName",
+          "id",
+          "lastName",
+          "salaryType",
+          "startDate"
+        ],
+        "type": "object",
+        "properties": {
+          "companyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "lastName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "maritalStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "childCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "salaryType": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "hourlyRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthlyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bruttoSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
+            "type": "string",
+            "nullable": true
+          },
+          "pensumPercent": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "overtimeRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LohnCalculateDto": {
+        "required": [
+          "employeeId"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "maximum": 12,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "maximum": 2100,
+            "minimum": 2000,
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LohnDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1217,9 +1937,6 @@
           "employeeId": {
             "type": "integer",
             "format": "int32"
-          },
-          "employee": {
-            "$ref": "#/components/schemas/Employee"
           },
           "month": {
             "type": "integer",
@@ -1260,11 +1977,66 @@
         },
         "additionalProperties": false
       },
-      "Setting": {
+      "LohnDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/LohnDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LohnDtoIEnumerableApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LohnDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SettingCreateDto": {
         "required": [
-          "name",
-          "value"
+          "name"
         ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "maximum": 1000000,
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SettingDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1272,14 +2044,95 @@
             "format": "int32"
           },
           "name": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "value": {
             "type": "number",
             "format": "double"
           },
           "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SettingDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SettingDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SettingDtoIEnumerableApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SettingUpdateDto": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "value": {
+            "maximum": 1000000,
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StringApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
             "type": "string",
             "nullable": true
           }
@@ -1309,11 +2162,37 @@
         },
         "additionalProperties": false
       },
-      "WorkDay": {
+      "WorkDayCreateDto": {
         "required": [
           "date",
-          "hoursWorked"
+          "employeeId"
         ],
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hoursWorked": {
+            "maximum": 24,
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          },
+          "overtimeHours": {
+            "maximum": 24,
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkDayDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1323,9 +2202,6 @@
           "employeeId": {
             "type": "integer",
             "format": "int32"
-          },
-          "employee": {
-            "$ref": "#/components/schemas/Employee"
           },
           "date": {
             "type": "string",
@@ -1338,6 +2214,77 @@
           "overtimeHours": {
             "type": "number",
             "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkDayDtoApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/WorkDayDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkDayDtoIEnumerableApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WorkDayDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkDayUpdateDto": {
+        "required": [
+          "date",
+          "employeeId",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hoursWorked": {
+            "maximum": 24,
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          },
+          "overtimeHours": {
+            "maximum": 24,
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

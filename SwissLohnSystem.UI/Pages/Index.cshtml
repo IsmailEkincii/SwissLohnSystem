@@ -2,40 +2,62 @@
 @model SwissLohnSystem.UI.Pages.IndexModel
 @{
     ViewData["Title"] = "Dashboard";
+    Layout = "_Layout";
 }
+<!-- ... üstteki breadcrumb aynı ... -->
 
-<div class="row">
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-            <div class="inner">
-                <h3>10</h3>
-                <p>Firmen</p>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Firmen -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@Model.FirmaCount</h3>
+                        <p>Firmen</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-building"></i></div>
+                    <a href="~/Companies" class="small-box-footer">Mehr Infos <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
             </div>
-            <div class="icon">
-                <i class="fas fa-building"></i>
+
+            <!-- Mitarbeiter -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@Model.MitarbeiterCount</h3>
+                        <p>Mitarbeiter</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <a href="~/Employees" class="small-box-footer">Mehr Infos <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Lohn-Abrechnungen (akt. Monat) -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@Model.LohnCountThisMonth</h3>
+                        <p>Lohn-Abrechnungen (akt. Monat)</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <a href="~/Lohn" class="small-box-footer">Mehr Infos <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <!-- Offene Aufgaben -->
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@Model.OpenTasks</h3>
+                        <p>Offene Aufgaben</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-tasks"></i></div>
+                    <a href="~/Calendar" class="small-box-footer">Zum Kalender <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
             </div>
         </div>
+
+        <!-- … kalan kartlar/aktiviteler aynı kalabilir … -->
     </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-            <div class="inner">
-                <h3>25</h3>
-                <p>Mitarbeiter</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-users"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-            <div class="inner">
-                <h3>12</h3>
-                <p>Lohnaufzeichnungen</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-money-bill"></i>
-            </div>
-        </div>
-    </div>
-</div>
+</section>

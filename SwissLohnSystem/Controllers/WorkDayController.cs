@@ -1,107 +1,121 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SwissLohnSystem.API.Controllers;
 using SwissLohnSystem.API.Data;
-using SwissLohnSystem.API.Models;
+using SwissLohnSystem.API.DTOs.WorkDay;
+using SwissLohnSystem.API.Mappings;
+using SwissLohnSystem.API.Responses;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-[Route("api/[controller]")]
-[ApiController]
-public class WorkDayController : ControllerBase
+namespace SwissLohnSystem.API.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public WorkDayController(ApplicationDbContext context)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class WorkDayController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly ApplicationDbContext _context;
+        public WorkDayController(ApplicationDbContext context) => _context = context;
 
-    // GET: api/WorkDay/Employee/5
-    [HttpGet("Employee/{employeeId}")]
-    public async Task<ActionResult<ApiResponse<IEnumerable<WorkDay>>>> GetEmployeeWorkDays(int employeeId)
-    {
-        var workDays = await _context.WorkDays
-            .Where(w => w.EmployeeId == employeeId)
-            .OrderBy(w => w.Date)
-            .ToListAsync();
-
-        return Ok(new ApiResponse<IEnumerable<WorkDay>>
+        // GET: api/WorkDay/Employee/5
+        [HttpGet("Employee/{employeeId:int}")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<WorkDayDto>>>> GetEmployeeWorkDays(int employeeId)
         {
-            Success = true,
-            Message = "Arbeitszeiten erfolgreich geladen.",
-            Data = workDays
-        });
-    }
+            // Mitarbeiter existiert mi?
+            var exists = await _context.Employees.AnyAsync(e => e.Id == employeeId);
+            if (!exists)
+                return NotFound(ApiResponse<IEnumerable<WorkDayDto>>.Fail("Mitarbeiter wurde nicht gefunden."));
 
-    // POST: api/WorkDay
-    [HttpPost]
-    public async Task<ActionResult<ApiResponse<WorkDay>>> PostWorkDay(WorkDay workDay)
-    {
-        _context.WorkDays.Add(workDay);
-        await _context.SaveChangesAsync();
+            var workDays = await _context.WorkDays
+                .AsNoTracking()
+                .Where(w => w.EmployeeId == employeeId)
+                .OrderBy(w => w.Date)
+                .Select(w => w.ToDto())
+                .ToListAsync();
 
-        return Ok(new ApiResponse<WorkDay>
+            return ApiResponse<IEnumerable<WorkDayDto>>.Ok(workDays, "Arbeitszeiten erfolgreich geladen.");
+        }
+
+        // POST: api/WorkDay
+        [HttpPost]
+        public async Task<ActionResult<ApiResponse<WorkDayDto>>> PostWorkDay([FromBody] WorkDayCreateDto dto)
         {
-            Success = true,
-            Message = "Arbeitszeit erfolgreich hinzugefügt.",
-            Data = workDay
-        });
-    }
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse<WorkDayDto>.Fail("Ungültige Eingabedaten."));
 
-    // PUT: api/WorkDay/5
-    [HttpPut("{id}")]
-    public async Task<ActionResult<ApiResponse<object>>> PutWorkDay(int id, WorkDay workDay)
-    {
-        if (id != workDay.Id)
-            return BadRequest(new ApiResponse<object>
-            {
-                Success = false,
-                Message = "Ungültige Arbeitszeit-ID."
-            });
+            // Mitarbeiter kontrol
+            var employeeExists = await _context.Employees.AnyAsync(e => e.Id == dto.EmployeeId);
+            if (!employeeExists)
+                return BadRequest(ApiResponse<WorkDayDto>.Fail("Ungültige Mitarbeiter-ID (EmployeeId)."));
 
-        _context.Entry(workDay).State = EntityState.Modified;
+            // Aynı gün için duplicate önleme (isteğe bağlı)
+            var duplicate = await _context.WorkDays.AnyAsync(w => w.EmployeeId == dto.EmployeeId && w.Date.Date == dto.Date.Date);
+            if (duplicate)
+                return BadRequest(ApiResponse<WorkDayDto>.Fail("Für diesen Tag existiert bereits ein Eintrag."));
 
-        try
-        {
+            var entity = dto.ToEntity();
+            _context.WorkDays.Add(entity);
             await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!_context.WorkDays.Any(w => w.Id == id))
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Arbeitszeit nicht gefunden."
-                });
-            else
-                throw;
+
+            return CreatedAtAction(nameof(GetById), new { id = entity.Id },
+                ApiResponse<WorkDayDto>.Ok(entity.ToDto(), "Arbeitszeit erfolgreich hinzugefügt."));
         }
 
-        return Ok(new ApiResponse<object>
+        // GET: api/WorkDay/5
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ApiResponse<WorkDayDto>>> GetById(int id)
         {
-            Success = true,
-            Message = "Arbeitszeit erfolgreich aktualisiert."
-        });
-    }
+            var w = await _context.WorkDays.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (w is null)
+                return NotFound(ApiResponse<WorkDayDto>.Fail("Arbeitszeit nicht gefunden."));
 
-    // DELETE: api/WorkDay/5
-    [HttpDelete("{id}")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteWorkDay(int id)
-    {
-        var workDay = await _context.WorkDays.FindAsync(id);
-        if (workDay == null)
-            return NotFound(new ApiResponse<object>
-            {
-                Success = false,
-                Message = "Arbeitszeit nicht gefunden."
-            });
+            return ApiResponse<WorkDayDto>.Ok(w.ToDto(), "Arbeitszeit erfolgreich geladen.");
+        }
 
-        _context.WorkDays.Remove(workDay);
-        await _context.SaveChangesAsync();
-
-        return Ok(new ApiResponse<object>
+        // PUT: api/WorkDay/5
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<ApiResponse<string>>> PutWorkDay(int id, [FromBody] WorkDayUpdateDto dto)
         {
-            Success = true,
-            Message = "Arbeitszeit erfolgreich gelöscht."
-        });
+            if (id != dto.Id)
+                return BadRequest(ApiResponse<string>.Fail("Ungültige Arbeitszeit-ID."));
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse<string>.Fail("Ungültige Eingabedaten."));
+
+            var entity = await _context.WorkDays.FindAsync(id);
+            if (entity is null)
+                return NotFound(ApiResponse<string>.Fail("Arbeitszeit nicht gefunden."));
+
+            // Mitarbeiter kontrol (EmployeeId değişmiş olabilir)
+            var employeeExists = await _context.Employees.AnyAsync(e => e.Id == dto.EmployeeId);
+            if (!employeeExists)
+                return BadRequest(ApiResponse<string>.Fail("Ungültige Mitarbeiter-ID (EmployeeId)."));
+
+            // Duplicate kontrol (aynı güne ikinci kayıt)
+            var duplicate = await _context.WorkDays.AnyAsync(w =>
+                w.EmployeeId == dto.EmployeeId &&
+                w.Date.Date == dto.Date.Date &&
+                w.Id != id);
+            if (duplicate)
+                return BadRequest(ApiResponse<string>.Fail("Für diesen Tag existiert bereits ein Eintrag."));
+
+            entity.Apply(dto);
+            await _context.SaveChangesAsync();
+
+            return ApiResponse<string>.Ok("Arbeitszeit erfolgreich aktualisiert.");
+        }
+
+        // DELETE: api/WorkDay/5
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult<ApiResponse<string>>> DeleteWorkDay(int id)
+        {
+            var entity = await _context.WorkDays.FindAsync(id);
+            if (entity is null)
+                return NotFound(ApiResponse<string>.Fail("Arbeitszeit nicht gefunden."));
+
+            _context.WorkDays.Remove(entity);
+            await _context.SaveChangesAsync();
+
+            return ApiResponse<string>.Ok("Arbeitszeit erfolgreich gelöscht.");
+        }
     }
 }

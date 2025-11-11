@@ -9,7 +9,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.Models.Admin, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -28,14 +28,14 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "admin",
-        "Type": "SwissLohnSystem.API.Models.Admin",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Admin.AdminCreateDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Admin",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -61,7 +61,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Admin",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -85,12 +85,22 @@
         "IsRequired": true
       },
       {
-        "Name": "admin",
-        "Type": "SwissLohnSystem.API.Models.Admin",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Admin.AdminUpdateDto",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.AdminController",
@@ -106,7 +116,17 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.CompanyController",
@@ -118,7 +138,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.Models.Company, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -137,14 +157,14 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "company",
-        "Type": "SwissLohnSystem.API.Models.Company",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Companies.CompanyCreateDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Company",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -170,7 +190,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Company",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -194,12 +214,22 @@
         "IsRequired": true
       },
       {
-        "Name": "company",
-        "Type": "SwissLohnSystem.API.Models.Company",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Companies.CompanyUpdateDto",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.CompanyController",
@@ -215,7 +245,43 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.CompanyController",
+    "Method": "GetCompanyEmployees",
+    "RelativePath": "api/Company/{id}/Employees",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.EmployeeController",
@@ -227,7 +293,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.Models.Employee, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -246,14 +312,14 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "employee",
-        "Type": "SwissLohnSystem.API.Models.Employee",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Employees.EmployeeCreateDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Employee",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -279,7 +345,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Employee",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -303,12 +369,22 @@
         "IsRequired": true
       },
       {
-        "Name": "employee",
-        "Type": "SwissLohnSystem.API.Models.Employee",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Employees.EmployeeUpdateDto",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.EmployeeController",
@@ -324,7 +400,17 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
@@ -336,7 +422,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.Models.Lohn, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -362,7 +448,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Lohn",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -374,31 +460,21 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "CalculateLohn",
+    "Method": "Calculate",
     "RelativePath": "api/Lohn/Calculate",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "employeeId",
-        "Type": "System.Int32",
-        "IsRequired": false
-      },
-      {
-        "Name": "month",
-        "Type": "System.Int32",
-        "IsRequired": false
-      },
-      {
-        "Name": "year",
-        "Type": "System.Int32",
-        "IsRequired": false
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Lohn.LohnCalculateDto",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Lohn",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -418,7 +494,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.Models.Setting, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Setting.SettingDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -437,14 +513,14 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "setting",
-        "Type": "SwissLohnSystem.API.Models.Setting",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Setting.SettingCreateDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Setting",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Setting.SettingDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -470,7 +546,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.Setting",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Setting.SettingDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -494,12 +570,22 @@
         "IsRequired": true
       },
       {
-        "Name": "setting",
-        "Type": "SwissLohnSystem.API.Models.Setting",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.Setting.SettingUpdateDto",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.SettingController",
@@ -515,7 +601,17 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.WorkDayController",
@@ -526,14 +622,40 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "workDay",
-        "Type": "SwissLohnSystem.API.Models.WorkDay",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.WorkDay.WorkDayCreateDto",
         "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Models.WorkDay",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.WorkDayController",
+    "Method": "GetById",
+    "RelativePath": "api/WorkDay/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -557,12 +679,22 @@
         "IsRequired": true
       },
       {
-        "Name": "workDay",
-        "Type": "SwissLohnSystem.API.Models.WorkDay",
+        "Name": "dto",
+        "Type": "SwissLohnSystem.API.DTOs.WorkDay.WorkDayUpdateDto",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.WorkDayController",
@@ -578,7 +710,17 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.WorkDayController",
@@ -596,7 +738,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.Models.WorkDay, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

@@ -1,0 +1,122 @@
+﻿@page
+@model SwissLohnSystem.UI.Pages.Companies.IndexModel
+@{
+    ViewData["Title"] = "Firmen";
+    Layout = "_Layout";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6"><h1>Firmen</h1></div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="~/">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Firmen</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        @* ❌ Bunlar artık kullanılmayacak — Toastr gösteriyor
+        @if (TempData["Alert"] is string alert && !string.IsNullOrWhiteSpace(alert))
+        {
+            <div class="alert alert-info">@alert</div>
+        }
+        @if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+        {
+            <div class="alert alert-danger">@err</div>
+        }
+        *@
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">Firmenliste</h3>
+                <a class="btn btn-primary btn-sm" href="~/Companies/Create"><i class="fas fa-plus"></i> Neue Firma</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width:70px;">#</th>
+                            <th>Name</th>
+                            <th>Kanton</th>
+                            <th>Adresse</th>
+                            <th style="width:260px;">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Companies?.Any() == true)
+                        {
+                            var i = 1;
+                            foreach (var c in Model.Companies)
+                            {
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@c.Name</td>
+                                    <td>@c.Canton</td>
+                                    <td>@(string.IsNullOrWhiteSpace(c.Address) ? "—" : c.Address)</td>
+                                    <td class="d-flex gap-1">
+                                        <a class="btn btn-outline-info btn-sm" href="~/Companies/Details/@c.Id">
+                                            <i class="fas fa-eye"></i> Details
+                                        </a>
+                                        <a class="btn btn-outline-secondary btn-sm" href="~/Companies/Edit/@c.Id">
+                                            <i class="fas fa-edit"></i> Bearbeiten
+                                        </a>
+
+                                        @* ✅ Silme butonu *@
+                                        <form method="post"
+                                              asp-page-handler="Delete"
+                                              asp-route-id="@c.Id"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Diese Firma löschen?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash"></i> Löschen
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="5" class="text-center text-muted p-4">Keine Daten</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            toastr.options = {
+                positionClass: "toast-top-right",
+                timeOut: 3000
+            };
+
+            @if (TempData["Toast"] is string toast && !string.IsNullOrWhiteSpace(toast))
+            {
+                    <text>toastr.success(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(toast)));</text>
+            }
+
+            @if (TempData["Alert"] is string alert && !string.IsNullOrWhiteSpace(alert))
+            {
+                    <text>toastr.info(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(alert)));</text>
+            }
+
+            @if (TempData["Error"] is string error && !string.IsNullOrWhiteSpace(error))
+            {
+                    <text>toastr.error(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(error)));</text>
+            }
+        })();
+    </script>
+}

@@ -66,6 +66,10 @@
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.4, )"
+            },
+            "OpenAI": {
+              "target": "Package",
+              "version": "[2.6.0, )"
             }
           },
           "imports": [
@@ -155,6 +159,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.21, )"
+            },
+            "OpenAI": {
+              "target": "Package",
+              "version": "[2.6.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

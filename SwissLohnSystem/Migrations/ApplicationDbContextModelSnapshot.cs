@@ -22,6 +22,109 @@ namespace SwissLohnSystem.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Employee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AHVNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BVGPlan")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("BruttoSalary")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ChildCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("HolidayRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("HourlyRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Krankenkasse")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaritalStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MonthlyHours")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OvertimeHours")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("OvertimeRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("PensumPercent")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Position")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SalaryType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("WithholdingTaxCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WorkedHours")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Zip")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Employees");
+                });
+
             modelBuilder.Entity("SwissLohnSystem.API.Models.Admin", b =>
                 {
                     b.Property<int>("Id")
@@ -80,106 +183,6 @@ namespace SwissLohnSystem.API.Migrations
                     b.ToTable("Companies");
                 });
 
-            modelBuilder.Entity("SwissLohnSystem.API.Models.Employee", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("BruttoSalary")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ChildCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("HourlyRate")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MaritalStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MonthlyHours")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OvertimeHours")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SalaryType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("WorkedHours")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Employees");
-                });
-
-            modelBuilder.Entity("SwissLohnSystem.API.Models.Firma", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Adresse")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("SteuerNummer")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Firmen");
-                });
-
             modelBuilder.Entity("SwissLohnSystem.API.Models.Lohn", b =>
                 {
                     b.Property<int>("Id")
@@ -223,41 +226,6 @@ namespace SwissLohnSystem.API.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("Lohns");
-                });
-
-            modelBuilder.Entity("SwissLohnSystem.API.Models.Mitarbeiter", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AHVNummer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("FirmaId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Lohn")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Nachname")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Vorname")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FirmaId");
-
-                    b.ToTable("Mitarbeiter");
                 });
 
             modelBuilder.Entity("SwissLohnSystem.API.Models.Setting", b =>
@@ -311,10 +279,10 @@ namespace SwissLohnSystem.API.Migrations
                     b.ToTable("WorkDays");
                 });
 
-            modelBuilder.Entity("SwissLohnSystem.API.Models.Employee", b =>
+            modelBuilder.Entity("Employee", b =>
                 {
                     b.HasOne("SwissLohnSystem.API.Models.Company", "Company")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -324,29 +292,18 @@ namespace SwissLohnSystem.API.Migrations
 
             modelBuilder.Entity("SwissLohnSystem.API.Models.Lohn", b =>
                 {
-                    b.HasOne("SwissLohnSystem.API.Models.Employee", "Employee")
+                    b.HasOne("Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("SwissLohnSystem.API.Models.Mitarbeiter", b =>
-                {
-                    b.HasOne("SwissLohnSystem.API.Models.Firma", "Firma")
-                        .WithMany("Mitarbeiter")
-                        .HasForeignKey("FirmaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Firma");
                 });
 
             modelBuilder.Entity("SwissLohnSystem.API.Models.WorkDay", b =>
                 {
-                    b.HasOne("SwissLohnSystem.API.Models.Employee", "Employee")
+                    b.HasOne("Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -355,9 +312,9 @@ namespace SwissLohnSystem.API.Migrations
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("SwissLohnSystem.API.Models.Firma", b =>
+            modelBuilder.Entity("SwissLohnSystem.API.Models.Company", b =>
                 {
-                    b.Navigation("Mitarbeiter");
+                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

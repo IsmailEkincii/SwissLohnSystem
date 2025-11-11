@@ -8,16 +8,14 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="~/adminlte/plugins/fontawesome-free/css/all.min.css" />
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <!-- AdminLTE -->
+    <!-- AdminLTE (Bootstrap 4 entegre) -->
     <link rel="stylesheet" href="~/adminlte/css/adminlte.min.css" />
 
-    <!-- Custom CSS -->
+    <!-- Toastr -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+    <!-- Custom -->
     <link rel="stylesheet" href="~/css/site.css" />
-
-
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -29,7 +27,7 @@
                     <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="/" class="nav-link">Startseite</a>
+                    <a href="~/" class="nav-link">Startseite</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -41,7 +39,7 @@
 
         <!-- Sidebar -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <a href="/" class="brand-link">
+            <a href="~/" class="brand-link">
                 <span class="brand-text font-weight-light">SwissLohnSystem</span>
             </a>
 
@@ -49,31 +47,31 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                         <li class="nav-item">
-                            <a href="/Index" class="nav-link">
+                            <a href="~/Index" class="nav-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>Dashboard</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/Companies" class="nav-link">
+                            <a href="~/Companies" class="nav-link">
                                 <i class="nav-icon fas fa-building"></i>
                                 <p>Firmen</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/Employees" class="nav-link">
+                            <a href="~/Employees" class="nav-link">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>Mitarbeiter</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/Calendar" class="nav-link">
+                            <a href="~/Calendar" class="nav-link">
                                 <i class="nav-icon fas fa-calendar-alt"></i>
                                 <p>Kalender</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/Settings" class="nav-link">
+                            <a href="~/Settings" class="nav-link">
                                 <i class="nav-icon fas fa-cogs"></i>
                                 <p>Einstellungen</p>
                             </a>
@@ -97,10 +95,11 @@
         </footer>
     </div>
 
-    <!-- JS -->
+    <!-- JS (tek sürüm: jQuery + BS4 bundle + AdminLTE) -->
     <script src="~/adminlte/plugins/jquery/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/adminlte/js/adminlte.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     @RenderSection("Scripts", required: false)
 </body>

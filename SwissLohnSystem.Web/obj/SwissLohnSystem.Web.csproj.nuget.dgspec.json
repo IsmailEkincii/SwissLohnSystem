@@ -54,6 +54,10 @@
             "MailKit": {
               "target": "Package",
               "version": "[4.14.1, )"
+            },
+            "OpenAI": {
+              "target": "Package",
+              "version": "[2.6.0, )"
             }
           },
           "imports": [

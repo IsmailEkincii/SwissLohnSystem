@@ -85,6 +85,8 @@ C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\bin\Debug\net8.0\
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\bin\Debug\net8.0\SwissLohnSystem.API.dll
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\bin\Debug\net8.0\SwissLohnSystem.API.pdb
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\obj\Debug\net8.0\SwissLohnSystem.UI.csproj.AssemblyReference.cache
-C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\obj\Debug\net8.0\SwissLohnSystem.UI.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\obj\Debug\net8.0\SwissLoh.7FB58EE6.Up2Date
 C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\bin\Debug\net8.0\OpenAI.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\bin\Debug\net8.0\System.Net.ServerSentEvents.dll
+C:\Users\Smale\source\repos\SwissLohnSystem\SwissLohnSystem.UI\obj\Debug\net8.0\SwissLohnSystem.UI.sourcelink.json

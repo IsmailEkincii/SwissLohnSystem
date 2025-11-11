@@ -2,10 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SwissLohnSystem.API.Data;
+using SwissLohnSystem.API.DTOs.Companies;   // CompanyDto, CompanyCreateDto, CompanyUpdateDto
+using SwissLohnSystem.API.DTOs.Employees;  // EmployeeDto
+using SwissLohnSystem.API.Mapping;
+using SwissLohnSystem.API.Mappings;        // CompanyMapping (ToDto/ToEntity/Apply)
 using SwissLohnSystem.API.Models;
+using SwissLohnSystem.API.Responses;       // ApiResponse<T>
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SwissLohnSystem.API.Controllers
 {
@@ -24,72 +28,56 @@ namespace SwissLohnSystem.API.Controllers
 
         // GET: api/Company
         [HttpGet]
-        public async Task<ActionResult<ApiResponse<IEnumerable<Company>>>> GetCompanies()
+        public async Task<ActionResult<ApiResponse<IEnumerable<CompanyDto>>>> GetCompanies()
         {
-            var companies = await _context.Companies.ToListAsync();
-            return Ok(new ApiResponse<IEnumerable<Company>>
-            {
-                Success = true,
-                Message = "Firmenliste wurde erfolgreich geladen.",
-                Data = companies
-            });
+            var companies = await _context.Companies
+                .OrderBy(c => c.Name)
+                .Select(c => c.ToDto()) // ✅ Mapping extension
+                .ToListAsync();
+
+            return ApiResponse<IEnumerable<CompanyDto>>.Ok(companies, "Firmenliste wurde erfolgreich geladen.");
         }
 
         // GET: api/Company/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResponse<Company>>> GetCompany(int id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ApiResponse<CompanyDto>>> GetCompany(int id)
         {
             var company = await _context.Companies.FindAsync(id);
-            if (company == null)
-            {
-                return NotFound(new ApiResponse<Company>
-                {
-                    Success = false,
-                    Message = "Firma wurde nicht gefunden."
-                });
-            }
+            if (company is null)
+                return NotFound(ApiResponse<CompanyDto>.Fail("Firma wurde nicht gefunden."));
 
-            return Ok(new ApiResponse<Company>
-            {
-                Success = true,
-                Message = "Firma erfolgreich gefunden.",
-                Data = company
-            });
+            return ApiResponse<CompanyDto>.Ok(company.ToDto(), "Firma erfolgreich gefunden.");
         }
 
         // POST: api/Company
         [HttpPost]
-        public async Task<ActionResult<ApiResponse<Company>>> PostCompany(Company company)
+        public async Task<ActionResult<ApiResponse<CompanyDto>>> PostCompany([FromBody] CompanyCreateDto dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<Company>
-                {
-                    Success = false,
-                    Message = "Ungültige Daten wurden gesendet."
-                });
+                return BadRequest(ApiResponse<CompanyDto>.Fail("Ungültige Daten wurden gesendet."));
 
-            _context.Companies.Add(company);
+            var entity = dto.ToEntity(); // ✅ Mapping extension
+            _context.Companies.Add(entity);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetCompany), new { id = company.Id }, new ApiResponse<Company>
-            {
-                Success = true,
-                Message = "Firma wurde erfolgreich hinzugefügt.",
-                Data = company
-            });
+            return CreatedAtAction(nameof(GetCompany), new { id = entity.Id },
+                ApiResponse<CompanyDto>.Ok(entity.ToDto(), "Firma wurde erfolgreich hinzugefügt."));
         }
 
         // PUT: api/Company/5
-        [HttpPut("{id}")]
-        public async Task<ActionResult<ApiResponse<string>>> PutCompany(int id, Company company)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<ApiResponse<string>>> PutCompany(int id, [FromBody] CompanyUpdateDto dto)
         {
-            if (id != company.Id)
-                return BadRequest(new ApiResponse<string> { Success = false, Message = "ID stimmt nicht überein." });
-
+            if (id != dto.Id)
+                return BadRequest(ApiResponse<string>.Fail("ID stimmt nicht überein."));
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string> { Success = false, Message = "Ungültige Eingabe." });
+                return BadRequest(ApiResponse<string>.Fail("Ungültige Eingabe."));
 
-            _context.Entry(company).State = EntityState.Modified;
+            var entity = await _context.Companies.FindAsync(id);
+            if (entity is null)
+                return NotFound(ApiResponse<string>.Fail("Firma wurde nicht gefunden."));
+
+            entity.Apply(dto); // ✅ Mapping extension
 
             try
             {
@@ -97,36 +85,53 @@ namespace SwissLohnSystem.API.Controllers
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                if (!_context.Companies.Any(e => e.Id == id))
-                    return NotFound(new ApiResponse<string> { Success = false, Message = "Firma wurde nicht gefunden." });
-
                 _logger.LogError(ex, "Fehler beim Aktualisieren der Firma.");
-                throw;
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ApiResponse<string>.Fail("Interner Fehler beim Aktualisieren."));
             }
 
-            return Ok(new ApiResponse<string> { Success = true, Message = "Firmendaten wurden erfolgreich aktualisiert." });
+            return ApiResponse<string>.Ok("Firmendaten wurden erfolgreich aktualisiert.");
         }
 
         // DELETE: api/Company/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult<ApiResponse<string>>> DeleteCompany(int id)
         {
             var company = await _context.Companies.FindAsync(id);
-            if (company == null)
-                return NotFound(new ApiResponse<string> { Success = false, Message = "Firma wurde nicht gefunden." });
+            if (company is null)
+                return NotFound(ApiResponse<string>.Fail("Firma wurde nicht gefunden."));
 
             _context.Companies.Remove(company);
             await _context.SaveChangesAsync();
 
-            return Ok(new ApiResponse<string> { Success = true, Message = "Firma wurde erfolgreich gelöscht." });
+            return ApiResponse<string>.Ok("Firma wurde erfolgreich gelöscht.");
         }
-    }
 
-    // ✅ Einheitliches API-Antwortmodell
-    public class ApiResponse<T>
-    {
-        public bool Success { get; set; }
-        public string Message { get; set; }
-        public T Data { get; set; }
+        // GET: api/Company/5/Employees
+        [HttpGet("{id:int}/Employees")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<EmployeeDto>>>> GetCompanyEmployees(int id)
+        {
+            var exists = await _context.Companies.AnyAsync(c => c.Id == id);
+            if (!exists)
+                return NotFound(ApiResponse<IEnumerable<EmployeeDto>>.Fail("Firma wurde nicht gefunden."));
+
+            var list = await _context.Employees
+                .Where(e => e.CompanyId == id)
+                .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
+                .Select(e => new EmployeeDto(
+                    e.Id, e.CompanyId,
+                    e.FirstName, e.LastName,
+                    e.Email, e.Position,
+                    e.BirthDate, e.MaritalStatus, e.ChildCount,
+                    e.SalaryType, e.HourlyRate, e.MonthlyHours, e.BruttoSalary,
+                    e.StartDate, e.EndDate, e.Active,
+                    e.AHVNumber, e.Krankenkasse, e.BVGPlan,
+                    e.PensumPercent, e.HolidayRate, e.OvertimeRate, e.WithholdingTaxCode,
+                    e.Address, e.Zip, e.City, e.Phone
+                ))
+                .ToListAsync();
+
+            return ApiResponse<IEnumerable<EmployeeDto>>.Ok(list, "Mitarbeiterliste wurde erfolgreich geladen.");
+        }
     }
 }

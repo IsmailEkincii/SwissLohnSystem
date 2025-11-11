@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SwissLohnSystem.API.Data;
-using SwissLohnSystem.API.Models;
+using SwissLohnSystem.API.DTOs.Admin;
+using SwissLohnSystem.API.Mappings;
+using SwissLohnSystem.API.Responses;
+
+
 
 namespace SwissLohnSystem.API.Controllers
 {
@@ -10,75 +14,89 @@ namespace SwissLohnSystem.API.Controllers
     public class AdminController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
-        public AdminController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        public AdminController(ApplicationDbContext context) => _context = context;
 
         // GET: api/Admin
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Admin>>> GetAdmins()
+        public async Task<ActionResult<ApiResponse<IEnumerable<AdminDto>>>> GetAdmins()
         {
-            return await _context.Admins.ToListAsync();
+            var list = await _context.Admins
+                .AsNoTracking()
+                .OrderBy(a => a.Username)
+                .Select(a => a.ToDto())
+                .ToListAsync();
+
+            return ApiResponse<IEnumerable<AdminDto>>.Ok(list, "Admins erfolgreich geladen.");
         }
 
         // GET: api/Admin/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Admin>> GetAdmin(int id)
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ApiResponse<AdminDto>>> GetAdmin(int id)
         {
-            var admin = await _context.Admins.FindAsync(id);
-            if (admin == null)
-                return NotFound();
+            var admin = await _context.Admins.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+            if (admin is null)
+                return NotFound(ApiResponse<AdminDto>.Fail("Admin wurde nicht gefunden."));
 
-            return admin;
+            return ApiResponse<AdminDto>.Ok(admin.ToDto(), "Admin erfolgreich gefunden.");
         }
 
         // POST: api/Admin
         [HttpPost]
-        public async Task<ActionResult<Admin>> PostAdmin(Admin admin)
+        public async Task<ActionResult<ApiResponse<AdminDto>>> PostAdmin([FromBody] AdminCreateDto dto)
         {
-            _context.Admins.Add(admin);
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse<AdminDto>.Fail("Ungültige Eingabedaten."));
+
+            // (Opsiyonel) aynı kullanıcı adı kontrolü
+            var exists = await _context.Admins.AnyAsync(a => a.Username == dto.Username);
+            if (exists)
+                return BadRequest(ApiResponse<AdminDto>.Fail("Benutzername ist bereits vergeben."));
+
+            var entity = dto.ToEntity();
+            _context.Admins.Add(entity);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetAdmin), new { id = admin.Id }, admin);
+
+            return CreatedAtAction(nameof(GetAdmin), new { id = entity.Id },
+                ApiResponse<AdminDto>.Ok(entity.ToDto(), "Admin wurde erfolgreich erstellt."));
         }
 
         // PUT: api/Admin/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutAdmin(int id, Admin admin)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult<ApiResponse<string>>> PutAdmin(int id, [FromBody] AdminUpdateDto dto)
         {
-            if (id != admin.Id)
-                return BadRequest();
+            if (id != dto.Id)
+                return BadRequest(ApiResponse<string>.Fail("ID stimmt nicht überein."));
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse<string>.Fail("Ungültige Eingabe."));
 
-            _context.Entry(admin).State = EntityState.Modified;
+            var entity = await _context.Admins.FindAsync(id);
+            if (entity is null)
+                return NotFound(ApiResponse<string>.Fail("Admin wurde nicht gefunden."));
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Admins.Any(e => e.Id == id))
-                    return NotFound();
-                else
-                    throw;
-            }
+            // (Opsiyonel) username uniqueness
+            var exists = await _context.Admins
+                .AnyAsync(a => a.Id != id && a.Username == dto.Username);
+            if (exists)
+                return BadRequest(ApiResponse<string>.Fail("Benutzername ist bereits vergeben."));
 
-            return NoContent();
+            entity.Apply(dto);
+            await _context.SaveChangesAsync();
+
+            return ApiResponse<string>.Ok("Admin wurde erfolgreich aktualisiert.");
         }
 
         // DELETE: api/Admin/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAdmin(int id)
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult<ApiResponse<string>>> DeleteAdmin(int id)
         {
-            var admin = await _context.Admins.FindAsync(id);
-            if (admin == null)
-                return NotFound();
+            var entity = await _context.Admins.FindAsync(id);
+            if (entity is null)
+                return NotFound(ApiResponse<string>.Fail("Admin wurde nicht gefunden."));
 
-            _context.Admins.Remove(admin);
+            _context.Admins.Remove(entity);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return ApiResponse<string>.Ok("Admin wurde erfolgreich gelöscht.");
         }
     }
 }

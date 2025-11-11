@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "SwissLohnSystem\\SwissLohnSystem.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "SwissLohnSystem.Web\\SwissLohnSystem.Web.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
