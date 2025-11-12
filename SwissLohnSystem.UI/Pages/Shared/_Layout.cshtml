@@ -14,8 +14,6 @@
     <!-- Toastr -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 
-    <!-- Custom -->
-    <link rel="stylesheet" href="~/css/site.css" />
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -59,9 +57,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="~/Employees" class="nav-link">
-                                <i class="nav-icon fas fa-users"></i>
-                                <p>Mitarbeiter</p>
+                            <a href="~/Lohn" class="nav-link">
+                                <i class="nav-icon fas fa-building"></i>
+                                <p>Lohn</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -94,13 +92,20 @@
             <strong>&copy; 2025 SwissLohnSystem.</strong> Alle Rechte vorbehalten.
         </footer>
     </div>
-
-    <!-- JS (tek sürüm: jQuery + BS4 bundle + AdminLTE) -->
     <script src="~/adminlte/plugins/jquery/jquery.min.js"></script>
     <script src="~/adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/adminlte/js/adminlte.min.js"></script>
+
+    <!-- Toastr (jQuery'den SONRA) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
+    <script>
+        // toastr gerçekten var mı? (ilk load test)
+        // global ayarlar (varsa uygula)
+        if (window.toastr) {
+          toastr.options = { closeButton:true, progressBar:true, positionClass:"toast-top-right", timeOut:"4000" };
+        }
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

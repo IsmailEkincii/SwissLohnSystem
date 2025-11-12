@@ -1,0 +1,69 @@
+﻿@page
+@model SwissLohnSystem.UI.Pages.Settings.IndexModel
+@{
+    ViewData["Title"] = "Einstellungen";
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card card-outline card-primary">
+                    <div class="card-header"><h3 class="card-title">Sozialversicherungen</h3></div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="Save">
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Schlüssel (Name)</th>
+                                        <th>Wert</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var s in Model.Settings)
+                                    {
+                                        <tr>
+                                            <td>@s.Name</td>
+                                            <td>
+                                                <input asp-for="@s.Value" name="Settings[@Model.Settings.IndexOf(s)].Value"
+                                                       class="form-control form-control-sm" />
+                                                <input type="hidden" name="Settings[@Model.Settings.IndexOf(s)].Name" value="@s.Name" />
+                                                <input type="hidden" name="Settings[@Model.Settings.IndexOf(s)].Description" value="@s.Description" />
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-save"></i> Speichern
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          // toastr yüklü mü?
+          if (window.toastr) {
+            toastr.options = { closeButton:true, progressBar:true, positionClass:"toast-top-right", timeOut: "4000" };
+
+            // Örnek TempData mesajları
+            @if (TempData["Toast"] is string ok)
+            {
+                <text> toastr.success('@ok'); </text>
+            }
+            @if (TempData["Error"] is string err)
+            {
+                <text> toastr.error('@err'); </text>
+            }
+          } else {
+            console.warn('toastr not loaded yet');
+          }
+        });
+    </script>
+}

@@ -1,13 +1,28 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SwissLohnSystem.UI.DTOs.Companies;
-
-public class CompanyCreateDto
+namespace SwissLohnSystem.UI.DTOs.Companies
 {
-    [Required] public string Name { get; set; } = null!;
-    [Required] public string Canton { get; set; } = null!;
-    public string? Address { get; set; }
-    public string? Email { get; set; }
-    public string? Phone { get; set; }
-    public string? TaxNumber { get; set; }
+    public class CompanyCreateDto
+    {
+        [Required(ErrorMessage = "Name ist erforderlich.")]
+        [MaxLength(200)]
+        public string Name { get; set; } = null!;
+
+        [Required(ErrorMessage = "Kanton ist erforderlich.")]
+        [MaxLength(10)]
+        public string Canton { get; set; } = null!;
+
+        [MaxLength(300)]
+        public string? Address { get; set; }
+
+        [EmailAddress(ErrorMessage = "Bitte eine gültige E-Mail eingeben.")]
+        [MaxLength(200)]
+        public string? Email { get; set; }
+
+        [MaxLength(50)]
+        public string? Phone { get; set; }
+
+        [MaxLength(100)]
+        public string? TaxNumber { get; set; }
+    }
 }

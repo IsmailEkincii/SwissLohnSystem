@@ -9,7 +9,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Firma: @(Model.Company?.Name ?? "—")</h1>
+                <h1>Firma: @(Model.Vm?.Company?.Name ?? "—")</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -34,7 +34,7 @@
                 <a class="btn btn-outline-secondary btn-sm" href="~/Companies/Edit/@Model.Id">
                     <i class="fas fa-edit"></i> Firma bearbeiten
                 </a>
-                <a class="btn btn-primary btn-sm" href="~/Employees/Create?companyId=@Model.Id">
+                <a class="btn btn-primary btn-sm" href="~/Companies/Employees/Create?companyId=@Model.Id">
                     <i class="fas fa-user-plus"></i> Neue/r Mitarbeiter/in
                 </a>
             </div>
@@ -68,29 +68,29 @@
                     <div class="tab-pane fade show active" id="info" role="tabpanel">
                         <dl class="row">
                             <dt class="col-sm-3">Name</dt>
-                            <dd class="col-sm-9">@Model.Company?.Name</dd>
+                            <dd class="col-sm-9">@Model.Vm?.Company?.Name</dd>
 
                             <dt class="col-sm-3">Kanton</dt>
-                            <dd class="col-sm-9">@Model.Company?.Canton</dd>
+                            <dd class="col-sm-9">@Model.Vm?.Company?.Canton</dd>
 
                             <dt class="col-sm-3">Adresse</dt>
-                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Company?.Address) ? Model.Company!.Address : "—")</dd>
+                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Address) ? Model.Vm!.Company!.Address : "—")</dd>
 
                             <dt class="col-sm-3">E-Mail</dt>
-                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Company?.Email) ? Model.Company!.Email : "—")</dd>
+                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Email) ? Model.Vm!.Company!.Email : "—")</dd>
 
                             <dt class="col-sm-3">Telefon</dt>
-                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Company?.Phone) ? Model.Company!.Phone : "—")</dd>
+                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Phone) ? Model.Vm!.Company!.Phone : "—")</dd>
 
                             <dt class="col-sm-3">Steuernummer</dt>
-                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Company?.TaxNumber) ? Model.Company!.TaxNumber : "—")</dd>
+                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.TaxNumber) ? Model.Vm!.Company!.TaxNumber : "—")</dd>
                         </dl>
                     </div>
 
                     <!-- Mitarbeiter -->
                     <div class="tab-pane fade" id="mitarbeiter" role="tabpanel">
                         <div class="mb-2">
-                            <a class="btn btn-primary btn-sm" href="~/Employees/Create?companyId=@Model.Id">
+                            <a class="btn btn-primary btn-sm" href="~/Companies/Employees/Create?companyId=@Model.Id">
                                 <i class="fas fa-user-plus"></i> Mitarbeiter hinzufügen
                             </a>
                         </div>
@@ -108,10 +108,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (Model.Employees?.Any() == true)
+                                    @if (Model.Vm?.Employees is { } emps && emps.Any())
                                     {
                                         var i = 1;
-                                        foreach (var e in Model.Employees)
+                                        foreach (var e in emps)
                                         {
                                             <tr>
                                                 <td>@i</td>
@@ -125,6 +125,7 @@
                                                     }
                                                     else
                                                     {
+
                                                         <span class="badge badge-secondary">Inaktiv</span>
                                                     }
                                                 </td>
@@ -153,51 +154,77 @@
 
                     <!-- Löhne -->
                     <div class="tab-pane fade" id="loehne" role="tabpanel">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th style="width:60px;">#</th>
-                                        <th>Monat/Jahr</th>
-                                        <th>Brutto</th>
-                                        <th>Abzüge</th>
-                                        <th>Netto</th>
-                                        <th>Überstunden</th>
-                                        <th>Ferien</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (Model.Lohns?.Any() == true)
-                                    {
-                                        var i = 1;
-                                        foreach (var l in Model.Lohns)
-                                        {
-                                            <tr>
-                                                <td>@i</td>
-                                                <td>@l.Month.@l.Year</td>
-                                                <td>@l.BruttoSalary.ToString("N2")</td>
-                                                <td>@l.TotalDeductions.ToString("N2")</td>
-                                                <td><strong>@l.NetSalary.ToString("N2")</strong></td>
-                                                <td>@l.OvertimePay.ToString("N2")</td>
-                                                <td>@l.HolidayAllowance.ToString("N2")</td>
-                                            </tr>
-                                            i++;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted p-4">Keine Löhne gefunden.</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                        <!-- JS için fallback: data-company-id -->
+                        <div id="loehneRoot" data-company-id="@Model.Id"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label for="period" class="mb-1">Monat (YYYY-MM)</label>
+                                <input id="period" type="month" class="form-control" />
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button id="btnLoadLohns" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i> Laden
+                                </button>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end justify-content-end">
+                                <button id="btnOpenCalcModal" class="btn btn-success" type="button" data-toggle="modal" data-target="#calcModal">
+                                    <i class="fas fa-calculator"></i> Lohn berechnen
+                                </button>
+                            </div>
                         </div>
 
+                        <div class="card">
+                            <div class="card-body table-responsive p-0">
+                                <table class="table table-hover" id="tblLohnMonthly">
+                                    <thead>
+                                        <tr>
+                                            <th>Mitarbeiter</th>
+                                            <th>Monat</th>
+                                            <th>Brutto</th>
+                                            <th>Netto</th>
+                                            <th>Status</th>
+                                            <th>Aktionen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody><!-- rows via JS --></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Lohn berechnen modal -->
+                        <div class="modal fade" id="calcModal" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog modal-md" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Lohn berechnen</h5>
+                                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="calcForm">
+                                            <div class="form-group">
+                                                <label for="employeeId">Mitarbeiter</label>
+                                                <select id="employeeId" class="form-control"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="calcMonth">Monat</label>
+                                                <input id="calcMonth" type="month" class="form-control" />
+                                            </div>
+                                        </form>
+                                        <small class="text-muted">Bestehende Entwürfe werden aktualisiert; finale Löhne bleiben unverändert.</small>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" data-dismiss="modal">Schließen</button>
+                                        <button id="btnDoCalc" class="btn btn-primary" type="button"><i class="fas fa-play"></i> Berechnen</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+@* 
                         <p class="text-muted small mb-0">
                             Hinweis: Diese Liste filtert alle Löhne anhand der Mitarbeiter dieser Firma.
-                            Für serverseitiges Filtern empfiehlt sich ein Endpoint wie <code>/api/Lohn/by-company/{companyId}</code>.
-                        </p>
+                            Für serverseitiges Filtern empfiehlt sich ein Endpoint wie <code>/api/Lohn/by-company/@Model.Id</code>.
+                        </p> *@
                     </div>
 
                     <!-- Dateien & Notizen -->
@@ -256,20 +283,21 @@
 
 @section Scripts {
     <script>
+        // JS için Company Id (loehne-tab.js'den ÖNCE!)
+        window.COMPANY_ID = @Model.Id;
+    </script>
+
+    <script>
         (function () {
-            // Hash ile açılışta doğru sekmeyi göster
             function showTabByEl(el) {
                 if (!el) return;
                 if (typeof $ !== 'undefined' && $.fn && $.fn.tab) { $(el).tab('show'); return; }
                 if (window.bootstrap && bootstrap.Tab) { new bootstrap.Tab(el).show(); return; }
             }
-
             if (window.location.hash) {
                 var sel = 'a[data-bs-toggle="tab"][href="' + window.location.hash + '"], a[data-toggle="tab"][href="' + window.location.hash + '"]';
                 showTabByEl(document.querySelector(sel));
             }
-
-            // Tıklamada URL hash'ini güncelle (BS4 jQuery)
             if (typeof $ !== 'undefined' && $.fn && $.fn.tab) {
                 $('a[data-toggle="tab"], a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
                     var href = e.target.getAttribute('href');
@@ -278,4 +306,6 @@
             }
         })();
     </script>
+
+    <script src="~/js/loehne-tab.js"></script>
 }

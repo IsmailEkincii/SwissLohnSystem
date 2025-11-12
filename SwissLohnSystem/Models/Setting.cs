@@ -4,12 +4,14 @@ namespace SwissLohnSystem.API.Models
 {
     public class Setting
     {
-        [Key]
         public int Id { get; set; }
-        [Required]
-        public string Name { get; set; }
-        [Required]
+
+        [Required, MaxLength(100)] // 👈 ekledik
+        public string Name { get; set; } = string.Empty;
+
         public decimal Value { get; set; }
-        public string Description { get; set; }
+
+        [MaxLength(255)]
+        public string? Description { get; set; }
     }
 }

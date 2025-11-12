@@ -28,6 +28,7 @@ namespace SwissLohnSystem.API.Data
                 .WithMany(c => c.Employees)
                 .HasForeignKey(e => e.CompanyId)
                 .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

@@ -1,22 +1,24 @@
 ﻿using SwissLohnSystem.API.DTOs.Lohn;
 using SwissLohnSystem.API.Models;
 
-namespace SwissLohnSystem.API.Mappings;
-
-public static class LohnMapping
+namespace SwissLohnSystem.API.Mappings
 {
-    public static LohnDto ToDto(this Lohn l) =>
-        new(
-            l.Id,
-            l.EmployeeId,
-            l.Month,
-            l.Year,
-            l.BruttoSalary,
-            l.TotalDeductions,
-            l.NetSalary,
-            l.ChildAllowance,
-            l.HolidayAllowance,
-            l.OvertimePay,
-            l.CreatedAt
-        );
+    public static class LohnMappings
+    {
+        public static LohnDto ToDto(this Lohn l) =>
+            new LohnDto(
+                l.Id,
+                l.EmployeeId,
+                l.Month,
+                l.Year,
+                l.BruttoSalary,
+                l.TotalDeductions,
+                l.NetSalary,
+                l.ChildAllowance,
+                l.HolidayAllowance,
+                l.OvertimePay,
+                l.CreatedAt,
+                l.IsFinal
+            );
+    }
 }

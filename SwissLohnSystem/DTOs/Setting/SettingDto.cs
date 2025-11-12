@@ -1,8 +1,9 @@
 ﻿namespace SwissLohnSystem.API.DTOs.Setting;
 
-public record SettingDto(
-    int Id,
-    string Name,
-    decimal Value,
-    string? Description
-);
+public sealed class SettingDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public decimal Value { get; set; }
+    public string? Description { get; set; }
+}

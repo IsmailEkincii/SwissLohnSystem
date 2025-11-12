@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SwissLohnSystem.API.DTOs.Employees;
-
-public class EmployeeUpdateDto : EmployeeCreateDto
+namespace SwissLohnSystem.API.DTOs.Employees
 {
-    [Required] public int Id { get; set; }
+    public class EmployeeUpdateDto : EmployeeCreateDto
+    {
+        [Required] public int Id { get; set; }
+    }
 }

@@ -1,81 +1,54 @@
-using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Net.Http.Json;
-using System.Linq;
-using SwissLohnSystem.UI.DTOs.Companies;   // CompanyDto
-using SwissLohnSystem.UI.DTOs.Employees;  // EmployeeDto (full)
-using SwissLohnSystem.UI.DTOs.Lohn;       // LohnDto  (UI'de yoksa ekle)
-using SwissLohnSystem.UI.Responses;       // ApiResponse<T>
+using SwissLohnSystem.UI.DTOs.Companies;
+using SwissLohnSystem.UI.DTOs.Employees;
+using SwissLohnSystem.UI.DTOs.Lohn;
+using SwissLohnSystem.UI.Services;
+using SwissLohnSystem.UI.Services.Mapping;
 
 namespace SwissLohnSystem.UI.Pages.Companies
 {
     public class DetailsModel : PageModel
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        public DetailsModel(IHttpClientFactory httpClientFactory) => _httpClientFactory = httpClientFactory;
+        private readonly ApiClient _api;
+        public DetailsModel(ApiClient api) => _api = api;
 
-        [BindProperty(SupportsGet = true)]
         public int Id { get; set; }
+        public CompanyDetailsDto Vm { get; set; } = new();
 
-        public CompanyDto? Company { get; private set; }
-        public List<EmployeeDto> Employees { get; private set; } = new();
-        public List<LohnDto> Lohns { get; private set; } = new();
-
-        [TempData] public string? Toast { get; set; }
-        [TempData] public string? Alert { get; set; }
-        [TempData] public string? Error { get; set; }
-
-        public async Task<IActionResult> OnGetAsync()
+        public async Task OnGetAsync(int id)
         {
-            if (Id <= 0)
+            Id = id;
+
+            var companyRes = await _api.GetAsync<CompanyDto>($"/api/Company/{id}");
+            var employeesRes = await _api.GetAsync<IEnumerable<EmployeeDto>>($"/api/Company/{id}/Employees");
+
+            if (!companyRes.ok || companyRes.data is null)
             {
-                TempData["Error"] = "Ungültige Firmen-ID.";
-                return RedirectToPage("/Companies/Index");
+                ViewData["Error"] = companyRes.message ?? "Firma konnte nicht geladen werden.";
+                Vm = new CompanyDetailsDto();
+                return;
             }
 
-            var api = _httpClientFactory.CreateClient("ApiClient");
+            var company = companyRes.data;
+            var employees = employeesRes.ok && employeesRes.data is not null
+                ? employeesRes.data
+                : Array.Empty<EmployeeDto>();
 
-            // 1) Firma
-            var companyResp = await api.GetFromJsonAsync<ApiResponse<CompanyDto>>($"/api/Company/{Id}");
-            if (companyResp is null || !companyResp.Success || companyResp.Data is null)
-            {
-                TempData["Error"] = companyResp?.Message ?? "Firma wurde nicht gefunden.";
-                return RedirectToPage("/Companies/Index");
-            }
-            Company = companyResp.Data;
+            Vm = ApiToUiMapper.BuildDetails(company!, employees!);
+        }
 
-            // 2) Mitarbeiter (firma bazlý)
-            try
-            {
-                var empResp = await api.GetFromJsonAsync<ApiResponse<IEnumerable<EmployeeDto>>>($"/api/Company/{Id}/Employees");
-                if (empResp?.Success == true && empResp.Data is not null)
-                    Employees = empResp.Data.ToList();
-            }
-            catch
-            {
-                Employees = new();
-            }
+        // (Opsiyonel) Server-side Löhne yükleme örneði:
+        public async Task<IEnumerable<LohnMonthlyRowDto>> LoadMonthlyAsync(int companyId, string period)
+        {
+            var loehneRes = await _api.GetAsync<IEnumerable<LohnDto>>($"/api/Lohn/by-company/{companyId}/monthly?period={period}");
+            var employeesRes = await _api.GetAsync<IEnumerable<EmployeeDto>>($"/api/Company/{companyId}/Employees");
+            if (!loehneRes.ok || !employeesRes.ok || loehneRes.data is null || employeesRes.data is null)
+                return Array.Empty<LohnMonthlyRowDto>();
 
-            // 3) Löhne (geçici: tüm Lohnlarý çek, çalýþan Id’lerine göre filtrele)
-            try
-            {
-                // ÝLERÝDE: /api/Lohn/by-company/{Id} yazarsak doðrudan bu çaðrýyý kullanýrýz.
-                var lohnResp = await api.GetFromJsonAsync<ApiResponse<IEnumerable<LohnDto>>>("/api/Lohn");
-                if (lohnResp?.Success == true && lohnResp.Data is not null && Employees.Count > 0)
-                {
-                    var empIds = Employees.Select(e => e.Id).ToHashSet();
-                    Lohns = lohnResp.Data
-                        .Where(l => empIds.Contains(l.EmployeeId))
-                        .OrderByDescending(l => l.Year).ThenByDescending(l => l.Month)
-                        .ToList();
-                }
-            }
-            catch
-            {
-                Lohns = new();
-            }
-
-            return Page();
+            return ApiToUiMapper.ToMonthlyRows(loehneRes.data, employeesRes.data);
         }
     }
 }

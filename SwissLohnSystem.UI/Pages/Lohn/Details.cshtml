@@ -1,0 +1,153 @@
+﻿@page "{id:int}"
+@model SwissLohnSystem.UI.Pages.Lohn.DetailsModel
+@{
+    ViewData["Title"] = "Lohndetails";
+    Layout = "_Layout";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Lohndetails <small class="text-muted">#@Model.Id</small></h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="~/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="~/Companies">Firmen</a></li>
+                    <li id="bc-company" class="breadcrumb-item">Firma</li>
+                    <li class="breadcrumb-item active">Lohndetails</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between mb-2">
+            <a id="btnBackToCompany" class="btn btn-secondary btn-sm" href="~/Companies">
+                <i class="fas fa-arrow-left"></i> Zurück zur Firma
+            </a>
+
+            <div>
+                <button id="btnFinalize" class="btn btn-success btn-sm d-none">
+                    <i class="fas fa-lock"></i> Finalisieren
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Sol sütun: Genel bilgiler -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Allgemein</h3>
+                        <div class="card-tools">
+                            <span id="badgeStatus" class="badge">—</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-5">Mitarbeiter</dt>
+                            <dd class="col-7" id="employeeName">—</dd>
+
+                            <dt class="col-5">Firma</dt>
+                            <dd class="col-7" id="companyName">—</dd>
+
+                            <dt class="col-5">Monat</dt>
+                            <dd class="col-7" id="period">—</dd>
+
+                            <dt class="col-5">Erstellt am</dt>
+                            <dd class="col-7" id="createdAt">—</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Zusätze</h3></div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Überstunden</span>
+                            <strong id="overtimePay">—</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Ferienentschädigung</span>
+                            <strong id="holidayAllowance">—</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Kinderzulagen</span>
+                            <strong id="childAllowance">—</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ sütun: Finansal özet -->
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3 id="bruttoSalary">—</h3>
+                                <p>Brutto</p>
+                            </div>
+                            <div class="icon"><i class="fas fa-coins"></i></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3 id="totalDeductions">—</h3>
+                                <p>Abzüge (Total)</p>
+                            </div>
+                            <div class="icon"><i class="fas fa-minus-circle"></i></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3 id="netSalary">—</h3>
+                                <p>Netto</p>
+                            </div>
+                            <div class="icon"><i class="fas fa-wallet"></i></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kalemler (ileride ayrıntı için) -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Kalemler</h3>
+                        <div class="card-tools">
+                            <span class="text-muted">Not: Şimdilik özet kalemler gösteriliyor.</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kalem</th>
+                                    <th class="text-right">Tutar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsBody">
+                                <!-- Dinamik olarak dolar -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        window.LOHN_ID = @Model.Id;
+    </script>
+    <script src="~/js/lohn-details.js"></script>
+}

@@ -1,16 +1,18 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Net.Http.Json;
-using SwissLohnSystem.UI.DTOs.Companies;   // ? CompanyDto
-using SwissLohnSystem.UI.Responses;        // ? ApiResponse<T>
+using SwissLohnSystem.UI.DTOs.Companies;
+using SwissLohnSystem.UI.Services;
 
 namespace SwissLohnSystem.UI.Pages.Companies
 {
     public class CreateModel : PageModel
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        public CreateModel(IHttpClientFactory httpClientFactory) => _httpClientFactory = httpClientFactory;
+        private readonly ApiClient _api;
+        public CreateModel(ApiClient api) => _api = api;
 
         // Ýsviçre kanton kýsaltmalarý
         public IReadOnlyList<string> Cantons { get; } = new[]
@@ -28,8 +30,6 @@ namespace SwissLohnSystem.UI.Pages.Companies
         {
             if (!ModelState.IsValid) return Page();
 
-            var api = _httpClientFactory.CreateClient("ApiClient");
-
             var body = new CompanyCreateDto
             {
                 Name = Input.Name!.Trim(),
@@ -43,21 +43,15 @@ namespace SwissLohnSystem.UI.Pages.Companies
             try
             {
                 // API: POST /api/Company -> ApiResponse<CompanyDto>
-                var res = await api.PostAsJsonAsync("/api/Company", body);
+                var (ok, data, message) = await _api.PostAsync<CompanyDto>("/api/Company", body);
 
-                ApiResponse<CompanyDto>? payload = null;
-                string? raw = null;
-                try { payload = await res.Content.ReadFromJsonAsync<ApiResponse<CompanyDto>>(); }
-                catch { raw = await res.Content.ReadAsStringAsync(); }
-
-                if (res.IsSuccessStatusCode && payload?.Success == true && payload.Data is not null)
+                if (ok && data is not null)
                 {
-                    TempData["Alert"] = payload.Message ?? "Firma wurde erfolgreich hinzugefügt.";
-                    return RedirectToPage("/Companies/Details", new { id = payload.Data.Id });
+                    TempData["Toast"] = message ?? "Firma wurde erfolgreich hinzugefügt.";
+                    return RedirectToPage("/Companies/Details", new { id = data.Id });
                 }
 
-                var err = payload?.Message ?? raw ?? "Unbekannter Fehler.";
-                TempData["Error"] = $"Speichern fehlgeschlagen: {err}";
+                TempData["Error"] = message ?? "Speichern fehlgeschlagen.";
                 return Page();
             }
             catch (Exception ex)

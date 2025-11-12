@@ -1,15 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using SwissLohnSystem.API.Data;
-using SwissLohnSystem.API.DTOs.Employees;   // EmployeeDto, EmployeeCreateDto, EmployeeUpdateDto
-using SwissLohnSystem.API.Mapping;
-using SwissLohnSystem.API.Mappings;         // EmployeeMapping (ToDto/ToEntity/Apply)
-using SwissLohnSystem.API.Responses;        // ApiResponse<T>
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SwissLohnSystem.API.Data;
+using SwissLohnSystem.API.DTOs.Employees;
+using SwissLohnSystem.API.Mappings;   // EmployeeMappings
+using SwissLohnSystem.API.Responses;
 
 namespace SwissLohnSystem.API.Controllers
 {
@@ -61,7 +60,7 @@ namespace SwissLohnSystem.API.Controllers
                 return BadRequest(ApiResponse<EmployeeDto>.Fail("Ungültige Eingabedaten."));
 
             // Firma var mı?
-            var companyExists = await _context.Companies.AnyAsync(c => c.Id == dto.CompanyId);
+            var companyExists = await _context.Companies.AsNoTracking().AnyAsync(c => c.Id == dto.CompanyId);
             if (!companyExists)
                 return BadRequest(ApiResponse<EmployeeDto>.Fail("Ungültige Firmen-ID (CompanyId)."));
 
@@ -127,7 +126,7 @@ namespace SwissLohnSystem.API.Controllers
                 return BadRequest(ApiResponse<string>.Fail("Enddatum darf nicht vor dem Startdatum liegen."));
 
             // Firma var mı? (Company değişmiş olabilir)
-            var companyExists = await _context.Companies.AnyAsync(c => c.Id == dto.CompanyId);
+            var companyExists = await _context.Companies.AsNoTracking().AnyAsync(c => c.Id == dto.CompanyId);
             if (!companyExists)
                 return BadRequest(ApiResponse<string>.Fail("Ungültige Firmen-ID (CompanyId)."));
 
@@ -147,10 +146,10 @@ namespace SwissLohnSystem.API.Controllers
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                if (!await _context.Employees.AnyAsync(e => e.Id == id))
+                if (!await _context.Employees.AsNoTracking().AnyAsync(e => e.Id == id))
                     return NotFound(ApiResponse<string>.Fail("Mitarbeiter wurde nicht gefunden."));
 
-                _logger.LogError(ex, "Fehler beim Aktualisieren des Mitarbeiters.");
+                _logger.LogError(ex, "Fehler beim Aktualisieren des Mitarbeiters (Id={EmployeeId}).", id);
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ApiResponse<string>.Fail("Interner Fehler beim Aktualisieren."));
             }

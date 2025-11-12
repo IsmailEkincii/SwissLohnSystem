@@ -44,7 +44,15 @@
 
                         <div class="form-group col-md-6">
                             <label asp-for="Input.Canton">Kanton</label>
-                            <input asp-for="Input.Canton" class="form-control" />
+                            <select asp-for="Input.Canton" class="form-control">
+                                <option value="">-- bitte wählen --</option>
+                                @foreach (var k in Model.Cantons)
+                                {
+                                    <option value="@k" selected="@(Model.Input.Canton == k)">
+                                        @k
+                                    </option>
+                                }
+                            </select>
                             <span asp-validation-for="Input.Canton" class="text-danger"></span>
                         </div>
                     </div>

@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SwissLohnSystem.API.Data;
 using SwissLohnSystem.API.DTOs.Companies;   // CompanyDto, CompanyCreateDto, CompanyUpdateDto
-using SwissLohnSystem.API.DTOs.Employees;  // EmployeeDto
-using SwissLohnSystem.API.Mapping;
-using SwissLohnSystem.API.Mappings;        // CompanyMapping (ToDto/ToEntity/Apply)
+using SwissLohnSystem.API.DTOs.Employees;   // EmployeeDto
+using SwissLohnSystem.API.Mappings;         // CompanyMappings
 using SwissLohnSystem.API.Models;
-using SwissLohnSystem.API.Responses;       // ApiResponse<T>
-using System.Collections.Generic;
-using System.Linq;
+using SwissLohnSystem.API.Responses;
 
 namespace SwissLohnSystem.API.Controllers
 {
@@ -31,8 +31,9 @@ namespace SwissLohnSystem.API.Controllers
         public async Task<ActionResult<ApiResponse<IEnumerable<CompanyDto>>>> GetCompanies()
         {
             var companies = await _context.Companies
+                .AsNoTracking()
                 .OrderBy(c => c.Name)
-                .Select(c => c.ToDto()) // ✅ Mapping extension
+                .Select(c => c.ToDto())
                 .ToListAsync();
 
             return ApiResponse<IEnumerable<CompanyDto>>.Ok(companies, "Firmenliste wurde erfolgreich geladen.");
@@ -42,7 +43,10 @@ namespace SwissLohnSystem.API.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ApiResponse<CompanyDto>>> GetCompany(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _context.Companies
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (company is null)
                 return NotFound(ApiResponse<CompanyDto>.Fail("Firma wurde nicht gefunden."));
 
@@ -56,7 +60,7 @@ namespace SwissLohnSystem.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ApiResponse<CompanyDto>.Fail("Ungültige Daten wurden gesendet."));
 
-            var entity = dto.ToEntity(); // ✅ Mapping extension
+            var entity = dto.ToEntity();
             _context.Companies.Add(entity);
             await _context.SaveChangesAsync();
 
@@ -77,7 +81,7 @@ namespace SwissLohnSystem.API.Controllers
             if (entity is null)
                 return NotFound(ApiResponse<string>.Fail("Firma wurde nicht gefunden."));
 
-            entity.Apply(dto); // ✅ Mapping extension
+            entity.Apply(dto);
 
             try
             {
@@ -85,7 +89,7 @@ namespace SwissLohnSystem.API.Controllers
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                _logger.LogError(ex, "Fehler beim Aktualisieren der Firma.");
+                _logger.LogError(ex, "Fehler beim Aktualisieren der Firma (Id={CompanyId}).", id);
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ApiResponse<string>.Fail("Interner Fehler beim Aktualisieren."));
             }
@@ -111,11 +115,13 @@ namespace SwissLohnSystem.API.Controllers
         [HttpGet("{id:int}/Employees")]
         public async Task<ActionResult<ApiResponse<IEnumerable<EmployeeDto>>>> GetCompanyEmployees(int id)
         {
-            var exists = await _context.Companies.AnyAsync(c => c.Id == id);
+            var exists = await _context.Companies.AsNoTracking().AnyAsync(c => c.Id == id);
             if (!exists)
                 return NotFound(ApiResponse<IEnumerable<EmployeeDto>>.Fail("Firma wurde nicht gefunden."));
 
+            // EmployeeDto mapping'ini projenizde zaten inline kurmuşsunuz; onu koruyorum.
             var list = await _context.Employees
+                .AsNoTracking()
                 .Where(e => e.CompanyId == id)
                 .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
                 .Select(e => new EmployeeDto(

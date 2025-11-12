@@ -1,0 +1,168 @@
+﻿@page "{id:int}"
+@model SwissLohnSystem.UI.Pages.Employees.DetailsModel
+@{
+    ViewData["Title"] = "Mitarbeiterdetails";
+    Layout = "_Layout";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Mitarbeiter: @(Model.Employee?.FirstName) @(Model.Employee?.LastName)</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="~/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="~/Companies">Firmen</a></li>
+                    <li class="breadcrumb-item">
+                        <a href="~/Companies/Details/@Model.Employee?.CompanyId">@Model.Company?.Name</a>
+                    </li>
+                    <li class="breadcrumb-item active">Mitarbeiter</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        @if (!string.IsNullOrWhiteSpace(Model.LoadError))
+        {
+            <div class="alert alert-danger">@Model.LoadError</div>
+        }
+
+        <div class="row">
+            <!-- Profil -->
+            <div class="col-md-4">
+                <div class="card card-outline card-primary">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">Profil</h3>
+                        <a class="btn btn-sm btn-outline-secondary" href="~/Employees/Edit/@Model.Employee?.Id">
+                            <i class="fas fa-edit"></i> Bearbeiten
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-5">Name</dt>
+                            <dd class="col-7">@Model.Employee?.FirstName @Model.Employee?.LastName</dd>
+
+                            <dt class="col-5">Firma</dt>
+                            <dd class="col-7">@Model.Company?.Name (@Model.Company?.Canton)</dd>
+
+                            <dt class="col-5">E-Mail</dt>
+                            <dd class="col-7">
+                                @if (!string.IsNullOrWhiteSpace(Model.Employee?.Email))
+                                {
+                                    <a href="mailto:@Model.Employee!.Email">@Model.Employee!.Email</a>
+                                }
+                                else
+                                {
+                                    @:—
+                                }
+                            </dd>
+
+                            <dt class="col-5">Position</dt>
+                            <dd class="col-7">@((!string.IsNullOrWhiteSpace(Model.Employee?.Position)) ? Model.Employee!.Position : "—")</dd>
+
+                            <dt class="col-5">Geburtsdatum</dt>
+                            <dd class="col-7">@((Model.Employee?.BirthDate.HasValue == true) ? Model.Employee!.BirthDate!.Value.ToString("dd.MM.yyyy") : "—")</dd>
+
+                            <dt class="col-5">Familienstand</dt>
+                            <dd class="col-7">@((!string.IsNullOrWhiteSpace(Model.Employee?.MaritalStatus)) ? Model.Employee!.MaritalStatus : "—")</dd>
+
+                            <dt class="col-5">Kinder</dt>
+                            <dd class="col-7">@Model.Employee?.ChildCount</dd>
+
+                            <dt class="col-5">Krankenkasse</dt>
+                            <dd class="col-7">@Model.Employee?.Krankenkasse</dd>
+
+                            <dt class="col-5">Status</dt>
+                            <dd class="col-7">
+                                @if (Model.Employee?.Active == true)
+                                {
+                                    <span class="badge badge-success">Aktiv</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge badge-secondary">Inaktiv</span>
+                                }
+                            </dd>
+
+                            <dt class="col-5">Start</dt>
+                            <dd class="col-7">@Model.Employee?.StartDate.ToString("dd.MM.yyyy")</dd>
+
+                            <dt class="col-5">Ende</dt>
+                            <dd class="col-7">@((Model.Employee?.EndDate.HasValue == true) ? Model.Employee!.EndDate!.Value.ToString("dd.MM.yyyy") : "—")</dd>
+
+                            <dt class="col-5">Gehaltsart</dt>
+                            <dd class="col-7">@(((Model.Employee?.SalaryType == "Hourly") ? "Stundenlohn" : "Monatslohn"))</dd>
+
+                            <dt class="col-5">Bruttolohn (Monat)</dt>
+                            <dd class="col-7">@Model.Employee?.BruttoSalary.ToString("N2")</dd>
+
+                            <dt class="col-5">Stundenlohn</dt>
+                            <dd class="col-7">@Model.Employee?.HourlyRate.ToString("N2")</dd>
+
+                            <dt class="col-5">Monatsstunden</dt>
+                            <dd class="col-7">@Model.Employee?.MonthlyHours</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lohnverlauf -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">Lohnverlauf</h3>
+                        <div>
+                            <a class="btn btn-sm btn-outline-primary" href="~/Companies/Details/@Model.Employee?.CompanyId#loehne">
+                                <i class="fas fa-calculator"></i> Lohn berechnen
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width:110px;">Monat/Jahr</th>
+                                    <th>Brutto</th>
+                                    <th>Abzüge</th>
+                                    <th>Netto</th>
+                                    <th>Überstunden</th>
+                                    <th>Ferien</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.LohnList is { } ll && ll.Any())
+                                {
+                                    foreach (var l in ll)
+                                    {
+                                        <tr>
+                                            <td>@l.Month.@l.Year</td>
+                                            <td>@l.BruttoSalary.ToString("N2")</td>
+                                            <td>@l.TotalDeductions.ToString("N2")</td>
+                                            <td><strong>@l.NetSalary.ToString("N2")</strong></td>
+                                            <td>@l.OvertimePay.ToString("N2")</td>
+                                            <td>@l.HolidayAllowance.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted p-4">Keine Lohnabrechnungen vorhanden.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SwissLohnSystem.API.Models
 {
@@ -6,17 +7,14 @@ namespace SwissLohnSystem.API.Models
     {
         [Key] public int Id { get; set; }
 
-        [Required] public string Name { get; set; }
+        [Required] public string Name { get; set; } = null!;
+        [Required] public string Canton { get; set; } = null!;
 
-        public string Address { get; set; }
+        public string? Address { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
+        public string? TaxNumber { get; set; }
 
-        [Required] public string Canton { get; set; }
-
-        public string Email { get; set; }
-        public string Phone { get; set; }
-        public string TaxNumber { get; set; }
-
-        // DÜZELTİLDİ: doğru navigation
-        public ICollection<Employee> Employees { get; set; } = new List<Employee>(); // ✔ doğru navigation
+        public ICollection<Employee> Employees { get; set; } = new List<Employee>();
     }
 }
