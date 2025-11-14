@@ -49,6 +49,7 @@
 
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
+                    <!-- Basisdaten -->
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label asp-for="Input.FirstName">Vorname</label>
@@ -97,6 +98,10 @@
                         </div>
                     </div>
 
+                    <!-- Gehaltsart -->
+                    <hr />
+                    <h5>Gehaltsart & Grundlohn</h5>
+
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label asp-for="Input.SalaryTypeOption">Gehaltsart</label>
@@ -137,7 +142,189 @@
                         </div>
                     </div>
 
-                    <div class="form-group form-check">
+                    <!-- Arbeitszeit & Lohnparameter -->
+                    <hr />
+                    <h5>Arbeitszeit & Lohnparameter</h5>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.WeeklyHours">Wochenstunden</label>
+                            <input asp-for="Input.WeeklyHours" type="number" min="0" max="80" class="form-control" />
+                            <span asp-validation-for="Input.WeeklyHours" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.PensumPercent">Pensum %</label>
+                            <input asp-for="Input.PensumPercent" type="number" step="0.01" min="0" max="100" class="form-control" />
+                            <span asp-validation-for="Input.PensumPercent" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.HolidayRate">Ferienentschädigung %</label>
+                            <input asp-for="Input.HolidayRate" type="number" step="0.01" min="0" max="100" class="form-control" />
+                            <span asp-validation-for="Input.HolidayRate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.OvertimeRate">Überstundenzuschlag Faktor</label>
+                            <input asp-for="Input.OvertimeRate" type="number" step="0.01" min="0" max="10" class="form-control" />
+                            <span asp-validation-for="Input.OvertimeRate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <div class="form-check">
+                                <input asp-for="Input.HolidayEligible" class="form-check-input" />
+                                <label asp-for="Input.HolidayEligible" class="form-check-label">Ferienanspruch (ausbezahlt / berechnet)</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <div class="form-check">
+                                <input asp-for="Input.ThirteenthEligible" class="form-check-input" />
+                                <label asp-for="Input.ThirteenthEligible" class="form-check-label">13. Monatslohn</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <div class="form-check">
+                                <input asp-for="Input.ThirteenthProrated" class="form-check-input" />
+                                <label asp-for="Input.ThirteenthProrated" class="form-check-label">13. Lohn pro rata verteilen</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sozialversicherungen -->
+                    <hr />
+                    <h5>Sozialversicherungen (AN/AG Beiträge anwenden)</h5>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input asp-for="Input.ApplyAHV" class="form-check-input" />
+                                <label asp-for="Input.ApplyAHV" class="form-check-label">AHV/IV/EO</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input asp-for="Input.ApplyALV" class="form-check-input" />
+                                <label asp-for="Input.ApplyALV" class="form-check-label">ALV</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input asp-for="Input.ApplyBVG" class="form-check-input" />
+                                <label asp-for="Input.ApplyBVG" class="form-check-label">BVG</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input asp-for="Input.ApplyNBU" class="form-check-input" />
+                                <label asp-for="Input.ApplyNBU" class="form-check-label">NBU</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input asp-for="Input.ApplyBU" class="form-check-input" />
+                                <label asp-for="Input.ApplyBU" class="form-check-label">BU</label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <div class="form-check">
+                                <input asp-for="Input.ApplyFAK" class="form-check-input" />
+                                <label asp-for="Input.ApplyFAK" class="form-check-label">FAK</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quellensteuer & Kanton -->
+                    <hr />
+                    <h5>Quellensteuer & Kanton</h5>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.PermitType">Bewilligung</label>
+                            <select asp-for="Input.PermitType" class="form-control">
+                                <option value="">-- bitte wählen --</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="L">L</option>
+                                <option value="F">F</option>
+                                <option value="N">N</option>
+                            </select>
+                            <span asp-validation-for="Input.PermitType" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.Canton">Kanton</label>
+                            <input asp-for="Input.Canton" class="form-control" maxlength="2" />
+                            <span asp-validation-for="Input.Canton" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.WithholdingTaxCode">Quellensteuer-Tarif</label>
+                            <input asp-for="Input.WithholdingTaxCode" class="form-control" />
+                            <span asp-validation-for="Input.WithholdingTaxCode" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <div class="form-check mt-4">
+                                <input asp-for="Input.ApplyQST" class="form-check-input" />
+                                <label asp-for="Input.ApplyQST" class="form-check-label">Quellensteuer anwenden</label>
+                            </div>
+                            <div class="form-check mt-1">
+                                <input asp-for="Input.ChurchMember" class="form-check-input" />
+                                <label asp-for="Input.ChurchMember" class="form-check-label">Kirchensteuerpflichtig</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AHV / Krankenkasse / BVG Plan -->
+                    <hr />
+                    <h5>Sozialversicherung & Vorsorge</h5>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label asp-for="Input.AHVNumber">AHV-Nummer</label>
+                            <input asp-for="Input.AHVNumber" class="form-control" placeholder="756.1234.5678.97" />
+                            <span asp-validation-for="Input.AHVNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="Input.Krankenkasse">Krankenkasse</label>
+                            <input asp-for="Input.Krankenkasse" class="form-control" />
+                            <span asp-validation-for="Input.Krankenkasse" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="Input.BVGPlan">BVG-Plan</label>
+                            <input asp-for="Input.BVGPlan" class="form-control" />
+                            <span asp-validation-for="Input.BVGPlan" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Adresse & Kontakt -->
+                    <hr />
+                    <h5>Adresse & Kontakt</h5>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="Input.Address">Adresse</label>
+                            <input asp-for="Input.Address" class="form-control" />
+                            <span asp-validation-for="Input.Address" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label asp-for="Input.Zip">PLZ</label>
+                            <input asp-for="Input.Zip" class="form-control" />
+                            <span asp-validation-for="Input.Zip" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label asp-for="Input.City">Ort</label>
+                            <input asp-for="Input.City" class="form-control" />
+                            <span asp-validation-for="Input.City" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label asp-for="Input.Phone">Telefon</label>
+                            <input asp-for="Input.Phone" class="form-control" />
+                            <span asp-validation-for="Input.Phone" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-check mt-3">
                         <input asp-for="Input.Active" type="checkbox" class="form-check-input" />
                         <label asp-for="Input.Active" class="form-check-label">Aktiv</label>
                     </div>
@@ -161,6 +348,7 @@
           const brutto = document.getElementById('Input_BruttoSalary');
 
           function updateReq() {
+            if (!select || !hourly || !brutto) return;
             const v = select.value;
             if (v === 'Stundenlohn') {
               hourly.setAttribute('required', 'required');

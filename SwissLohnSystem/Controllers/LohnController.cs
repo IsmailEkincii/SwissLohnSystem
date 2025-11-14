@@ -27,121 +27,221 @@ namespace SwissLohnSystem.API.Controllers
             _calculator = calculator;
         }
 
-        // =========================
-        // NEW: Modern hesap motoru
-        // =========================
-        // NOT: Bu uç yalnızca hesaplar ve sonucu döner (persist ETMEZ).
-        // Oranlar/kurallar PayrollCalculator içinde Settings'ten okunmalıdır.
-       
+        // =====================================================
+        // POST: api/Lohn/calc
+        // - Nur Berechnung, KEIN Persist
+        // - Flags und Stammdaten immer vom Employee lesen
+        // =====================================================
         [HttpPost("calc")]
-        public ActionResult<ApiResponse<PayrollResponseDto>> Calculate([FromBody] PayrollRequestDto request)
+        public async Task<ActionResult<ApiResponse<PayrollResponseDto>>> Calculate([FromBody] PayrollRequestDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ApiResponse<PayrollResponseDto>.Fail("Ungültige Eingabedaten."));
+
+            var employee = await _context.Employees
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == request.EmployeeId);
+
+            if (employee is null)
+                return NotFound(ApiResponse<PayrollResponseDto>.Fail("Mitarbeiter wurde nicht gefunden."));
+
+            // --- Zeitraum: Mitarbeiter in diesem Monat aktiv? ---
+            var periodMonthStart = new DateTime(request.Period.Year, request.Period.Month, 1);
+            if (employee.StartDate > periodMonthStart ||
+                (employee.EndDate.HasValue && employee.EndDate.Value < periodMonthStart))
+            {
+                return BadRequest(ApiResponse<PayrollResponseDto>.Fail(
+                    "Mitarbeiter ist in diesem Monat nicht aktiv."
+                ));
+            }
+
+            // --- Stammdaten & Flags immer vom Employee lesen ---
+            request.Canton = string.IsNullOrWhiteSpace(employee.Canton) ? "ZH" : employee.Canton;
+            request.ApplyAHV = employee.ApplyAHV;
+            request.ApplyALV = employee.ApplyALV;
+            request.ApplyBVG = employee.ApplyBVG;
+            request.ApplyNBU = employee.ApplyNBU;
+            request.ApplyBU = employee.ApplyBU;
+            request.ApplyFAK = employee.ApplyFAK;
+            request.ApplyQST = employee.ApplyQST;
+            request.WeeklyHours = employee.WeeklyHours;
+            request.PermitType = employee.PermitType;
+            request.ChurchMember = employee.ChurchMember;
+            request.WithholdingTaxCode = employee.WithholdingTaxCode;
+
+            // --- Bruttolohn (Monat) bestimmen ---
+            if (employee.SalaryType == "Monthly")
+            {
+                // Fixer Monatslohn
+                request.GrossMonthly = employee.BruttoSalary;
+            }
+            else // SalaryType == "Hourly"
+            {
+                var year = request.Period.Year;
+                var month = request.Period.Month;
+
+                var workDays = await _context.WorkDays
+                    .AsNoTracking()
+                    .Where(w => w.EmployeeId == employee.Id &&
+                                w.Date.Year == year &&
+                                w.Date.Month == month)
+                    .ToListAsync();
+
+                if (workDays.Count == 0)
+                {
+                    return BadRequest(ApiResponse<PayrollResponseDto>.Fail(
+                        "Keine Arbeitszeit-Daten für diesen stundenbasierten Mitarbeiter in diesem Monat gefunden."
+                    ));
+                }
+
+                var totalHours = workDays.Sum(w => w.HoursWorked);
+                // TODO: Überstunden & Ferienentschädigung später als separate Items integrieren
+                request.GrossMonthly = employee.HourlyRate * totalHours;
+            }
 
             var result = _calculator.Calculate(request);
             return Ok(ApiResponse<PayrollResponseDto>.Ok(result, "Berechnung erfolgreich."));
         }
 
-
-        // ==============================================
-        // LEGACY: Eski yöntem (DB'ye yazan idempotent akış)
-        // ==============================================
-        // Geçici olarak farklı route altında tutuluyor; ileride kaldırılabilir.
-        [HttpPost("calc-legacy")]
-        public async Task<ActionResult<ApiResponse<LohnDto>>> CalculateLegacy([FromBody] LohnCalculateDto dto)
+        // =====================================================
+        // POST: api/Lohn/calc-and-save
+        // - Berechnen + als Entwurf (Lohn) speichern
+        // =====================================================
+        [HttpPost("calc-and-save")]
+        public async Task<ActionResult<ApiResponse<LohnDto>>> CalculateAndSave([FromBody] PayrollRequestDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ApiResponse<LohnDto>.Fail("Ungültige Eingabedaten."));
 
-            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == dto.EmployeeId);
+            var employee = await _context.Employees
+                .FirstOrDefaultAsync(e => e.Id == request.EmployeeId);
+
             if (employee is null)
                 return NotFound(ApiResponse<LohnDto>.Fail("Mitarbeiter wurde nicht gefunden."));
 
-            var date = new DateTime(dto.Year, dto.Month, 1);
-            if (employee.StartDate > date || (employee.EndDate.HasValue && employee.EndDate.Value < date))
-                return BadRequest(ApiResponse<LohnDto>.Fail("Mitarbeiter ist in diesem Monat nicht aktiv."));
+            // ---- Zeitraum: Mitarbeiter in diesem Monat aktiv? ----
+            var periodMonthStart = new DateTime(request.Period.Year, request.Period.Month, 1);
+            if (employee.StartDate > periodMonthStart ||
+                (employee.EndDate.HasValue && employee.EndDate.Value < periodMonthStart))
+            {
+                return BadRequest(ApiResponse<LohnDto>.Fail(
+                    "Mitarbeiter ist in diesem Monat nicht aktiv."
+                ));
+            }
 
-            // Einstellungen (tek seferde çek) - LEGACY: yüzdelik ölçek (%)
-            var settings = await _context.Settings.AsNoTracking().ToListAsync();
-            decimal ahv = settings.FirstOrDefault(s => s.Name == "AHV")?.Value ?? 0m;
-            decimal alv = settings.FirstOrDefault(s => s.Name == "ALV")?.Value ?? 0m;
-            decimal bvg = settings.FirstOrDefault(s => s.Name == "BVG")?.Value ?? 0m;
-            decimal steuer = settings.FirstOrDefault(s => s.Name == "Steuer")?.Value ?? 0m;
-            decimal childAllowanceValue = settings.FirstOrDefault(s => s.Name == "ChildAllowance")?.Value ?? 0m;
-            decimal holidayRate = settings.FirstOrDefault(s => s.Name == "HolidayRate")?.Value ?? 8.33m;
-            decimal overtimeRate = settings.FirstOrDefault(s => s.Name == "OvertimeRate")?.Value ?? 1.25m;
+            // ---- Kritik alanları Employee'den al ----
+            request.Canton = string.IsNullOrWhiteSpace(employee.Canton) ? "ZH" : employee.Canton;
 
-            var workDays = await _context.WorkDays
-                .Where(w => w.EmployeeId == dto.EmployeeId && w.Date.Month == dto.Month && w.Date.Year == dto.Year)
-                .ToListAsync();
+            request.ApplyAHV = employee.ApplyAHV;
+            request.ApplyALV = employee.ApplyALV;
+            request.ApplyBVG = employee.ApplyBVG;
+            request.ApplyNBU = employee.ApplyNBU;
+            request.ApplyBU = employee.ApplyBU;
+            request.ApplyFAK = employee.ApplyFAK;
+            request.ApplyQST = employee.ApplyQST;
 
-            decimal totalHours = employee.SalaryType == "Monthly"
-                ? employee.MonthlyHours
-                : workDays.Sum(w => w.HoursWorked);
+            request.WeeklyHours = employee.WeeklyHours;
+            request.PermitType = employee.PermitType;
+            request.ChurchMember = employee.ChurchMember;
+            request.WithholdingTaxCode = employee.WithholdingTaxCode;
 
-            decimal totalOvertime = workDays.Sum(w => w.OvertimeHours);
+            // ---- Bruttolohn (Monat) hesaplama ----
+            if (employee.SalaryType == "Monthly")
+            {
+                request.GrossMonthly = employee.BruttoSalary;
+            }
+            else // "Hourly"
+            {
+                var year = request.Period.Year;
+                var month = request.Period.Month;
 
-            if (employee.SalaryType == "Hourly" && workDays.Count == 0)
-                return BadRequest(ApiResponse<LohnDto>.Fail("Keine Arbeitszeit-Daten für diesen stundenbasierten Mitarbeiter gefunden."));
+                var workDays = await _context.WorkDays
+                    .AsNoTracking()
+                    .Where(w => w.EmployeeId == employee.Id &&
+                                w.Date.Year == year &&
+                                w.Date.Month == month)
+                    .ToListAsync();
 
-            decimal brutto = employee.SalaryType == "Monthly"
-                ? employee.BruttoSalary
-                : employee.HourlyRate * totalHours;
+                if (workDays.Count == 0)
+                {
+                    return BadRequest(ApiResponse<LohnDto>.Fail(
+                        "Keine Arbeitszeit-Daten für diesen stundenbasierten Mitarbeiter in diesem Monat gefunden."
+                    ));
+                }
 
-            decimal overtimePay = totalOvertime * employee.HourlyRate * overtimeRate;
-            decimal holidayAllowance = brutto * holidayRate / 100m;
+                decimal totalHours = workDays.Sum(w => w.HoursWorked);
+                // decimal totalOvertime = workDays.Sum(w => w.OvertimeHours); // ileride kullanılabilir
 
-            // DİKKAT: Legacy kod yüzdelik ölçek kullanır (%, 100'e böler).
-            decimal totalDeductions = (brutto + overtimePay) * (ahv + alv + bvg + steuer) / 100m;
+                request.GrossMonthly = employee.HourlyRate * totalHours;
+            }
 
-            decimal childAllowance = employee.ChildCount * childAllowanceValue;
+            // ---- Modern hesap motorunu kullan ----
+            var result = _calculator.Calculate(request);
 
-            // Net: Brutto + (ek ödemeler) - (kesintiler)
-            decimal netSalary = brutto + overtimePay + holidayAllowance + childAllowance - totalDeductions;
+            var yearForLohn = request.Period.Year;
+            var monthForLohn = request.Period.Month;
 
-            // Idempotent upsert: aynı (EmployeeId, Month, Year) varsa güncelle; yoksa oluştur.
+            // Brutto / Net / Kesintiler
+            var gross = request.GrossMonthly;
+            var net = result.NetToPay;
+            var empDeductions = result.Employee.Total; // MoneyBreakdownDto.Total
+            var overtimePay = 0m; // şimdilik 0, ileride detay eklenebilir
+            var holidayAllowance = 0m;
+            var childAllowance = 0m;
+
+            // Idempotent upsert
             var existing = await _context.Lohns
-                .FirstOrDefaultAsync(l => l.EmployeeId == employee.Id && l.Month == dto.Month && l.Year == dto.Year);
+                .FirstOrDefaultAsync(l =>
+                    l.EmployeeId == employee.Id &&
+                    l.Year == yearForLohn &&
+                    l.Month == monthForLohn);
 
+            Lohn lohn;
             if (existing is not null)
             {
                 if (existing.IsFinal)
-                    return BadRequest(ApiResponse<LohnDto>.Fail("Diese Lohnabrechnung ist bereits finalisiert und kann nicht geändert werden."));
+                    return BadRequest(ApiResponse<LohnDto>.Fail(
+                        "Diese Lohnabrechnung ist bereits finalisiert und kann nicht geändert werden."
+                    ));
 
-                existing.BruttoSalary = brutto;
+                existing.BruttoSalary = gross;
+                existing.NetSalary = net;
+                existing.TotalDeductions = empDeductions;
                 existing.OvertimePay = overtimePay;
                 existing.HolidayAllowance = holidayAllowance;
-                existing.TotalDeductions = totalDeductions;
                 existing.ChildAllowance = childAllowance;
-                existing.NetSalary = netSalary;
                 existing.CreatedAt = DateTime.Now;
 
-                await _context.SaveChangesAsync();
-                return ApiResponse<LohnDto>.Ok(existing.ToDto(), "Lohnabrechnung erfolgreich neu berechnet (aktualisiert).");
+                lohn = existing;
+            }
+            else
+            {
+                lohn = new Lohn
+                {
+                    EmployeeId = employee.Id,
+                    Month = monthForLohn,
+                    Year = yearForLohn,
+                    BruttoSalary = gross,
+                    NetSalary = net,
+                    TotalDeductions = empDeductions,
+                    OvertimePay = overtimePay,
+                    HolidayAllowance = holidayAllowance,
+                    ChildAllowance = childAllowance,
+                    CreatedAt = DateTime.Now,
+                    IsFinal = false
+                };
+
+                _context.Lohns.Add(lohn);
             }
 
-            var lohn = new Lohn
-            {
-                EmployeeId = employee.Id,
-                Month = dto.Month,
-                Year = dto.Year,
-                BruttoSalary = brutto,
-                OvertimePay = overtimePay,
-                HolidayAllowance = holidayAllowance,
-                TotalDeductions = totalDeductions,
-                ChildAllowance = childAllowance,
-                NetSalary = netSalary,
-                CreatedAt = DateTime.Now,
-                IsFinal = false
-            };
-
-            _context.Lohns.Add(lohn);
             await _context.SaveChangesAsync();
-            return ApiResponse<LohnDto>.Ok(lohn.ToDto(), "Lohnabrechnung erfolgreich berechnet und gespeichert.");
+
+            return ApiResponse<LohnDto>.Ok(lohn.ToDto(), "Lohnabrechnung wurde berechnet und als Entwurf gespeichert.");
         }
 
+        // =============================
         // GET: api/Lohn
+        // =============================
         [HttpGet]
         public async Task<ActionResult<ApiResponse<IEnumerable<LohnDto>>>> GetLohns()
         {
@@ -154,7 +254,9 @@ namespace SwissLohnSystem.API.Controllers
             return ApiResponse<IEnumerable<LohnDto>>.Ok(lohns, "Alle Lohnabrechnungen wurden erfolgreich geladen.");
         }
 
-        // GET: api/Lohn/5
+        // =============================
+        // GET: api/Lohn/{id}
+        // =============================
         [HttpGet("{id:int}")]
         public async Task<ActionResult<ApiResponse<LohnDto>>> GetLohn(int id)
         {
@@ -168,7 +270,9 @@ namespace SwissLohnSystem.API.Controllers
             return ApiResponse<LohnDto>.Ok(lohn.ToDto(), "Lohnabrechnung erfolgreich geladen.");
         }
 
+        // ======================================
         // POST: api/Lohn/finalize
+        // ======================================
         [HttpPost("finalize")]
         public async Task<ActionResult<ApiResponse<LohnDto>>> FinalizePayroll([FromBody] LohnCalculateDto dto)
         {
@@ -176,7 +280,10 @@ namespace SwissLohnSystem.API.Controllers
                 return BadRequest(ApiResponse<LohnDto>.Fail("Ungültige Eingabedaten."));
 
             var lohn = await _context.Lohns
-                .FirstOrDefaultAsync(l => l.EmployeeId == dto.EmployeeId && l.Month == dto.Month && l.Year == dto.Year);
+                .FirstOrDefaultAsync(l =>
+                    l.EmployeeId == dto.EmployeeId &&
+                    l.Month == dto.Month &&
+                    l.Year == dto.Year);
 
             if (lohn is null)
                 return NotFound(ApiResponse<LohnDto>.Fail("Lohnabrechnung wurde nicht gefunden."));
@@ -186,33 +293,39 @@ namespace SwissLohnSystem.API.Controllers
 
             lohn.IsFinal = true;
             await _context.SaveChangesAsync();
+
             return ApiResponse<LohnDto>.Ok(lohn.ToDto(), "Lohnabrechnung wurde finalisiert.");
         }
 
+        // =====================================
         // GET: api/Lohn/by-employee/{employeeId}
+        // =====================================
         [HttpGet("by-employee/{employeeId:int}")]
         public async Task<ActionResult<ApiResponse<IEnumerable<LohnDto>>>> GetByEmployee(int employeeId)
         {
             var list = await _context.Lohns
                 .AsNoTracking()
                 .Where(l => l.EmployeeId == employeeId)
-                .OrderByDescending(l => l.Year).ThenByDescending(l => l.Month)
+                .OrderByDescending(l => l.Year)
+                .ThenByDescending(l => l.Month)
                 .Select(l => l.ToDto())
                 .ToListAsync();
 
             return ApiResponse<IEnumerable<LohnDto>>.Ok(list, "Löhne erfolgreich geladen.");
         }
 
+        // =========================================================
         // GET: api/Lohn/by-company/{companyId}?period=YYYY-MM
+        // =========================================================
         [HttpGet("by-company/{companyId:int}")]
-        public async Task<ActionResult<ApiResponse<IEnumerable<LohnDto>>>> GetByCompany(int companyId, [FromQuery] string? period = null)
+        public async Task<ActionResult<ApiResponse<IEnumerable<LohnDto>>>> GetByCompany(
+            int companyId,
+            [FromQuery] string? period = null)
         {
             int? month = null, year = null;
 
             if (IsValidPeriod(period))
-            {
                 (year, month) = ParsePeriod(period!);
-            }
 
             var query = _context.Lohns
                 .AsNoTracking()
@@ -220,19 +333,26 @@ namespace SwissLohnSystem.API.Controllers
                 .Where(l => l.Employee.CompanyId == companyId);
 
             if (month.HasValue && year.HasValue)
+            {
                 query = query.Where(l => l.Month == month.Value && l.Year == year.Value);
+            }
 
             var list = await query
-                .OrderByDescending(l => l.Year).ThenByDescending(l => l.Month)
+                .OrderByDescending(l => l.Year)
+                .ThenByDescending(l => l.Month)
                 .Select(l => l.ToDto())
                 .ToListAsync();
 
             return ApiResponse<IEnumerable<LohnDto>>.Ok(list, "Löhne erfolgreich geladen.");
         }
 
+        // =========================================================
         // GET: api/Lohn/by-company/{companyId}/monthly?period=YYYY-MM
+        // =========================================================
         [HttpGet("by-company/{companyId:int}/monthly")]
-        public async Task<ActionResult<ApiResponse<IEnumerable<LohnMonthlyRowDto>>>> GetCompanyMonthly(int companyId, [FromQuery] string? period = null)
+        public async Task<ActionResult<ApiResponse<IEnumerable<LohnMonthlyRowDto>>>> GetCompanyMonthly(
+            int companyId,
+            [FromQuery] string? period = null)
         {
             if (!IsValidPeriod(period))
                 return BadRequest(ApiResponse<IEnumerable<LohnMonthlyRowDto>>.Fail("Ungültiger Zeitraum. Erwartet: YYYY-MM."));
@@ -242,8 +362,11 @@ namespace SwissLohnSystem.API.Controllers
             var rows = await _context.Lohns
                 .AsNoTracking()
                 .Include(l => l.Employee)
-                .Where(l => l.Employee.CompanyId == companyId && l.Year == year && l.Month == month)
-                .OrderBy(l => l.Employee.LastName).ThenBy(l => l.Employee.FirstName)
+                .Where(l => l.Employee.CompanyId == companyId &&
+                            l.Year == year &&
+                            l.Month == month)
+                .OrderBy(l => l.Employee.LastName)
+                .ThenBy(l => l.Employee.FirstName)
                 .Select(l => new LohnMonthlyRowDto(
                     l.EmployeeId,
                     l.Employee.FirstName + " " + l.Employee.LastName,
@@ -262,8 +385,10 @@ namespace SwissLohnSystem.API.Controllers
 
         // --------- helpers ---------
         private static bool IsValidPeriod(string? p) =>
-            !string.IsNullOrWhiteSpace(p) && p!.Length == 7 && p[4] == '-' &&
-            int.TryParse(p.AsSpan(0, 4), out var y) &&
+            !string.IsNullOrWhiteSpace(p) &&
+            p!.Length == 7 &&
+            p[4] == '-' &&
+            int.TryParse(p.AsSpan(0, 4), out _) &&
             int.TryParse(p.AsSpan(5, 2), out var m) &&
             m is >= 1 and <= 12;
 

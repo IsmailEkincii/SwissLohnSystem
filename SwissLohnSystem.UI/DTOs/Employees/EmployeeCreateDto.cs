@@ -3,47 +3,81 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SwissLohnSystem.UI.DTOs.Employees
 {
-    public class EmployeeCreateDto
+    public sealed record EmployeeCreateDto
     {
-        [Required] public int CompanyId { get; set; }
+        [Required]
+        public int CompanyId { get; init; }
 
-        [Required, MaxLength(100)] public string FirstName { get; set; } = null!;
-        [Required, MaxLength(100)] public string LastName { get; set; } = null!;
+        [Required, StringLength(100)]
+        public string FirstName { get; init; } = null!;
 
-        [EmailAddress, MaxLength(200)] public string? Email { get; set; }
-        [MaxLength(100)] public string? Position { get; set; }
+        [Required, StringLength(100)]
+        public string LastName { get; init; } = null!;
 
-        public DateTime? BirthDate { get; set; }
-        [MaxLength(20)] public string? MaritalStatus { get; set; }   // "ledig" | "verheiratet"
-        [Range(0, 20)] public int ChildCount { get; set; }
+        [EmailAddress]
+        public string? Email { get; init; }
 
-        [Required, RegularExpression("^(Monthly|Hourly)$", ErrorMessage = "SalaryType muss 'Monthly' oder 'Hourly' sein.")]
-        public string SalaryType { get; set; } = null!;
+        [StringLength(100)]
+        public string? Position { get; init; }
 
-        [Range(0, 1_000_000)] public decimal HourlyRate { get; set; }
-        [Range(0, 400)] public int MonthlyHours { get; set; }
-        [Range(0, 1_000_000)] public decimal BruttoSalary { get; set; }
+        public DateTime? BirthDate { get; init; }
+        public string? MaritalStatus { get; init; }
+        public int ChildCount { get; init; }
 
-        [Required] public DateTime StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        [Required]
+        [RegularExpression("Monthly|Hourly", ErrorMessage = "SalaryType muss 'Monthly' oder 'Hourly' sein.")]
+        public string SalaryType { get; init; } = "Monthly";
 
-        public bool Active { get; set; } = true;
+        // SalaryType == "Hourly" ise kullanılır
+        [Range(0, 1_000_000)]
+        public decimal HourlyRate { get; init; }
+
+        public int MonthlyHours { get; init; }
+
+        // SalaryType == "Monthly" ise kullanılır
+        [Range(0, 1_000_000)]
+        public decimal BruttoSalary { get; init; }
+
+        [Required]
+        public DateTime StartDate { get; init; }
+
+        public DateTime? EndDate { get; init; }
+
+        public bool Active { get; init; } = true;
 
         // Sigorta & kimlik
-        [MaxLength(20)] public string? AHVNumber { get; set; }
-        [MaxLength(100)] public string? Krankenkasse { get; set; }
-        [MaxLength(100)] public string? BVGPlan { get; set; }
+        public string? AHVNumber { get; init; }
+        public string? Krankenkasse { get; init; }
+        public string? BVGPlan { get; init; }
 
         // Parametreler
-        [Range(0, 100)] public decimal? PensumPercent { get; set; }   // vars. 100
-        [Range(0, 100)] public decimal? HolidayRate { get; set; }     // vars. 8.33
-        [Range(0, 10)] public decimal? OvertimeRate { get; set; }    // vars. 1.25
-        [MaxLength(50)] public string? WithholdingTaxCode { get; set; }
+        public decimal? PensumPercent { get; init; }
+        public decimal? HolidayRate { get; init; }
+        public decimal? OvertimeRate { get; init; }
+        public string? WithholdingTaxCode { get; init; }
+
+        public int WeeklyHours { get; init; } = 42;   // istersen değiştir
+
+        public bool ApplyAHV { get; init; } = true;
+        public bool ApplyALV { get; init; } = true;
+        public bool ApplyNBU { get; init; } = true;
+        public bool ApplyBU { get; init; } = true;
+        public bool ApplyBVG { get; init; } = true;
+        public bool ApplyFAK { get; init; } = true;
+        public bool ApplyQST { get; init; }
+
+        public bool HolidayEligible { get; init; } = true;
+        public bool ThirteenthEligible { get; init; } = true;
+        public bool ThirteenthProrated { get; init; } = true;
+
+        public string PermitType { get; init; } = "B";
+        public bool ChurchMember { get; init; }
+        public string Canton { get; init; } = "ZH";
 
         // Adres & iletişim
-        [MaxLength(200)] public string? Address { get; set; }
-        [MaxLength(20)] public string? Zip { get; set; }
-        [MaxLength(100)] public string? City { get; set; }
-        [MaxLength(50)] public string? Phone { get; set; }
+        public string? Address { get; init; }
+        public string? Zip { get; init; }
+        public string? City { get; init; }
+        public string? Phone { get; init; }
     }
 }

@@ -1,15 +1,29 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace SwissLohnSystem.UI.Services
 {
     public class ApiClient
     {
         private readonly HttpClient _http;
-        public ApiClient(HttpClient http) => _http = http;
+
+        public string BaseUrl { get; }
+
+        public ApiClient(HttpClient http, IConfiguration config)
+        {
+            _http = http;
+
+            // appsettings.json:  "Api": { "BaseUrl": "https://localhost:7090" }
+            BaseUrl = config["Api:BaseUrl"]?.TrimEnd('/') ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(BaseUrl))
+            {
+                _http.BaseAddress = new System.Uri(BaseUrl);
+            }
+        }
 
         public async Task<(bool ok, T? data, string? message)> GetAsync<T>(string url) where T : class
         {

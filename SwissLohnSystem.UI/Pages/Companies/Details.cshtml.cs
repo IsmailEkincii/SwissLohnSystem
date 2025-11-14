@@ -1,10 +1,9 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SwissLohnSystem.UI.DTOs.Companies;
 using SwissLohnSystem.UI.DTOs.Employees;
-using SwissLohnSystem.UI.DTOs.Lohn;
 using SwissLohnSystem.UI.Services;
 using SwissLohnSystem.UI.Services.Mapping;
 
@@ -13,10 +12,17 @@ namespace SwissLohnSystem.UI.Pages.Companies
     public class DetailsModel : PageModel
     {
         private readonly ApiClient _api;
-        public DetailsModel(ApiClient api) => _api = api;
+        public DetailsModel(ApiClient api)
+        {
+            _api = api;
+        }
 
         public int Id { get; set; }
         public CompanyDetailsDto Vm { get; set; } = new();
+
+        // ðŸ”´ Swagger adresine gÃ¶re BURASI:
+        // https://localhost:7090/swagger/index.html => BaseUrl: https://localhost:7090
+        public string ApiBaseUrl => "https://localhost:7090";
 
         public async Task OnGetAsync(int id)
         {
@@ -38,17 +44,6 @@ namespace SwissLohnSystem.UI.Pages.Companies
                 : Array.Empty<EmployeeDto>();
 
             Vm = ApiToUiMapper.BuildDetails(company!, employees!);
-        }
-
-        // (Opsiyonel) Server-side Löhne yükleme örneði:
-        public async Task<IEnumerable<LohnMonthlyRowDto>> LoadMonthlyAsync(int companyId, string period)
-        {
-            var loehneRes = await _api.GetAsync<IEnumerable<LohnDto>>($"/api/Lohn/by-company/{companyId}/monthly?period={period}");
-            var employeesRes = await _api.GetAsync<IEnumerable<EmployeeDto>>($"/api/Company/{companyId}/Employees");
-            if (!loehneRes.ok || !employeesRes.ok || loehneRes.data is null || employeesRes.data is null)
-                return Array.Empty<LohnMonthlyRowDto>();
-
-            return ApiToUiMapper.ToMonthlyRows(loehneRes.data, employeesRes.data);
         }
     }
 }

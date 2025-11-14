@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SwissLohnSystem.UI.DTOs.Setting;
-using SwissLohnSystem.UI.Services; // ApiClient
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using SwissLohnSystem.UI.Services;
 
 namespace SwissLohnSystem.UI.Pages.Settings
 {
@@ -17,29 +15,26 @@ namespace SwissLohnSystem.UI.Pages.Settings
 
         public async Task OnGetAsync()
         {
-            // ApiClient: Task<(bool ok, T? data, string? message)>
             var (ok, data, message) = await _api.GetAsync<List<SettingDto>>("/api/Settings");
-
-            if (ok && data != null)
-            {
-                Settings = data;
-            }
+            if (ok && data != null) Settings = data.OrderBy(s => s.Name).ToList();
             else
             {
                 TempData["Error"] = message ?? "Einstellungen konnten nicht geladen werden.";
-                Settings = new List<SettingDto>(); // güvenli default
             }
         }
 
+       
         public async Task<IActionResult> OnPostSaveAsync()
         {
-            // NoContent dönebilir ? T olarak object veriyoruz
-            var (ok, _, message) = await _api.PutAsync<object>("/api/Settings", Settings);
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Bitte Eingaben prüfen.";
+                return Page();
+            }
 
-            if (ok)
-                TempData["Toast"] = "Einstellungen erfolgreich gespeichert.";
-            else
-                TempData["Error"] = message ?? "Speichern fehlgeschlagen.";
+            var (ok, _, message) = await _api.PutAsync<object>("/api/Settings", Settings);
+            if (ok) TempData["Toast"] = "Einstellungen erfolgreich gespeichert.";
+            else TempData["Error"] = message ?? "Speichern fehlgeschlagen.";
 
             return RedirectToPage();
         }

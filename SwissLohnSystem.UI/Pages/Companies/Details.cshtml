@@ -74,16 +74,24 @@
                             <dd class="col-sm-9">@Model.Vm?.Company?.Canton</dd>
 
                             <dt class="col-sm-3">Adresse</dt>
-                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Address) ? Model.Vm!.Company!.Address : "—")</dd>
+                            <dd class="col-sm-9">
+                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Address) ? Model.Vm!.Company!.Address : "—")
+                            </dd>
 
                             <dt class="col-sm-3">E-Mail</dt>
-                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Email) ? Model.Vm!.Company!.Email : "—")</dd>
+                            <dd class="col-sm-9">
+                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Email) ? Model.Vm!.Company!.Email : "—")
+                            </dd>
 
                             <dt class="col-sm-3">Telefon</dt>
-                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Phone) ? Model.Vm!.Company!.Phone : "—")</dd>
+                            <dd class="col-sm-9">
+                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Phone) ? Model.Vm!.Company!.Phone : "—")
+                            </dd>
 
                             <dt class="col-sm-3">Steuernummer</dt>
-                            <dd class="col-sm-9">@(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.TaxNumber) ? Model.Vm!.Company!.TaxNumber : "—")</dd>
+                            <dd class="col-sm-9">
+                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.TaxNumber) ? Model.Vm!.Company!.TaxNumber : "—")
+                            </dd>
                         </dl>
                     </div>
 
@@ -125,7 +133,6 @@
                                                     }
                                                     else
                                                     {
-
                                                         <span class="badge badge-secondary">Inaktiv</span>
                                                     }
                                                 </td>
@@ -154,7 +161,6 @@
 
                     <!-- Löhne -->
                     <div class="tab-pane fade" id="loehne" role="tabpanel">
-                        <!-- JS için fallback: data-company-id -->
                         <div id="loehneRoot" data-company-id="@Model.Id"></div>
 
                         <div class="row mb-3">
@@ -192,13 +198,15 @@
                             </div>
                         </div>
 
-                        <!-- Lohn berechnen modal -->
+                        <!-- Lohn berechnen Modal -->
                         <div class="modal fade" id="calcModal" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog modal-md" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Lohn berechnen</h5>
-                                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                        <button type="button" class="close" data-dismiss="modal">
+                                            <span>&times;</span>
+                                        </button>
                                     </div>
                                     <div class="modal-body">
                                         <form id="calcForm">
@@ -211,20 +219,19 @@
                                                 <input id="calcMonth" type="month" class="form-control" />
                                             </div>
                                         </form>
-                                        <small class="text-muted">Bestehende Entwürfe werden aktualisiert; finale Löhne bleiben unverändert.</small>
+                                        <small class="text-muted">
+                                            Bestehende Entwürfe werden aktualisiert; finale Löhne bleiben unverändert.
+                                        </small>
                                     </div>
                                     <div class="modal-footer">
                                         <button class="btn btn-secondary" data-dismiss="modal">Schließen</button>
-                                        <button id="btnDoCalc" class="btn btn-primary" type="button"><i class="fas fa-play"></i> Berechnen</button>
+                                        <button id="btnDoCalc" class="btn btn-primary" type="button">
+                                            <i class="fas fa-play"></i> Berechnen
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-@* 
-                        <p class="text-muted small mb-0">
-                            Hinweis: Diese Liste filtert alle Löhne anhand der Mitarbeiter dieser Firma.
-                            Für serverseitiges Filtern empfiehlt sich ein Endpoint wie <code>/api/Lohn/by-company/@Model.Id</code>.
-                        </p> *@
                     </div>
 
                     <!-- Dateien & Notizen -->
@@ -283,8 +290,12 @@
 
 @section Scripts {
     <script>
-        // JS için Company Id (loehne-tab.js'den ÖNCE!)
+        // Razor tarafında JS'e context aktarma //
         window.COMPANY_ID = @Model.Id;
+        // API'nin base adresi (Swagger'da gördüğün API URL)
+        window.API_BASE_URL = 'https://localhost:7090'; // <- kendi API portuna göre ayarla
+        console.log('[loehne] (cshtml) COMPANY_ID =', window.COMPANY_ID);
+        console.log('[loehne] (cshtml) API_BASE_URL =', window.API_BASE_URL);
     </script>
 
     <script>
@@ -309,3 +320,6 @@
 
     <script src="~/js/loehne-tab.js"></script>
 }
+
+
+

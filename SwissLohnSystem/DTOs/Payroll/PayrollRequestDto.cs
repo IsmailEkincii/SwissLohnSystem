@@ -1,26 +1,32 @@
-﻿namespace SwissLohnSystem.API.DTOs.Payroll
-{
-    public sealed class PayrollRequestDto
-    {
-        public Guid CompanyId { get; set; }
-        public Guid EmployeeId { get; set; }
-        public string Canton { get; set; } = "ZH"; // örn. Zürich
-        public DateOnly Period { get; set; }       // YYYY-MM ayı
-        public decimal GrossMonthly { get; set; }  // Brüt maaş
-        public bool ThirteenthSalaryProrated { get; set; } = false;
-        public int Age { get; set; }
-        public int WeeklyHours { get; set; }
-        public string PermitType { get; set; } = "B";
-        public string MaritalStatus { get; set; } = "single";
-        public int Children { get; set; }
-        public bool ChurchMember { get; set; } = false;
-        public BvgPlanDto? BvgPlan { get; set; }
-    }
+﻿// örnek: SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto
+using SwissLohnSystem.API.DTOs.Payroll;
 
-    public sealed class BvgPlanDto
-    {
-        public decimal? EmployeeRateOverride { get; set; }
-        public decimal? EmployerRateOverride { get; set; }
-        public decimal? CoordinationDeductionAnnualOverride { get; set; }
-    }
+public sealed class PayrollRequestDto
+{
+    public int EmployeeId { get; set; }
+
+    public DateOnly Period { get; set; }   // veya DateTime, sen nasıl tanımladıysan
+    public string? Canton { get; set; }
+
+    /// <summary>
+    /// Bu alan UI’dan gelse bile, LohnController DB’deki Employee’den override etmeli.
+    /// </summary>
+    public decimal GrossMonthly { get; set; }
+
+    // Employee -> Apply* flag’leri
+    public bool ApplyAHV { get; set; }
+    public bool ApplyALV { get; set; }
+    public bool ApplyBVG { get; set; }
+    public bool ApplyNBU { get; set; }
+    public bool ApplyBU { get; set; }
+    public bool ApplyFAK { get; set; }
+    public bool ApplyQST { get; set; }
+
+    public decimal WeeklyHours { get; set; }
+
+    public string? PermitType { get; set; }
+    public string? WithholdingTaxCode { get; set; }
+    public bool ChurchMember { get; set; }
+
+    public BvgPlanDto? BvgPlan { get; set; }  // Zaten kullanıyorsun
 }

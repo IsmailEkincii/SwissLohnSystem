@@ -1,237 +1,309 @@
 ﻿// wwwroot/js/loehne-tab.js
+
 (function () {
-    // ==========================
-    // 🔧 Config & Helper Functions
-    // ==========================
-    window.__LOHN_DEBUG__ = true; // Konsolda log görmek için açık bırak (istersen false yap)
-    function dbg() {
-        if (window.__LOHN_DEBUG__) console.log.apply(console, arguments);
+    const COMPANY_ID = window.COMPANY_ID;
+    const API_BASE = (window.API_BASE_URL || '').replace(/\/+$/, '');
+
+    console.log('[loehne] COMPANY_ID =', COMPANY_ID);
+    console.log('[loehne] API_BASE =', API_BASE);
+
+    if (!COMPANY_ID) {
+        console.warn('[loehne] Kein COMPANY_ID gesetzt – Abbruch.');
+        return;
     }
 
-    function getApiBase() {
-        const b = (window.API_BASE || '').trim().replace(/\/+$/, '');
-        dbg('[loehne] API_BASE =', b);
-        return b;
+    function api(path) {
+        // path: "/api/xyz"
+        return API_BASE + path;
     }
 
-    function getCompanyId() {
-        const cid = Number(window.COMPANY_ID || 0);
-        dbg('[loehne] COMPANY_ID =', cid);
-        return cid > 0 ? cid : null;
+    function formatMoney(val) {
+        if (val === null || val === undefined) return '0.00';
+        return Number(val).toFixed(2);
     }
 
-    async function safeJson(res) {
-        const status = res.status;
-        if (!res.ok) {
-            const text = await res.text();
-            return { ok: false, status, message: text || res.statusText };
-        }
-        try {
-            const json = await res.json();
-            return { ok: true, status, data: json };
-        } catch {
-            return { ok: false, status, message: 'JSON parse error' };
+    function showToast(type, msg) {
+        if (window.toastr) {
+            if (type === 'error') toastr.error(msg);
+            else if (type === 'success') toastr.success(msg);
+            else toastr.info(msg);
+        } else {
+            alert(msg);
         }
     }
 
-    function unwrapEnvelope(env) {
-        if (!env) return { success: false, message: 'No data', data: null };
-        return {
-            success: env.success ?? env.Success ?? false,
-            message: env.message ?? env.Message ?? null,
-            data: env.data ?? env.Data ?? null,
-        };
-    }
+    // ---------------------------
+    // 1) Mitarbeiterları modal için yükle
+    // ---------------------------
+    async function loadEmployeesForModal() {
+        const select = document.getElementById('employeeId');
+        if (!select) return;
 
-    function toCurrency(v) {
-        const n = Number(v || 0);
-        return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    // ==========================
-    // 📋 Löhne Listeleme
-    // ==========================
-    async function loadMonthly() {
-        const companyId = getCompanyId();
-        if (!companyId) return;
-
-        const api = getApiBase();
-        const periodInput = document.getElementById('period');
-        if (periodInput && !periodInput.value) {
-            const d = new Date();
-            periodInput.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-        }
-        const period = periodInput ? periodInput.value : '';
-
-        let url = `${api}/api/Lohn/by-company/${companyId}/monthly`;
-        if (period) url += `?period=${encodeURIComponent(period)}`;
-        dbg('[loehne] GET', url);
-
-        try {
-            const res = await fetch(url);
-            const parsed = await safeJson(res);
-            if (!parsed.ok) return renderRows([]);
-
-            const env = unwrapEnvelope(parsed.data);
-            if (!env.success) return renderRows([]);
-
-            renderRows(Array.isArray(env.data) ? env.data : []);
-        } catch (err) {
-            console.error('[loehne] loadMonthly error', err);
-            renderRows([]);
-        }
-    }
-
-    function renderRows(rows) {
-        const tbody = document.querySelector('#tblLohnMonthly tbody');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        if (!rows || rows.length === 0) {
-            tbody.innerHTML =
-                '<tr><td colspan="6" class="text-center text-muted p-4">Keine Löhne gefunden.</td></tr>';
+        // Zaten yüklenmişse tekrar çağırma (isteğe bağlı)
+        if (select.options.length > 1) {
             return;
         }
 
-        rows.forEach((r) => {
-            const id = r.employeeId ?? r.EmployeeId;
-            const name =
-                r.employeeName ??
-                r.EmployeeName ??
-                `${r.firstName ?? r.FirstName ?? ''} ${r.lastName ?? r.LastName ?? ''}`.trim();
-            const month = r.month ?? r.Month;
-            const year = r.year ?? r.Year;
-            const brutto = r.bruttoSalary ?? r.BruttoSalary ?? 0;
-            const netto = r.netSalary ?? r.NetSalary ?? 0;
-            const status = r.statusText ?? r.StatusText ?? '—';
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-        <td>${name || '-'}</td>
-        <td>${month}.${year}</td>
-        <td>${toCurrency(brutto)}</td>
-        <td><strong>${toCurrency(netto)}</strong></td>
-        <td>${status}</td>
-        <td>
-          <a class="btn btn-sm btn-outline-info" href="/Employees/Details/${id}">Details</a>
-        </td>`;
-            tbody.appendChild(tr);
-        });
-    }
-
-    // ==========================
-    // 👥 Mitarbeiter Dropdown
-    // ==========================
-    async function loadEmployeesIntoSelect() {
-        const companyId = getCompanyId();
-        const sel = document.getElementById('employeeId');
-        if (!sel || !companyId) return;
-
-        const api = getApiBase();
-        const url = `${api}/api/Company/${companyId}/Employees`;
-        dbg('[loehne] GET employees', url);
-
-        sel.innerHTML = '<option value="">-- bitte wählen --</option>';
+        const url = api(`/api/Company/${COMPANY_ID}/Employees`);
+        console.log('[loehne] GET employees', url);
 
         try {
             const res = await fetch(url);
-            const parsed = await safeJson(res);
-            if (!parsed.ok) return disableCalc(sel, true);
+            if (!res.ok) {
+                console.error('[loehne] Mitarbeiter Laden HTTP-Fehler', res.status);
+                showToast('error', 'Mitarbeiter konnten nicht geladen werden.');
+                return;
+            }
+            const json = await res.json(); // ApiResponse<IEnumerable<EmployeeDto>>
+            console.log('[loehne] employees response', json);
 
-            const env = unwrapEnvelope(parsed.data);
-            if (!env.success) return disableCalc(sel, true);
-
-            const list = Array.isArray(env.data) ? env.data : [];
-            if (list.length === 0) {
-                disableCalc(sel, true);
-                if (window.toastr) toastr.info('Keine Mitarbeiter gefunden.');
+            if (!json.success || !Array.isArray(json.data)) {
+                showToast('error', json.message || 'Fehler beim Laden der Mitarbeiter.');
                 return;
             }
 
-            list.forEach((e) => {
-                const id = e.id ?? e.Id;
-                const name = `${e.firstName ?? e.FirstName ?? ''} ${e.lastName ?? e.LastName ?? ''}`.trim();
+            // Temizle & default option ekle
+            select.innerHTML = '';
+            const optDefault = document.createElement('option');
+            optDefault.value = '';
+            optDefault.textContent = '-- bitte wählen --';
+            select.appendChild(optDefault);
+
+            json.data.forEach(e => {
                 const opt = document.createElement('option');
-                opt.value = id;
-                opt.textContent = name || `#${id}`;
-                sel.appendChild(opt);
+                opt.value = e.id;
+                opt.textContent = `${e.firstName} ${e.lastName}`;
+                select.appendChild(opt);
             });
 
-            disableCalc(sel, false);
+            if (json.data.length === 0) {
+                showToast('info', 'Keine Mitarbeiter für diese Firma vorhanden.');
+            }
         } catch (err) {
-            console.error('[loehne] loadEmployeesIntoSelect error', err);
-            disableCalc(sel, true);
+            console.error('[loehne] Fehler beim Laden der Mitarbeiter:', err);
+            showToast('error', 'Fehler beim Laden der Mitarbeiter (Netzwerk).');
         }
     }
 
-    function disableCalc(selectEl, disabled) {
-        selectEl.disabled = disabled;
-        const btn = document.getElementById('btnDoCalc');
-        if (btn) btn.disabled = disabled;
+    // ---------------------------
+    // 2) Firma için aylık Löhne listesini yükle
+    // ---------------------------
+    async function loadMonthlyLohns() {
+        const tbody = document.querySelector('#tblLohnMonthly tbody');
+        const periodInput = document.getElementById('period');
+
+        if (!tbody) return;
+
+        let period = periodInput && periodInput.value ? periodInput.value : null;
+
+        // Period boşsa: bugünün ayını kullan
+        if (!period) {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            period = `${y}-${m}`;
+            if (periodInput) periodInput.value = period;
+        }
+
+        const url = api(`/api/Lohn/by-company/${COMPANY_ID}/monthly?period=${encodeURIComponent(period)}`);
+        console.log('[loehne] GET', url);
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-muted">Lade Daten...</td>
+            </tr>`;
+
+        try {
+            const res = await fetch(url);
+            if (!res.ok) {
+                console.error('[loehne] Löhne HTTP-Fehler', res.status);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">Fehler beim Laden der Löhne (HTTP ${res.status}).</td>
+                    </tr>`;
+                return;
+            }
+
+            const json = await res.json(); // ApiResponse<IEnumerable<LohnMonthlyRowDto>>
+            console.log('[loehne] monthly loehne response', json);
+
+            if (!json.success) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">${json.message || 'Fehler beim Laden der Löhne.'}</td>
+                    </tr>`;
+                return;
+            }
+
+            const rows = json.data || [];
+            if (rows.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Keine Löhne für diesen Monat gefunden.</td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+
+                const colEmp = document.createElement('td');
+                colEmp.textContent = row.employeeName || '';
+                tr.appendChild(colEmp);
+
+                const colMonth = document.createElement('td');
+                colMonth.textContent = `${String(row.month).padStart(2, '0')}.${row.year}`;
+                tr.appendChild(colMonth);
+
+                const colBrutto = document.createElement('td');
+                colBrutto.textContent = formatMoney(row.bruttoSalary);
+                tr.appendChild(colBrutto);
+
+                const colNet = document.createElement('td');
+                colNet.textContent = formatMoney(row.netSalary);
+                tr.appendChild(colNet);
+
+                const colStatus = document.createElement('td');
+                // Şimdilik hepsi Entwurf; ileride IsFinal geldiğinde güncelleriz
+                colStatus.innerHTML = `<span class="badge badge-secondary">Entwurf</span>`;
+                tr.appendChild(colStatus);
+
+                const colActions = document.createElement('td');
+                colActions.innerHTML = `
+                    <a class="btn btn-sm btn-outline-info"
+                       href="/Employees/Details/${row.employeeId}#lohnverlauf">
+                        <i class="fas fa-eye"></i> Verlauf
+                    </a>`;
+                tr.appendChild(colActions);
+
+                tbody.appendChild(tr);
+            });
+
+        } catch (err) {
+            console.error('[loehne] Fehler beim Laden der Löhne:', err);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-danger">Fehler beim Laden der Löhne (Netzwerk).</td>
+                </tr>`;
+        }
     }
 
-    // ==========================
-    // 🧮 Lohn Berechnen
-    // ==========================
-    async function doCalc() {
-        const sel = document.getElementById('employeeId');
-        const monthInput = document.getElementById('calcMonth');
-        const employeeId = Number(sel?.value || 0);
-        const ym = monthInput?.value || '';
+    // ---------------------------
+    // 3) Lohn berechnen + speichern (calc-and-save)
+    // ---------------------------
+    async function doCalcAndSave() {
+        const selEmp = document.getElementById('employeeId');
+        const inpMonth = document.getElementById('calcMonth');
 
-        if (!employeeId || !/^\d{4}-\d{2}$/.test(ym)) {
-            if (window.toastr) toastr.error('Bitte Mitarbeiter und Monat auswählen.');
+        if (!selEmp || !inpMonth) return;
+
+        const empId = parseInt(selEmp.value, 10);
+        const monthVal = inpMonth.value; // "YYYY-MM"
+
+        if (!empId) {
+            showToast('error', 'Bitte Mitarbeiter auswählen.');
+            return;
+        }
+        if (!monthVal) {
+            showToast('error', 'Bitte Monat auswählen.');
             return;
         }
 
-        const [year, month] = ym.split('-').map(Number);
-        const api = getApiBase();
-        const url = `${api}/api/Lohn/calc`;
-        dbg('[loehne] POST calc', url, { employeeId, year, month });
+        // period DateTime string: "YYYY-MM-01T00:00:00"
+        const periodIso = `${monthVal}-01T00:00:00`;
+
+        const payload = {
+            employeeId: empId,
+            period: periodIso
+            // Diğer alanlar server tarafında Employee’den override ediliyor.
+        };
+
+        const url = api('/api/Lohn/calc-and-save');
+        console.log('[loehne] POST calc-and-save', url, payload);
 
         try {
             const res = await fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ employeeId, year, month }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
             });
-            const parsed = await safeJson(res);
-            if (!parsed.ok) return toastr.error(parsed.message || 'Fehler bei Berechnung.');
 
-            const env = unwrapEnvelope(parsed.data);
-            if (env.success) {
-                toastr.success(env.message || 'Lohn berechnet.');
-                if (typeof $ !== 'undefined' && $('#calcModal').modal) $('#calcModal').modal('hide');
-                await loadMonthly();
-            } else {
-                toastr.error(env.message || 'Berechnung fehlgeschlagen.');
+            const json = await res.json();
+            console.log('[loehne] calc-and-save response', json);
+
+            if (!res.ok || !json.success) {
+                showToast('error', json.message || 'Lohnberechnung fehlgeschlagen.');
+                return;
             }
+
+            showToast('success', json.message || 'Lohnberechnung erfolgreich.');
+
+            // Modal kapat
+            if (typeof $ !== 'undefined') {
+                $('#calcModal').modal('hide');
+            }
+
+            // Listeyi seçilen ay için yeniden yükle
+            const periodInput = document.getElementById('period');
+            if (periodInput && !periodInput.value) {
+                periodInput.value = monthVal;
+            }
+            await loadMonthlyLohns();
+
         } catch (err) {
-            console.error('[loehne] doCalc error', err);
-            toastr.error('Serverfehler.');
+            console.error('[loehne] Fehler bei calc-and-save:', err);
+            showToast('error', 'Fehler bei der Berechnung (Netzwerk).');
         }
     }
 
-    // ==========================
-    // ⚡ Init Events
-    // ==========================
-    document.addEventListener('DOMContentLoaded', function () {
-        const btnLoad = document.getElementById('btnLoadLohns');
-        const openCalc = document.getElementById('btnOpenCalcModal');
-        const btnDoCalc = document.getElementById('btnDoCalc');
-
-        if (btnLoad) btnLoad.addEventListener('click', (e) => { e.preventDefault(); loadMonthly(); });
-        if (openCalc)
-            openCalc.addEventListener('click', () => {
-                loadEmployeesIntoSelect();
-                const m = document.getElementById('calcMonth');
-                if (m && !m.value) {
-                    const d = new Date();
-                    m.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                }
+    // ---------------------------
+    // 4) Event binding
+    // ---------------------------
+    function init() {
+        // "Löhne" tabı açıldığında ilk yükleme
+        if (typeof $ !== 'undefined' && $.fn && $.fn.tab) {
+            $('a[href="#loehne"]').on('shown.bs.tab', function () {
+                loadMonthlyLohns();
             });
-        if (btnDoCalc) btnDoCalc.addEventListener('click', (e) => { e.preventDefault(); doCalc(); });
+        }
 
-        loadMonthly();
-    });
+        // Sayfa zaten Löhne tab ile geliyorsa (hash vs.) yine de yüklemeyi deneyelim:
+        const loehneTab = document.getElementById('loehne');
+        if (loehneTab && loehneTab.classList.contains('show') && loehneTab.classList.contains('active')) {
+            loadMonthlyLohns();
+        }
+
+        const btnLoad = document.getElementById('btnLoadLohns');
+        if (btnLoad) {
+            btnLoad.addEventListener('click', function (e) {
+                e.preventDefault();
+                loadMonthlyLohns();
+            });
+        }
+
+        const btnDoCalc = document.getElementById('btnDoCalc');
+        if (btnDoCalc) {
+            btnDoCalc.addEventListener('click', function (e) {
+                e.preventDefault();
+                doCalcAndSave();
+            });
+        }
+
+        // Modal açıldığında Mitarbeiter listesini yükle
+        if (typeof $ !== 'undefined') {
+            $('#calcModal').on('shown.bs.modal', function () {
+                loadEmployeesForModal();
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();

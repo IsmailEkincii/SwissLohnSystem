@@ -4,95 +4,129 @@ using Microsoft.EntityFrameworkCore;
 using SwissLohnSystem.API.Data;
 using SwissLohnSystem.API.DTOs.Setting;
 
-
 [Route("api/[controller]")]
 [ApiController]
-// [Authorize(Policy="Settings.Edit")] // istersen aç
 public class SettingsController : ControllerBase
 {
+    private static readonly string[] AllowedPrefixes = { "AHV.", "ALV.", "UVG.", "BVG.", "FAK.", "Rounding.", "QST." };
+
     private readonly ApplicationDbContext _db;
     public SettingsController(ApplicationDbContext db) => _db = db;
 
-    // Tümü (opsiyonel prefix filtre)
-    // GET /api/Settings?prefix=AHV.   veya  ?prefix=ALV.
+    // GET /api/Settings?prefix=AHV.
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SettingDto>>> GetAll([FromQuery] string? prefix = null)
+    public async Task<ActionResult<IEnumerable<SettingDto>>> GetAll([FromQuery] string? prefix = null, CancellationToken ct = default)
     {
-        var q = _db.Settings.AsNoTracking().AsQueryable();
+        var q = _db.Settings.AsNoTracking();
         if (!string.IsNullOrWhiteSpace(prefix))
-            q = q.Where(s => s.Name.StartsWith(prefix));
+        {
+            var p = prefix.Trim();
+            q = q.Where(s => s.Name.StartsWith(p));
+        }
+
         var data = await q
-            .OrderBy(s => s.Name)
-            .Select(s => new SettingDto { Name = s.Name, Value = s.Value, Description = s.Description })
-            .ToListAsync();
+     .OrderBy(s => s.Name)
+     .Select(s => new SettingDto { Id = s.Id, Name = s.Name, Value = s.Value, Description = s.Description })
+     .ToListAsync(ct);
+
         return Ok(data);
     }
 
-    // Tek ayar
+    // GET /api/Settings/{name}
     [HttpGet("{name}")]
-    public async Task<ActionResult<SettingDto>> GetOne(string name)
+    public async Task<ActionResult<SettingDto>> GetOne(string name, CancellationToken ct = default)
     {
-        var s = await _db.Settings.AsNoTracking().FirstOrDefaultAsync(x => x.Name == name);
+        var key = name.Trim();
+        var s = await _db.Settings.AsNoTracking().FirstOrDefaultAsync(x => x.Name == key, ct);
         if (s is null) return NotFound();
-        return Ok(new SettingDto { Name = s.Name, Value = s.Value, Description = s.Description });
+        return Ok(new SettingDto { Id = s.Id, Name = s.Name, Value = s.Value, Description = s.Description });
     }
 
-    // Tek ayar upsert (PUT /api/Settings/AHV.Employee)
+    // PUT /api/Settings/{name}   (single upsert)
     [HttpPut("{name}")]
-    public async Task<IActionResult> UpsertOne(string name, [FromBody] SettingDto dto)
+    public async Task<IActionResult> UpsertOne(string name, [FromBody] SettingDto dto, CancellationToken ct = default)
     {
-        if (!string.Equals(name, dto.Name, StringComparison.OrdinalIgnoreCase))
+        if (dto is null) return BadRequest("Body required.");
+        var key = (dto.Name ?? "").Trim();
+        if (!string.Equals(name.Trim(), key, StringComparison.OrdinalIgnoreCase))
             return BadRequest("Name mismatch.");
-        if (!IsValidKey(dto.Name)) return BadRequest("Invalid key.");
-        if (!IsValidValue(dto.Name, dto.Value)) return BadRequest("Invalid value.");
+        if (!IsValidKey(key)) return BadRequest("Invalid key.");
+        if (!IsValidValue(key, dto.Value)) return BadRequest("Invalid value.");
 
-        var s = await _db.Settings.FirstOrDefaultAsync(x => x.Name == dto.Name);
+        var s = await _db.Settings.FirstOrDefaultAsync(x => x.Name == key, ct);
         if (s is null)
-            _db.Settings.Add(new SwissLohnSystem.API.Models.Setting { Name = dto.Name, Value = dto.Value, Description = dto.Description });
+            _db.Settings.Add(new SwissLohnSystem.API.Models.Setting { Name = key, Value = dto.Value, Description = Clean(dto.Description) });
         else
         {
             s.Value = dto.Value;
-            s.Description = dto.Description;
+            s.Description = Clean(dto.Description);
         }
-        await _db.SaveChangesAsync();
+
+        await _db.SaveChangesAsync(ct);
         return NoContent();
     }
 
-    // Toplu güncelle (Dashboard save)
-    // PUT /api/Settings (body: SettingDto[])
+    // PUT /api/Settings   (bulk upsert)
     [HttpPut]
-    public async Task<IActionResult> BulkUpsert([FromBody] IEnumerable<SettingDto> dtos)
+    public async Task<IActionResult> BulkUpsert([FromBody] IEnumerable<SettingDto> dtos, CancellationToken ct = default)
     {
-        foreach (var dto in dtos)
+        if (dtos is null) return BadRequest("Body required.");
+
+        var list = dtos
+            .Where(d => d is not null && !string.IsNullOrWhiteSpace(d.Name))
+            .Select(d => new SettingDto { Name = d.Name!.Trim(), Value = d.Value, Description = Clean(d.Description) })
+            .ToList();
+
+        if (list.Count == 0) return BadRequest("No items.");
+
+        // validate all first
+        foreach (var d in list)
         {
-            if (!IsValidKey(dto.Name)) return BadRequest($"Invalid key: {dto.Name}");
-            if (!IsValidValue(dto.Name, dto.Value)) return BadRequest($"Invalid value for {dto.Name}");
-            var s = await _db.Settings.FirstOrDefaultAsync(x => x.Name == dto.Name);
-            if (s is null)
-                _db.Settings.Add(new SwissLohnSystem.API.Models.Setting { Name = dto.Name, Value = dto.Value, Description = dto.Description });
+            if (!IsValidKey(d.Name)) return BadRequest($"Invalid key: {d.Name}");
+            if (!IsValidValue(d.Name, d.Value)) return BadRequest($"Invalid value for {d.Name}");
+        }
+
+        // fetch all existing in one shot (no N+1)
+        var names = list.Select(d => d.Name).Distinct().ToList();
+        var existing = await _db.Settings.Where(s => names.Contains(s.Name)).ToListAsync(ct);
+        var map = existing.ToDictionary(s => s.Name, StringComparer.OrdinalIgnoreCase);
+
+        foreach (var d in list)
+        {
+            if (map.TryGetValue(d.Name, out var s))
+            {
+                s.Value = d.Value;
+                s.Description = d.Description;
+            }
             else
             {
-                s.Value = dto.Value;
-                s.Description = dto.Description;
+                _db.Settings.Add(new SwissLohnSystem.API.Models.Setting
+                {
+                    Name = d.Name,
+                    Value = d.Value,
+                    Description = d.Description
+                });
             }
         }
-        await _db.SaveChangesAsync();
+
+        await _db.SaveChangesAsync(ct);
         return NoContent();
     }
 
-    // Basit key/value validasyonları
-    private static bool IsValidKey(string key) =>
-        key.StartsWith("AHV.") || key.StartsWith("ALV.") || key.StartsWith("UVG.") ||
-        key.StartsWith("BVG.") || key.StartsWith("FAK.") || key.StartsWith("Rounding.") ||
-        key.StartsWith("QST."); // ileride QST tarifleri için
+    // --- helpers ---
+    private static string? Clean(string? s) => string.IsNullOrWhiteSpace(s) ? null : s.Trim();
+
+    private static bool IsValidKey(string key) => AllowedPrefixes.Any(p => key.StartsWith(p, StringComparison.Ordinal));
 
     private static bool IsValidValue(string key, decimal value)
     {
-        if (key.StartsWith("Rounding."))
-            return value == 0.01m || value == 0.05m; // istersen gevşet
+        if (key.StartsWith("Rounding.", StringComparison.Ordinal))
+            return value == 0.01m || value == 0.05m;
+
         if (key is "ALV.CapAnnual" or "BVG.EntryThresholdAnnual" or "BVG.CoordinationDedAnnual" or "BVG.UpperLimitAnnual")
             return value >= 0;
-        // oranlar
-        return value >= 0 && value <= 1.0m || value > 1m; // >1 ise sen % girebilirsin (EfSettingsProvider normalize ediyor)
+
+        // oranlar: 0..1 (ondalık) veya >1 ise % gibi kullanılabilir (normalize eden provider'da ele alınır)
+        return value >= 0;
     }
 }

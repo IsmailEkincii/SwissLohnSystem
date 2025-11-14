@@ -1,7 +1,11 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SwissLohnSystem.UI.Services;
+
 
 namespace SwissLohnSystem.UI.Pages.Employees
 {
@@ -47,7 +51,39 @@ namespace SwissLohnSystem.UI.Pages.Employees
                 BruttoSalary = emp.BruttoSalary,
                 StartDate = emp.StartDate,
                 EndDate = emp.EndDate,
-                Active = emp.Active
+                Active = emp.Active,
+
+                // Neue Payroll-Felder
+                WeeklyHours = emp.WeeklyHours,
+                PensumPercent = emp.PensumPercent,
+                HolidayRate = emp.HolidayRate,
+                OvertimeRate = emp.OvertimeRate,
+                WithholdingTaxCode = emp.WithholdingTaxCode,
+
+                AHVNumber = emp.AHVNumber,
+                Krankenkasse = emp.Krankenkasse,
+                BVGPlan = emp.BVGPlan,
+
+                Address = emp.Address,
+                Zip = emp.Zip,
+                City = emp.City,
+                Phone = emp.Phone,
+
+                ApplyAHV = emp.ApplyAHV,
+                ApplyALV = emp.ApplyALV,
+                ApplyNBU = emp.ApplyNBU,
+                ApplyBU = emp.ApplyBU,
+                ApplyBVG = emp.ApplyBVG,
+                ApplyFAK = emp.ApplyFAK,
+                ApplyQST = emp.ApplyQST,
+
+                HolidayEligible = emp.HolidayEligible,
+                ThirteenthEligible = emp.ThirteenthEligible,
+                ThirteenthProrated = emp.ThirteenthProrated,
+
+                PermitType = emp.PermitType,
+                ChurchMember = emp.ChurchMember,
+                Canton = emp.Canton
             };
 
             return Page();
@@ -58,6 +94,17 @@ namespace SwissLohnSystem.UI.Pages.Employees
             if (!ModelState.IsValid) return Page();
 
             var salaryType = Input.SalaryTypeOption == "Stundenlohn" ? "Hourly" : "Monthly";
+
+            // Basit AHV format kontrolü (UI tarafýnda da kullanýcýya geri bildirim)
+            if (!string.IsNullOrWhiteSpace(Input.AHVNumber))
+            {
+                var ok = Regex.IsMatch(Input.AHVNumber.Trim(), @"^(756\.\d{4}\.\d{4}\.\d{2}|756\d{10})$");
+                if (!ok)
+                {
+                    ModelState.AddModelError(nameof(Input.AHVNumber), "Ungültige AHV-Nummer. Beispiel: 756.1234.5678.97");
+                    return Page();
+                }
+            }
 
             var body = new EmployeeUpdateDtoForApi
             {
@@ -78,24 +125,44 @@ namespace SwissLohnSystem.UI.Pages.Employees
                 EndDate = Input.EndDate,
                 Active = Input.Active,
 
-                // opsiyoneller alanlar (þimdilik dokunmuyoruz):
-                AHVNumber = null,
-                Krankenkasse = null,
-                BVGPlan = null,
-                PensumPercent = null,
-                HolidayRate = null,
-                OvertimeRate = null,
-                WithholdingTaxCode = null,
-                Address = null,
-                Zip = null,
-                City = null,
-                Phone = null
+                AHVNumber = string.IsNullOrWhiteSpace(Input.AHVNumber) ? null : Input.AHVNumber.Trim(),
+                Krankenkasse = string.IsNullOrWhiteSpace(Input.Krankenkasse) ? null : Input.Krankenkasse.Trim(),
+                BVGPlan = string.IsNullOrWhiteSpace(Input.BVGPlan) ? null : Input.BVGPlan.Trim(),
+
+                PensumPercent = Input.PensumPercent,
+                HolidayRate = Input.HolidayRate,
+                OvertimeRate = Input.OvertimeRate,
+                WithholdingTaxCode = string.IsNullOrWhiteSpace(Input.WithholdingTaxCode)
+                    ? null
+                    : Input.WithholdingTaxCode.Trim(),
+
+                Address = string.IsNullOrWhiteSpace(Input.Address) ? null : Input.Address.Trim(),
+                Zip = string.IsNullOrWhiteSpace(Input.Zip) ? null : Input.Zip.Trim(),
+                City = string.IsNullOrWhiteSpace(Input.City) ? null : Input.City.Trim(),
+                Phone = string.IsNullOrWhiteSpace(Input.Phone) ? null : Input.Phone.Trim(),
+
+                WeeklyHours = Input.WeeklyHours ?? 0,
+                ApplyAHV = Input.ApplyAHV,
+                ApplyALV = Input.ApplyALV,
+                ApplyNBU = Input.ApplyNBU,
+                ApplyBU = Input.ApplyBU,
+                ApplyBVG = Input.ApplyBVG,
+                ApplyFAK = Input.ApplyFAK,
+                ApplyQST = Input.ApplyQST,
+
+                HolidayEligible = Input.HolidayEligible,
+                ThirteenthEligible = Input.ThirteenthEligible,
+                ThirteenthProrated = Input.ThirteenthProrated,
+
+                PermitType = string.IsNullOrWhiteSpace(Input.PermitType) ? "B" : Input.PermitType.Trim(),
+                ChurchMember = Input.ChurchMember,
+                Canton = string.IsNullOrWhiteSpace(Input.Canton) ? "ZH" : Input.Canton.Trim()
             };
 
-            var (ok, _, msg) = await _api.PutAsync<string>($"/api/Employee/{Input.Id}", body);
-            if (!ok)
+            var (success, _, message) = await _api.PutAsync<string>($"/api/Employee/{Input.Id}", body);
+            if (!success)
             {
-                ModelState.AddModelError(string.Empty, msg ?? "Aktualisierung fehlgeschlagen.");
+                ModelState.AddModelError(string.Empty, message ?? "Aktualisierung fehlgeschlagen.");
                 return Page();
             }
 
@@ -118,15 +185,53 @@ namespace SwissLohnSystem.UI.Pages.Employees
             public string? MaritalStatus { get; set; }
             [Range(0, 20)] public int? ChildCount { get; set; }
 
-            [Required, RegularExpression("Monatslohn|Stundenlohn")] public string? SalaryTypeOption { get; set; }
+            [Required, RegularExpression("Monatslohn|Stundenlohn")]
+            public string? SalaryTypeOption { get; set; }
+
             [Range(0, 1000)] public decimal? HourlyRate { get; set; }
             [Range(0, 300)] public int? MonthlyHours { get; set; }
-            [Range(0, 1000000)] public decimal? BruttoSalary { get; set; }
+            [Range(0, 1_000_000)] public decimal? BruttoSalary { get; set; }
 
             [Required] public DateTime? StartDate { get; set; }
             public DateTime? EndDate { get; set; }
 
             public bool Active { get; set; }
+
+            // Payroll / Arbeitszeit
+            [Range(0, 80)] public int? WeeklyHours { get; set; }
+            [Range(0, 100)] public decimal? PensumPercent { get; set; }
+            [Range(0, 100)] public decimal? HolidayRate { get; set; }
+            [Range(0, 10)] public decimal? OvertimeRate { get; set; }
+
+            public bool HolidayEligible { get; set; }
+            public bool ThirteenthEligible { get; set; }
+            public bool ThirteenthProrated { get; set; }
+
+            // Sozialversicherungen Flags
+            public bool ApplyAHV { get; set; }
+            public bool ApplyALV { get; set; }
+            public bool ApplyNBU { get; set; }
+            public bool ApplyBU { get; set; }
+            public bool ApplyBVG { get; set; }
+            public bool ApplyFAK { get; set; }
+            public bool ApplyQST { get; set; }
+
+            // Steuer / Kanton
+            public string? PermitType { get; set; }
+            public bool ChurchMember { get; set; }
+            [StringLength(2)] public string? Canton { get; set; }
+            public string? WithholdingTaxCode { get; set; }
+
+            // Sozialversicherung
+            public string? AHVNumber { get; set; }
+            public string? Krankenkasse { get; set; }
+            public string? BVGPlan { get; set; }
+
+            // Adresse & Kontakt
+            public string? Address { get; set; }
+            public string? Zip { get; set; }
+            public string? City { get; set; }
+            public string? Phone { get; set; }
         }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
@@ -134,16 +239,22 @@ namespace SwissLohnSystem.UI.Pages.Employees
             if (Input.SalaryTypeOption == "Stundenlohn")
             {
                 if (Input.HourlyRate is null or <= 0)
-                    yield return new ValidationResult("Stundenlohn ist erforderlich und muss größer als 0 sein.", new[] { nameof(Input.HourlyRate) });
+                    yield return new ValidationResult(
+                        "Stundenlohn ist erforderlich und muss größer als 0 sein.",
+                        new[] { nameof(Input.HourlyRate) });
             }
             else if (Input.SalaryTypeOption == "Monatslohn")
             {
                 if (Input.BruttoSalary is null or <= 0)
-                    yield return new ValidationResult("Bruttolohn ist erforderlich und muss größer als 0 sein.", new[] { nameof(Input.BruttoSalary) });
+                    yield return new ValidationResult(
+                        "Bruttolohn ist erforderlich und muss größer als 0 sein.",
+                        new[] { nameof(Input.BruttoSalary) });
             }
 
             if (Input.EndDate.HasValue && Input.StartDate.HasValue && Input.EndDate < Input.StartDate)
-                yield return new ValidationResult("Enddatum darf nicht vor dem Startdatum liegen.", new[] { nameof(Input.EndDate) });
+                yield return new ValidationResult(
+                    "Enddatum darf nicht vor dem Startdatum liegen.",
+                    new[] { nameof(Input.EndDate) });
         }
 
         // ----- API DTO’larý -----
@@ -156,6 +267,10 @@ namespace SwissLohnSystem.UI.Pages.Employees
             DateTime StartDate, DateTime? EndDate, bool Active,
             string? AHVNumber, string? Krankenkasse, string? BVGPlan,
             decimal? PensumPercent, decimal? HolidayRate, decimal? OvertimeRate, string? WithholdingTaxCode,
+            int WeeklyHours,
+            bool ApplyAHV, bool ApplyALV, bool ApplyNBU, bool ApplyBU, bool ApplyBVG, bool ApplyFAK, bool ApplyQST,
+            bool HolidayEligible, bool ThirteenthEligible, bool ThirteenthProrated,
+            string PermitType, bool ChurchMember, string Canton,
             string? Address, string? Zip, string? City, string? Phone
         );
 
@@ -185,6 +300,24 @@ namespace SwissLohnSystem.UI.Pages.Employees
             public decimal? HolidayRate { get; set; }
             public decimal? OvertimeRate { get; set; }
             public string? WithholdingTaxCode { get; set; }
+
+            public int WeeklyHours { get; set; }
+            public bool ApplyAHV { get; set; }
+            public bool ApplyALV { get; set; }
+            public bool ApplyNBU { get; set; }
+            public bool ApplyBU { get; set; }
+            public bool ApplyBVG { get; set; }
+            public bool ApplyFAK { get; set; }
+            public bool ApplyQST { get; set; }
+
+            public bool HolidayEligible { get; set; }
+            public bool ThirteenthEligible { get; set; }
+            public bool ThirteenthProrated { get; set; }
+
+            public string PermitType { get; set; } = "B";
+            public bool ChurchMember { get; set; }
+            public string Canton { get; set; } = "ZH";
+
             public string? Address { get; set; }
             public string? Zip { get; set; }
             public string? City { get; set; }

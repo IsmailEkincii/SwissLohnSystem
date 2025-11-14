@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SwissLohnSystem.API.Data;
-using SwissLohnSystem.API.DTOs.Companies;   // CompanyDto, CompanyCreateDto, CompanyUpdateDto
-using SwissLohnSystem.API.DTOs.Employees;   // EmployeeDto
-using SwissLohnSystem.API.Mappings;         // CompanyMappings
+using SwissLohnSystem.API.DTOs.Companies;
+using SwissLohnSystem.API.DTOs.Employees;
+using SwissLohnSystem.API.Mappings;
 using SwissLohnSystem.API.Models;
 using SwissLohnSystem.API.Responses;
 
@@ -119,22 +119,11 @@ namespace SwissLohnSystem.API.Controllers
             if (!exists)
                 return NotFound(ApiResponse<IEnumerable<EmployeeDto>>.Fail("Firma wurde nicht gefunden."));
 
-            // EmployeeDto mapping'ini projenizde zaten inline kurmuşsunuz; onu koruyorum.
             var list = await _context.Employees
                 .AsNoTracking()
                 .Where(e => e.CompanyId == id)
                 .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
-                .Select(e => new EmployeeDto(
-                    e.Id, e.CompanyId,
-                    e.FirstName, e.LastName,
-                    e.Email, e.Position,
-                    e.BirthDate, e.MaritalStatus, e.ChildCount,
-                    e.SalaryType, e.HourlyRate, e.MonthlyHours, e.BruttoSalary,
-                    e.StartDate, e.EndDate, e.Active,
-                    e.AHVNumber, e.Krankenkasse, e.BVGPlan,
-                    e.PensumPercent, e.HolidayRate, e.OvertimeRate, e.WithholdingTaxCode,
-                    e.Address, e.Zip, e.City, e.Phone
-                ))
+                .Select(e => e.ToDto())   // 🔴 BURASI DÜZENLENDİ
                 .ToListAsync();
 
             return ApiResponse<IEnumerable<EmployeeDto>>.Ok(list, "Mitarbeiterliste wurde erfolgreich geladen.");

@@ -94,6 +94,27 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("ApplyAHV")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyALV")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyBU")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyBVG")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyFAK")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyNBU")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyQST")
+                        .HasColumnType("bit");
+
                     b.Property<string>("BVGPlan")
                         .HasColumnType("nvarchar(max)");
 
@@ -101,10 +122,17 @@ namespace SwissLohnSystem.API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("BruttoSalary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Canton")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ChildCount")
                         .HasColumnType("int");
+
+                    b.Property<bool>("ChurchMember")
+                        .HasColumnType("bit");
 
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
@@ -122,11 +150,14 @@ namespace SwissLohnSystem.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HolidayEligible")
+                        .HasColumnType("bit");
+
                     b.Property<decimal?>("HolidayRate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("HourlyRate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Krankenkasse")
                         .HasColumnType("nvarchar(max)");
@@ -145,10 +176,14 @@ namespace SwissLohnSystem.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal?>("OvertimeRate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal?>("PensumPercent")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PermitType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
@@ -162,6 +197,15 @@ namespace SwissLohnSystem.API.Migrations
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("ThirteenthEligible")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ThirteenthProrated")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("WeeklyHours")
+                        .HasColumnType("int");
 
                     b.Property<string>("WithholdingTaxCode")
                         .HasColumnType("nvarchar(max)");

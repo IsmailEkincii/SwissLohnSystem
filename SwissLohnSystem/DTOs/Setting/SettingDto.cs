@@ -2,8 +2,8 @@
 
 public sealed class SettingDto
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public int Id { get; set; }                 // <-- EKLİ
+    public string Name { get; set; } = null!;
     public decimal Value { get; set; }
     public string? Description { get; set; }
 }

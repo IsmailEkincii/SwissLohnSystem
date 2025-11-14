@@ -16,7 +16,14 @@
                     <li class="breadcrumb-item"><a href="~/">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="~/Companies">Firmen</a></li>
                     <li class="breadcrumb-item">
-                        <a href="~/Companies/Details/@Model.Employee?.CompanyId">@Model.Company?.Name</a>
+                        @if (Model.Employee?.CompanyId != null && Model.Company != null)
+                        {
+                            <a href="~/Companies/Details/@Model.Employee.CompanyId">@Model.Company.Name</a>
+                        }
+                        else
+                        {
+                            @:Firma
+                        }
                     </li>
                     <li class="breadcrumb-item active">Mitarbeiter</li>
                 </ol>
@@ -39,9 +46,12 @@
                 <div class="card card-outline card-primary">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h3 class="card-title mb-0">Profil</h3>
-                        <a class="btn btn-sm btn-outline-secondary" href="~/Employees/Edit/@Model.Employee?.Id">
-                            <i class="fas fa-edit"></i> Bearbeiten
-                        </a>
+                        @if (Model.Employee?.Id != null)
+                        {
+                            <a class="btn btn-sm btn-outline-secondary" href="~/Employees/Edit/@Model.Employee.Id">
+                                <i class="fas fa-edit"></i> Bearbeiten
+                            </a>
+                        }
                     </div>
                     <div class="card-body">
                         <dl class="row">
@@ -64,19 +74,35 @@
                             </dd>
 
                             <dt class="col-5">Position</dt>
-                            <dd class="col-7">@((!string.IsNullOrWhiteSpace(Model.Employee?.Position)) ? Model.Employee!.Position : "—")</dd>
+                            <dd class="col-7">
+                                @((!string.IsNullOrWhiteSpace(Model.Employee?.Position))
+                                                                ? Model.Employee!.Position
+                                                                : "—")
+                            </dd>
 
                             <dt class="col-5">Geburtsdatum</dt>
-                            <dd class="col-7">@((Model.Employee?.BirthDate.HasValue == true) ? Model.Employee!.BirthDate!.Value.ToString("dd.MM.yyyy") : "—")</dd>
+                            <dd class="col-7">
+                                @((Model.Employee?.BirthDate.HasValue == true)
+                                                                ? Model.Employee!.BirthDate!.Value.ToString("dd.MM.yyyy")
+                                                                : "—")
+                            </dd>
 
                             <dt class="col-5">Familienstand</dt>
-                            <dd class="col-7">@((!string.IsNullOrWhiteSpace(Model.Employee?.MaritalStatus)) ? Model.Employee!.MaritalStatus : "—")</dd>
+                            <dd class="col-7">
+                                @((!string.IsNullOrWhiteSpace(Model.Employee?.MaritalStatus))
+                                                                ? Model.Employee!.MaritalStatus
+                                                                : "—")
+                            </dd>
 
                             <dt class="col-5">Kinder</dt>
                             <dd class="col-7">@Model.Employee?.ChildCount</dd>
 
                             <dt class="col-5">Krankenkasse</dt>
-                            <dd class="col-7">@Model.Employee?.Krankenkasse</dd>
+                            <dd class="col-7">
+                                @(!string.IsNullOrWhiteSpace(Model.Employee?.Krankenkasse)
+                                                                ? Model.Employee.Krankenkasse
+                                                                : "—")
+                            </dd>
 
                             <dt class="col-5">Status</dt>
                             <dd class="col-7">
@@ -86,19 +112,28 @@
                                 }
                                 else
                                 {
-
                                     <span class="badge badge-secondary">Inaktiv</span>
                                 }
                             </dd>
 
                             <dt class="col-5">Start</dt>
-                            <dd class="col-7">@Model.Employee?.StartDate.ToString("dd.MM.yyyy")</dd>
+                            <dd class="col-7">
+                                @(Model.Employee?.StartDate.ToString("dd.MM.yyyy") ?? "—")
+                            </dd>
 
                             <dt class="col-5">Ende</dt>
-                            <dd class="col-7">@((Model.Employee?.EndDate.HasValue == true) ? Model.Employee!.EndDate!.Value.ToString("dd.MM.yyyy") : "—")</dd>
+                            <dd class="col-7">
+                                @((Model.Employee?.EndDate.HasValue == true)
+                                                                ? Model.Employee!.EndDate!.Value.ToString("dd.MM.yyyy")
+                                                                : "—")
+                            </dd>
 
                             <dt class="col-5">Gehaltsart</dt>
-                            <dd class="col-7">@(((Model.Employee?.SalaryType == "Hourly") ? "Stundenlohn" : "Monatslohn"))</dd>
+                            <dd class="col-7">
+                                @(((Model.Employee?.SalaryType == "Hourly")
+                                                                ? "Stundenlohn"
+                                                                : "Monatslohn"))
+                            </dd>
 
                             <dt class="col-5">Bruttolohn (Monat)</dt>
                             <dd class="col-7">@Model.Employee?.BruttoSalary.ToString("N2")</dd>
@@ -116,15 +151,19 @@
             <!-- Lohnverlauf -->
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header">
                         <h3 class="card-title mb-0">Lohnverlauf</h3>
-                        <div>
-                            <a class="btn btn-sm btn-outline-primary" href="~/Companies/Details/@Model.Employee?.CompanyId#loehne">
+                    </div>
+
+                    <div class="card-body table-responsive p-2">
+                        <!-- 🔹 HER ZAMAN GÖRÜNECEK BUTON -->
+                        <div class="mb-3 text-right">
+                            <a class="btn btn-sm btn-primary"
+                               href="~/Companies/Details/@(Model.Employee?.CompanyId ?? 0)#loehne">
                                 <i class="fas fa-calculator"></i> Lohn berechnen
                             </a>
                         </div>
-                    </div>
-                    <div class="card-body table-responsive p-0">
+
                         <table class="table table-striped table-hover mb-0">
                             <thead>
                                 <tr>
@@ -134,35 +173,192 @@
                                     <th>Netto</th>
                                     <th>Überstunden</th>
                                     <th>Ferien</th>
+                                    <th>Status</th>
+                                    <th style="width:140px;">Aktion</th>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 @if (Model.LohnList is { } ll && ll.Any())
                                 {
-                                    foreach (var l in ll)
+                                    @foreach (var l in ll)
                                     {
-                                        <tr>
-                                            <td>@l.Month.@l.Year</td>
+                                        <tr class="lohn-row"
+                                            data-employee="@l.EmployeeId"
+                                            data-year="@l.Year"
+                                            data-month="@l.Month"
+                                            data-brutto="@l.BruttoSalary"
+                                            data-net="@l.NetSalary"
+                                            data-totalded="@l.TotalDeductions"
+                                            data-ot="@l.OvertimePay"
+                                            data-holiday="@l.HolidayAllowance">
+                                            <td>@l.Month.ToString("00").@l.Year</td>
                                             <td>@l.BruttoSalary.ToString("N2")</td>
                                             <td>@l.TotalDeductions.ToString("N2")</td>
                                             <td><strong>@l.NetSalary.ToString("N2")</strong></td>
                                             <td>@l.OvertimePay.ToString("N2")</td>
                                             <td>@l.HolidayAllowance.ToString("N2")</td>
+                                            <td>
+                                                @if (l.IsFinal)
+                                                {
+                                                    <span class="badge badge-success">Final</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-warning">Entwurf</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <button type="button"
+                                                        class="btn btn-xs btn-outline-primary btn-lohn-detail">
+                                                    <i class="fas fa-file-invoice"></i> Details / PDF
+                                                </button>
+                                            </td>
                                         </tr>
                                     }
                                 }
                                 else
                                 {
                                     <tr>
-                                        <td colspan="6" class="text-center text-muted p-4">Keine Lohnabrechnungen vorhanden.</td>
+                                        <td colspan="7" class="text-center text-muted p-4">
+                                            Keine Lohnabrechnungen vorhanden.
+                                        </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="card-footer text-muted small">
+                        Klicken Sie auf eine Zeile, um Details der Abrechnung zu sehen.
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 </section>
+<!-- 🔍 Lohn-Detail Modal -->
+<div class="modal fade" id="lohnDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Lohn-Details&nbsp;<span id="ldmPeriod" class="text-muted"></span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- 🔹 ÖZET KUTULARI: SADECE MODALDA GÖRÜNSÜN, PDF'DE DEĞİL -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <div class="info-box-content">
+                                <span class="info-box-text">Bruttolohn</span>
+                                <span class="info-box-number" id="ldmGross">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <div class="info-box-content">
+                                <span class="info-box-text">Abzüge (AN)</span>
+                                <span class="info-box-number" id="ldmEmpTotal">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <div class="info-box-content">
+                                <span class="info-box-text">AG-Kosten</span>
+                                <span class="info-box-number" id="ldmErTotal">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <div class="info-box-content">
+                                <span class="info-box-text">Netto auszuzahlen</span>
+                                <span class="info-box-number" id="ldmNet">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🔹 SADECE BURASI PDF / YAZDIRMA İÇİN KULLANILACAK -->
+                <div id="lohnDetailPrintable" class="p-3">
+
+                    <!-- ÜST HEADER: SOL = FIRMA, SAĞ = TARİH + PERSONEL -->
+                    <div class="row mb-4">
+                        <!-- Firma bilgileri -->
+                        <div class="col-sm-6 small">
+                            <strong>@Model.Company?.Name</strong><br />
+                            @Model.Company?.Address<br />
+                            @Model.Company?.Phone<br />
+                            @Model.Company?.Email<br />
+                            @Model.Company?.Canton
+                        </div>
+
+                        <!-- Tarih + Mitarbeiter -->
+                        <div class="col-sm-6 small text-right">
+                            @DateTime.Today.ToString("dd.MM.yyyy")<br />
+                            <br />
+                            <strong>Mitarbeiter</strong><br />
+                            @Model.Employee?.FirstName @Model.Employee?.LastName<br />
+                            @Model.Employee?.Address<br />
+                            @Model.Employee?.Zip @Model.Employee?.City<br />
+                            <br />
+                            <strong>Personal-Nr.</strong> @Model.Employee?.Id<br />
+                            <strong>AHV-Nr.</strong> @Model.Employee?.AHVNumber
+                        </div>
+                    </div>
+
+                    <h5 class="mb-2">
+                        Lohnabrechnung&nbsp;<span id="ldmPeriodHeader" class="text-muted"></span>
+                    </h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered" id="ldmSlipTable">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th style="width:40%;">Legende</th>
+                                    <th style="width:10%;" class="text-right">%</th>
+                                    <th style="width:15%;" class="text-right">Menge</th>
+                                    <th style="width:15%;" class="text-right">Ansatz</th>
+                                    <th style="width:20%;" class="text-right">Betrag</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ldmSlipBody">
+                                <!-- JS dolduracak -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div><!-- /#lohnDetailPrintable -->
+            </div><!-- /.modal-body -->
+
+            <div class="modal-footer">
+                <button id="btnLdmPrint" type="button" class="btn btn-outline-secondary">
+                    <i class="fas fa-print"></i> Drucken / PDF
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Schließen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        window.API_BASE_URL = "@(ViewData["ApiBaseUrl"] ?? "")";
+        window.EMPLOYEE_ID = @((Model.Employee?.Id ?? 0));
+        console.log("[lohnverlauf] (cshtml) EMPLOYEE_ID =", window.EMPLOYEE_ID);
+        console.log("[lohnverlauf] (cshtml) API_BASE_URL =", window.API_BASE_URL);
+    </script>
+    <script src="~/js/lohnverlauf-detail.js"></script>
+}
+

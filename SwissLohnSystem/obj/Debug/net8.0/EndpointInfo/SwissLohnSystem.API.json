@@ -723,7 +723,7 @@
         }
       }
     },
-    "/api/Lohn/calc-legacy": {
+    "/api/Lohn/calc-and-save": {
       "post": {
         "tags": [
           "Lohn"
@@ -732,17 +732,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LohnCalculateDto"
+                "$ref": "#/components/schemas/PayrollRequestDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LohnCalculateDto"
+                "$ref": "#/components/schemas/PayrollRequestDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LohnCalculateDto"
+                "$ref": "#/components/schemas/PayrollRequestDto"
               }
             }
           }
@@ -1720,18 +1720,23 @@
             "format": "int32"
           },
           "firstName": {
-            "minLength": 1,
+            "maxLength": 100,
+            "minLength": 0,
             "type": "string"
           },
           "lastName": {
-            "minLength": 1,
+            "maxLength": 100,
+            "minLength": 0,
             "type": "string"
           },
           "email": {
             "type": "string",
+            "format": "email",
             "nullable": true
           },
           "position": {
+            "maxLength": 100,
+            "minLength": 0,
             "type": "string",
             "nullable": true
           },
@@ -1750,9 +1755,12 @@
           },
           "salaryType": {
             "minLength": 1,
+            "pattern": "Monthly|Hourly",
             "type": "string"
           },
           "hourlyRate": {
+            "maximum": 1000000,
+            "minimum": 0,
             "type": "number",
             "format": "double"
           },
@@ -1761,6 +1769,8 @@
             "format": "int32"
           },
           "bruttoSalary": {
+            "maximum": 1000000,
+            "minimum": 0,
             "type": "number",
             "format": "double"
           },
@@ -1804,6 +1814,51 @@
             "nullable": true
           },
           "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "holidayEligible": {
+            "type": "boolean"
+          },
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "canton": {
             "type": "string",
             "nullable": true
           },
@@ -1925,6 +1980,51 @@
             "type": "string",
             "nullable": true
           },
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "holidayEligible": {
+            "type": "boolean"
+          },
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
           "address": {
             "type": "string",
             "nullable": true
@@ -1991,23 +2091,32 @@
         ],
         "type": "object",
         "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
           "companyId": {
             "type": "integer",
             "format": "int32"
           },
           "firstName": {
-            "minLength": 1,
+            "maxLength": 100,
+            "minLength": 0,
             "type": "string"
           },
           "lastName": {
-            "minLength": 1,
+            "maxLength": 100,
+            "minLength": 0,
             "type": "string"
           },
           "email": {
             "type": "string",
+            "format": "email",
             "nullable": true
           },
           "position": {
+            "maxLength": 100,
+            "minLength": 0,
             "type": "string",
             "nullable": true
           },
@@ -2026,9 +2135,12 @@
           },
           "salaryType": {
             "minLength": 1,
+            "pattern": "Monthly|Hourly",
             "type": "string"
           },
           "hourlyRate": {
+            "maximum": 1000000,
+            "minimum": 0,
             "type": "number",
             "format": "double"
           },
@@ -2037,6 +2149,8 @@
             "format": "int32"
           },
           "bruttoSalary": {
+            "maximum": 1000000,
+            "minimum": 0,
             "type": "number",
             "format": "double"
           },
@@ -2083,6 +2197,51 @@
             "type": "string",
             "nullable": true
           },
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "holidayEligible": {
+            "type": "boolean"
+          },
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
           "address": {
             "type": "string",
             "nullable": true
@@ -2098,10 +2257,6 @@
           "phone": {
             "type": "string",
             "nullable": true
-          },
-          "id": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
@@ -2354,48 +2509,54 @@
       "PayrollRequestDto": {
         "type": "object",
         "properties": {
-          "companyId": {
-            "type": "string",
-            "format": "uuid"
-          },
           "employeeId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "canton": {
-            "type": "string",
-            "nullable": true
+            "type": "integer",
+            "format": "int32"
           },
           "period": {
             "type": "string",
             "format": "date"
           },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
           "grossMonthly": {
             "type": "number",
             "format": "double"
           },
-          "thirteenthSalaryProrated": {
+          "applyAHV": {
             "type": "boolean"
           },
-          "age": {
-            "type": "integer",
-            "format": "int32"
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
           },
           "weeklyHours": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           },
           "permitType": {
             "type": "string",
             "nullable": true
           },
-          "maritalStatus": {
+          "withholdingTaxCode": {
             "type": "string",
             "nullable": true
-          },
-          "children": {
-            "type": "integer",
-            "format": "int32"
           },
           "churchMember": {
             "type": "boolean"

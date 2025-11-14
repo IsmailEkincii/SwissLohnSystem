@@ -33,7 +33,7 @@ namespace SwissLohnSystem.UI.Services.Mapping
         {
             Id = e.Id,
             CompanyId = e.CompanyId,
-            FullName = $"{e.FirstName} {e.LastName}".Trim(),
+            FirstName = $"{e.FirstName} {e.LastName}".Trim(),
             Email = e.Email,
             Position = e.Position,
             Active = e.Active

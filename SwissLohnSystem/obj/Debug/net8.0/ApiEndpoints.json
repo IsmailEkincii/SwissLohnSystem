@@ -556,7 +556,7 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto",
+        "Type": "PayrollRequestDto",
         "IsRequired": true
       }
     ],
@@ -574,15 +574,15 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "CalculateLegacy",
-    "RelativePath": "api/Lohn/calc-legacy",
+    "Method": "CalculateAndSave",
+    "RelativePath": "api/Lohn/calc-and-save",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "dto",
-        "Type": "SwissLohnSystem.API.DTOs.Lohn.LohnCalculateDto",
+        "Name": "request",
+        "Type": "PayrollRequestDto",
         "IsRequired": true
       }
     ],
