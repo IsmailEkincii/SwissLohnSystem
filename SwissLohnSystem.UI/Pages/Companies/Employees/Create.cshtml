@@ -248,17 +248,49 @@
                         </div>
                         <div class="form-group col-md-3">
                             <label asp-for="Input.Canton">Kanton</label>
-                            <input asp-for="Input.Canton" class="form-control" maxlength="2" />
+                            <select asp-for="Input.Canton" class="form-control">
+                                <option value="">-- bitte wählen --</option>
+                                <option value="ZH">ZH</option>
+                                <option value="BE">BE</option>
+                                <option value="LU">LU</option>
+                                <option value="UR">UR</option>
+                                <option value="SZ">SZ</option>
+                                <option value="OW">OW</option>
+                                <option value="NW">NW</option>
+                                <option value="GL">GL</option>
+                                <option value="ZG">ZG</option>
+                                <option value="FR">FR</option>
+                                <option value="SO">SO</option>
+                                <option value="BS">BS</option>
+                                <option value="BL">BL</option>
+                                <option value="SH">SH</option>
+                                <option value="AR">AR</option>
+                                <option value="AI">AI</option>
+                                <option value="SG">SG</option>
+                                <option value="GR">GR</option>
+                                <option value="AG">AG</option>
+                                <option value="TG">TG</option>
+                                <option value="TI">TI</option>
+                                <option value="VD">VD</option>
+                                <option value="VS">VS</option>
+                                <option value="NE">NE</option>
+                                <option value="GE">GE</option>
+                                <option value="JU">JU</option>
+                            </select>
                             <span asp-validation-for="Input.Canton" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-3">
                             <label asp-for="Input.WithholdingTaxCode">Quellensteuer-Tarif</label>
-                            <input asp-for="Input.WithholdingTaxCode" class="form-control" />
+                            <select asp-for="Input.WithholdingTaxCode"
+                                    class="form-control"
+                                    asp-items="Model.QstTariffCodes"
+                                    id="QstTarifSelect">
+                            </select>
                             <span asp-validation-for="Input.WithholdingTaxCode" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-3">
                             <div class="form-check mt-4">
-                                <input asp-for="Input.ApplyQST" class="form-check-input" />
+                                <input asp-for="Input.ApplyQST" class="form-check-input" id="ApplyQstCheckbox" />
                                 <label asp-for="Input.ApplyQST" class="form-check-label">Quellensteuer anwenden</label>
                             </div>
                             <div class="form-check mt-1">
@@ -285,7 +317,13 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label asp-for="Input.BVGPlan">BVG-Plan</label>
-                            <input asp-for="Input.BVGPlan" class="form-control" />
+                            <select asp-for="Input.BVGPlan"
+                                    class="form-control"
+                                    asp-items="Model.BvgPlans">
+                            </select>
+                            <span class="form-text text-muted">
+                                Wählen Sie den passenden BVG-Plan (z.B. Standard / Kader / Kein BVG).
+                            </span>
                             <span asp-validation-for="Input.BVGPlan" class="text-danger"></span>
                         </div>
                     </div>
@@ -360,6 +398,18 @@
           if (select) {
             select.addEventListener('change', updateReq);
             updateReq();
+          }
+
+          // QST seçili değilse tarif dropdown disable
+          const qstCheckbox = document.getElementById('ApplyQstCheckbox');
+          const qstSelect = document.getElementById('QstTarifSelect');
+          function toggleQstSelect() {
+              if (!qstSelect) return;
+              qstSelect.disabled = !qstCheckbox || !qstCheckbox.checked;
+          }
+          document.addEventListener('DOMContentLoaded', toggleQstSelect);
+          if (qstCheckbox) {
+              qstCheckbox.addEventListener('change', toggleQstSelect);
           }
         })();
     </script>

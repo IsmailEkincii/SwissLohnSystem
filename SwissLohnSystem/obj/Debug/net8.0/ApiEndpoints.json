@@ -556,7 +556,7 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "PayrollRequestDto",
+        "Type": "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto",
         "IsRequired": true
       }
     ],
@@ -582,7 +582,7 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "PayrollRequestDto",
+        "Type": "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto",
         "IsRequired": true
       }
     ],

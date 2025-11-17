@@ -2329,6 +2329,14 @@
             "type": "number",
             "format": "double"
           },
+          "monthlyHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthlyOvertimeHours": {
+            "type": "number",
+            "format": "double"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -2507,6 +2515,10 @@
         "additionalProperties": false
       },
       "PayrollRequestDto": {
+        "required": [
+          "employeeId",
+          "period"
+        ],
         "type": "object",
         "properties": {
           "employeeId": {
@@ -2515,7 +2527,7 @@
           },
           "period": {
             "type": "string",
-            "format": "date"
+            "format": "date-time"
           },
           "canton": {
             "type": "string",
@@ -2547,8 +2559,8 @@
             "type": "boolean"
           },
           "weeklyHours": {
-            "type": "number",
-            "format": "double"
+            "type": "integer",
+            "format": "int32"
           },
           "permitType": {
             "type": "string",

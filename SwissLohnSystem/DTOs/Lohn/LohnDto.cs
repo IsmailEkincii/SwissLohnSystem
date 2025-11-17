@@ -3,7 +3,7 @@
 namespace SwissLohnSystem.API.DTOs.Lohn
 {
     public record LohnDto(
-        int Id,
+     int Id,
         int EmployeeId,
         int Month,
         int Year,
@@ -13,6 +13,8 @@ namespace SwissLohnSystem.API.DTOs.Lohn
         decimal ChildAllowance,
         decimal HolidayAllowance,
         decimal OvertimePay,
+        decimal MonthlyHours,          // 🔥
+        decimal MonthlyOvertimeHours,  // 🔥
         DateTime CreatedAt,
         bool IsFinal
     );

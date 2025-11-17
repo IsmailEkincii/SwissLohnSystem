@@ -318,8 +318,21 @@
         })();
     </script>
 
+    <!-- 🔥 Toast mesajları (Create/Edit sonrası) -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            @if (TempData["ToastSuccess"] is string toastSuccess && !string.IsNullOrWhiteSpace(toastSuccess))
+            {
+                    <text>toastr.success("@toastSuccess");</text>
+            }
+
+            @if (TempData["ToastError"] is string toastError && !string.IsNullOrWhiteSpace(toastError))
+            {
+                    <text>toastr.error("@toastError");</text>
+            }
+        });
+    </script>
+
+    <script src="~/js/lohnverlauf-detail.js"></script>
     <script src="~/js/loehne-tab.js"></script>
 }
-
-
-

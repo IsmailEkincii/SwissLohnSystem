@@ -1,9 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SwissLohnSystem.UI.DTOs.Employees;
 using SwissLohnSystem.UI.Services;
 
 namespace SwissLohnSystem.UI.Pages.Companies.Employees
@@ -19,6 +22,12 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
+        // QST dropdown için
+        public List<SelectListItem> QstTariffCodes { get; set; } = new();
+
+        // 🔹 BVG-Plan dropdown için
+        public List<SelectListItem> BvgPlans { get; set; } = new();
+
         [TempData] public string? Toast { get; set; }
 
         public void OnGet(int companyId)
@@ -26,7 +35,7 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
             CompanyId = companyId;
             Input.CompanyId = companyId;
 
-            // Varsay�lanlar
+            // Varsayılanlar
             Input.StartDate = DateTime.Today;
             Input.Active = true;
             Input.WeeklyHours = 42;
@@ -39,22 +48,49 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
             Input.ApplyNBU = true;
             Input.ApplyBU = true;
             Input.ApplyFAK = true;
+
+            LoadLookups();
+        }
+
+        private void LoadLookups()
+        {
+            QstTariffCodes = new List<SelectListItem>
+            {
+                new() { Value = "", Text = "-- bitte wählen --" },
+                new() { Value = "A", Text = "A – ledig, ohne Kinder" },
+                new() { Value = "B", Text = "B – verheiratet, 1 Verdiener" },
+                new() { Value = "C", Text = "C – verheiratet, 2 Verdiener" },
+                new() { Value = "H", Text = "H – alleinerziehend" }
+                // İleride echtes QST-Setup aus DB
+            };
+
+            // 🔹 BVG-Plan seçenekleri
+            BvgPlans = new List<SelectListItem>
+            {
+                new() { Value = "", Text = "-- bitte wählen --" },
+                new() { Value = "None", Text = "Kein BVG (unter Eintrittsschwelle)" },
+                new() { Value = "Standard", Text = "Standard BVG-Plan" },
+                new() { Value = "Kader", Text = "Kader- / Management-Plan" }
+            };
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // Post’ta da dropdown boş kalmasın diye
+            LoadLookups();
+
             if (!ModelState.IsValid)
                 return Page();
 
             var salaryType = Input.SalaryTypeOption == "Stundenlohn" ? "Hourly" : "Monthly";
 
-            // Basit AHV format kontrol� (Create taraf�nda da)
+            // Basit AHV format kontrolü
             if (!string.IsNullOrWhiteSpace(Input.AHVNumber))
             {
                 var ok = Regex.IsMatch(Input.AHVNumber.Trim(), @"^(756\.\d{4}\.\d{4}\.\d{2}|756\d{10})$");
                 if (!ok)
                 {
-                    ModelState.AddModelError(nameof(Input.AHVNumber), "Ung�ltige AHV-Nummer. Beispiel: 756.1234.5678.97");
+                    ModelState.AddModelError(nameof(Input.AHVNumber), "Ungültige AHV-Nummer. Beispiel: 756.1234.5678.97");
                     return Page();
                 }
             }
@@ -111,14 +147,14 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
                 Canton = string.IsNullOrWhiteSpace(Input.Canton) ? "ZH" : Input.Canton.Trim()
             };
 
-            var (success, _, message) = await _api.PostAsync<string>("/api/Employee", body);
+            var (success, createdEmployee, message) = await _api.PostAsync<EmployeeDto>("/api/Employee", body);
             if (!success)
             {
                 ModelState.AddModelError(string.Empty, message ?? "Erstellung fehlgeschlagen.");
                 return Page();
             }
 
-            TempData["Alert"] = "Mitarbeiter erfolgreich erstellt.";
+            TempData["Alert"] = $"Mitarbeiter \"{Input.FirstName} {Input.LastName}\" wurde erfolgreich erstellt.";
             return RedirectToPage("/Companies/Details", new { id = Input.CompanyId });
         }
 
@@ -191,14 +227,14 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
             {
                 if (Input.HourlyRate is null or <= 0)
                     yield return new ValidationResult(
-                        "Stundenlohn ist erforderlich und muss gr��er als 0 sein.",
+                        "Stundenlohn ist erforderlich und muss größer als 0 sein.",
                         new[] { nameof(Input.HourlyRate) });
             }
             else if (Input.SalaryTypeOption == "Monatslohn")
             {
                 if (Input.BruttoSalary is null or <= 0)
                     yield return new ValidationResult(
-                        "Bruttolohn ist erforderlich und muss gr��er als 0 sein.",
+                        "Bruttolohn ist erforderlich und muss größer als 0 sein.",
                         new[] { nameof(Input.BruttoSalary) });
             }
 

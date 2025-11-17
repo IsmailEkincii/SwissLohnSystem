@@ -5,8 +5,8 @@ namespace SwissLohnSystem.API.Mappings
 {
     public static class LohnMappings
     {
-        public static LohnDto ToDto(this Lohn l) =>
-            new LohnDto(
+        public static LohnDto ToDto(this Lohn l)
+            => new LohnDto(
                 l.Id,
                 l.EmployeeId,
                 l.Month,
@@ -17,6 +17,8 @@ namespace SwissLohnSystem.API.Mappings
                 l.ChildAllowance,
                 l.HolidayAllowance,
                 l.OvertimePay,
+                l.MonthlyHours,          // 🔥 aylık toplam saat
+                l.MonthlyOvertimeHours,  // 🔥 aylık toplam mesai
                 l.CreatedAt,
                 l.IsFinal
             );

@@ -3,8 +3,8 @@
 namespace SwissLohnSystem.UI.DTOs.Lohn
 {
     /// <summary>
-    /// Tek bir Lohn kaydının tam temsili (detay sayfası için uygun).
-    /// API LohnDto ile birebir uyumludur.
+    /// Tek bir Lohn kaydının tam temsili (detay ve liste için).
+    /// API LohnDto ile birebir uyumlu olmalı.
     /// </summary>
     public record LohnDto(
         int Id,
@@ -17,6 +17,8 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
         decimal ChildAllowance,
         decimal HolidayAllowance,
         decimal OvertimePay,
+        decimal MonthlyHours,          // 🔥
+        decimal MonthlyOvertimeHours,  // 🔥
         DateTime CreatedAt,
         bool IsFinal
     );

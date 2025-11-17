@@ -9,7 +9,10 @@ function normalizeNumber(value) {
     return n;
 }
 
-function formatNumber(value, decimals = 2, showZero = true) {
+function formatNumber(value, decimals, showZero) {
+    if (decimals === undefined) decimals = 2;
+    if (showZero === undefined) showZero = true;
+
     var n = normalizeNumber(value);
     if (n === null) return "–";
     if (!showZero && n === 0) return "–";
@@ -23,11 +26,11 @@ function formatCurrency(amount, typeHint) {
     var t = (typeHint || "").toString().toLowerCase();
     var sign = "";
 
-    if (t.includes("deduct") || t.includes("abzug") || t.includes("employee")) {
+    if (t.indexOf("deduct") >= 0 || t.indexOf("abzug") >= 0 || t.indexOf("employee") >= 0) {
         sign = "-";
-    } else if (t.includes("employer") || t.includes("ag-kosten")) {
+    } else if (t.indexOf("employer") >= 0 || t.indexOf("ag-kosten") >= 0) {
         sign = "+";
-    } else if (t.includes("netto")) {
+    } else if (t.indexOf("netto") >= 0) {
         sign = "";
     } else {
         sign = "+";
@@ -61,7 +64,7 @@ var monthNamesDe = [
 document.addEventListener("DOMContentLoaded", function () {
 
     var EMPLOYEE_ID = window.EMPLOYEE_ID || 0;
-    var API_BASE_URL = window.API_BASE_URL || "";
+    var API_BASE_URL = (window.API_BASE_URL || "").replace(/\/+$/, "");
 
     console.log("[lohnverlauf] DOMContentLoaded");
     console.log("[lohnverlauf] EMPLOYEE_ID =", EMPLOYEE_ID);
@@ -73,6 +76,49 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!rows || rows.length === 0) {
         console.log("[lohnverlauf] no rows found");
         return;
+    }
+
+    // 🔥 WorkDays'ten belirli bir ay için toplam saat hesapla
+    async function loadMonthHoursFromWorkDays(year, month) {
+        if (!EMPLOYEE_ID || !API_BASE_URL) return { total: null, overtime: null };
+
+        var url = API_BASE_URL + "/api/WorkDay/Employee/" + EMPLOYEE_ID;
+        console.log("[lohnverlauf] loadMonthHoursFromWorkDays GET", url);
+
+        try {
+            var res = await fetch(url);
+            if (!res.ok) {
+                console.warn("[lohnverlauf] WorkDay HTTP error", res.status);
+                return { total: null, overtime: null };
+            }
+
+            var json = await res.json();
+            console.log("[lohnverlauf] WorkDay response", json);
+
+            if (!json.success || !json.data) return { total: null, overtime: null };
+
+            var list = json.data;
+            var ym = year + "-" + String(month).padStart(2, "0");
+
+            var total = 0;
+            var ot = 0;
+
+            list.forEach(function (w) {
+                if (!w.date) return;
+                var dateStr = w.date.split("T")[0]; // "2025-11-14"
+                if (dateStr.indexOf(ym) !== 0) return;
+
+                var h = normalizeNumber(w.hoursWorked);
+                var oh = normalizeNumber(w.overtimeHours);
+                if (h !== null) total += h;
+                if (oh !== null) ot += oh;
+            });
+
+            return { total: total, overtime: ot };
+        } catch (e) {
+            console.error("[lohnverlauf] WorkDay load exception", e);
+            return { total: null, overtime: null };
+        }
     }
 
     async function openLohnDetail(row) {
@@ -96,6 +142,40 @@ document.addEventListener("DOMContentLoaded", function () {
         var netFromRow = row.getAttribute("data-net");
         var totalDedFromRow = row.getAttribute("data-totalded");
 
+        // 🔥 Aylık saatler (row attribute'larından)
+        var mhoursFromRow = row.getAttribute("data-mhours");
+        var motHoursFromRow = row.getAttribute("data-mot-hours");
+        console.log("[lohnverlauf] mhoursFromRow =", mhoursFromRow, "motHoursFromRow =", motHoursFromRow);
+
+        var spanMonthlyHours = document.getElementById("ldmMonthlyHours");
+        var spanMonthlyOvertime = document.getElementById("ldmMonthlyOvertime");
+
+        var mhoursNum = normalizeNumber(mhoursFromRow);
+        var motNum = normalizeNumber(motHoursFromRow);
+
+        if (mhoursNum !== null || motNum !== null) {
+            // Lohn tablosunda saatler varsa direkt kullan
+            if (spanMonthlyHours) {
+                spanMonthlyHours.textContent = formatNumber(mhoursNum || 0, 2, true) + " h";
+            }
+            if (spanMonthlyOvertime) {
+                spanMonthlyOvertime.textContent = formatNumber(motNum || 0, 2, true) + " h";
+            }
+        } else {
+            // 🔥 Fallback: WorkDays'ten hesapla
+            var hoursResult = await loadMonthHoursFromWorkDays(parseInt(year, 10), parseInt(month, 10));
+            console.log("[lohnverlauf] hoursResult =", hoursResult);
+
+            if (spanMonthlyHours) {
+                spanMonthlyHours.textContent =
+                    hoursResult.total !== null ? formatNumber(hoursResult.total, 2, true) + " h" : "–";
+            }
+            if (spanMonthlyOvertime) {
+                spanMonthlyOvertime.textContent =
+                    hoursResult.overtime !== null ? formatNumber(hoursResult.overtime, 2, true) + " h" : "–";
+            }
+        }
+
         // Modal başlığındaki küçük yazı
         var spanPeriodTitle = document.getElementById("ldmPeriod");
         if (spanPeriodTitle) spanPeriodTitle.textContent = period;
@@ -107,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
             spanPeriodHeader.textContent = monthName + " " + year;
         }
 
-        var url = (API_BASE_URL ? API_BASE_URL : "") + "/api/Lohn/calc";
+        var url = API_BASE_URL + "/api/Lohn/calc";
 
         if (!EMPLOYEE_ID) {
             alert("EMPLOYEE_ID fehlt – Mitarbeiter konnte nicht ermittelt werden.");
@@ -173,11 +253,15 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             // ---- 2) NETTO: API -> satır ----
-            var netVal = d.netToPay ?? netFromRow ?? null;
+            var netVal = (d.netToPay !== undefined && d.netToPay !== null) ? d.netToPay : netFromRow;
             var netNum = normalizeNumber(netVal);
 
             // ---- 3) BRUTTO: API -> satır -> (net + AN) ----
-            var grossVal = d.grossSalary ?? d.bruttoSalary ?? grossFromRow ?? null;
+            var grossVal = (d.grossSalary !== undefined && d.grossSalary !== null)
+                ? d.grossSalary
+                : (d.bruttoSalary !== undefined && d.bruttoSalary !== null
+                    ? d.bruttoSalary
+                    : grossFromRow);
             var grossNum = normalizeNumber(grossVal);
 
             if (grossNum === null || grossNum === 0) {
@@ -206,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (sumEr) sumEr.textContent = formatNumber(totalEmployerCost);
             if (sumNet) sumNet.textContent = formatNumber(netVal);
 
-            // Modal başındaki küçük kartlar (varsa)
+            // Modal başındaki küçük kartlar
             var cardGross = document.getElementById("ldmGross");
             var cardEmp = document.getElementById("ldmEmpTotal");
             var cardEr = document.getElementById("ldmErTotal");
@@ -223,8 +307,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 var side = (x.side || "").toString().toLowerCase();
 
                 var isEarning =
-                    typeRaw.includes("earn") ||
-                    typeRaw.includes("lohn") ||
+                    typeRaw.indexOf("earn") >= 0 ||
+                    typeRaw.indexOf("lohn") >= 0 ||
                     (typeRaw === "" && (side === "" || side === "employee"));
 
                 if (!isEarning) return;
@@ -370,12 +454,12 @@ document.addEventListener("DOMContentLoaded", function () {
             ], true);
 
             // ---- Modal aç ----
-            if (window.$ && $("#lohnDetailModal").modal) {
-                $("#lohnDetailModal").modal("show");
+            if (window.$ && window.$("#lohnDetailModal").modal) {
+                window.$("#lohnDetailModal").modal("show");
             } else {
                 var modalEl = document.getElementById("lohnDetailModal");
-                if (modalEl && window.bootstrap && bootstrap.Modal) {
-                    var m = bootstrap.Modal.getOrCreateInstance(modalEl);
+                if (modalEl && window.bootstrap && window.bootstrap.Modal) {
+                    var m = window.bootstrap.Modal.getOrCreateInstance(modalEl);
                     m.show();
                 } else {
                     alert("Netto: " + formatCurrency(netVal, "netto"));
@@ -420,38 +504,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
             var win = window.open("", "_blank");
             win.document.write("<html><head><title>Lohnabrechnung</title>");
-            win.document.write(`
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        font-size: 13px;
-        line-height: 1.5;
-        margin: 18mm;
-    }
-    h5 {
-        margin: 0 0 6mm 0;
-        font-size: 15px;
-        font-weight: bold;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 4mm;
-    }
-    th, td {
-        border: 1px solid #d0d0d0;
-        padding: 5px 7px;
-        font-size: 12px;
-    }
-    th {
-        background: #f0f4fb;
-        font-weight: bold;
-    }
-    .bg-light {
-        background: #f7f7f7 !important;
-    }
-    .text-right { text-align: right; }
-</style>`);
+            win.document.write(
+                "<style>" +
+                "body{font-family:Arial,sans-serif;font-size:13px;line-height:1.5;margin:18mm;}" +
+                "h5{margin:0 0 6mm 0;font-size:15px;font-weight:bold;}" +
+                "table{width:100%;border-collapse:collapse;margin-top:4mm;}" +
+                "th,td{border:1px solid #d0d0d0;padding:5px 7px;font-size:12px;}" +
+                "th{background:#f0f4fb;font-weight:bold;}" +
+                ".bg-light{background:#f7f7f7 !important;}" +
+                ".text-right{text-align:right;}" +
+                "</style>"
+            );
             win.document.write("</head><body>");
             win.document.write(printable.innerHTML);
             win.document.write("</body></html>");

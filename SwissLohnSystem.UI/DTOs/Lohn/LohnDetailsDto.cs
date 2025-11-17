@@ -4,8 +4,7 @@ using System.Collections.Generic;
 namespace SwissLohnSystem.UI.DTOs.Lohn
 {
     /// <summary>
-    /// Detay sayfası için genişletilebilir DTO (ileride kalem bazında döküm için).
-    /// Şimdilik LohnDto alanlarını taşıyor; PayrollItem eklendiğinde Items doldurulabilir.
+    /// Lohn detay modal/sayfası için genişletilmiş DTO.
     /// </summary>
     public class LohnDetailsDto
     {
@@ -21,6 +20,10 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
         public decimal HolidayAllowance { get; set; }
         public decimal OvertimePay { get; set; }
 
+        // 🔥 Aylık çalışma saatleri
+        public decimal MonthlyHours { get; set; }
+        public decimal MonthlyOvertimeHours { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public bool IsFinal { get; set; }
 
@@ -29,7 +32,7 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
         public int? CompanyId { get; set; }
         public string? CompanyName { get; set; }
 
-        // İleride: kalem dökümü (AHV/ALV/NBU/BVG/QST vs.)
+        // İleride kalem dökümü için (şimdilik boş)
         public List<LohnItemDto> Items { get; set; } = new();
     }
 
@@ -38,9 +41,9 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
         public string Code { get; set; } = "";         // AHV, ALV, NBU, BU, BVG, QST, FAK, etc.
         public string Title { get; set; } = "";        // DE başlık
         public string Type { get; set; } = "info";     // deduction | contribution | info
-        public string Basis { get; set; } = "";        // Örn: "Brutto", "Koord. Lohn", "bis 12’350"
+        public string Basis { get; set; } = "";        // Örn: Brutto, Koord. Lohn
         public decimal Rate { get; set; }              // 0.053 vb.
-        public decimal Amount { get; set; }            // +/-
+        public decimal Amount { get; set; }            // +/- tutar
         public string Side { get; set; } = "employee"; // employee | employer
     }
 }

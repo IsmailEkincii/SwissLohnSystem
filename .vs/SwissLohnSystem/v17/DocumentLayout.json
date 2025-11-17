@@ -3,24 +3,40 @@
   "WorkspaceRootPath": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\pages\\employees\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\pages\\employees\\details.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\pages\\employees\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\pages\\employees\\edit.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\wwwroot\\js\\lohnverlauf-detail.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
-      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\wwwroot\\js\\lohnverlauf-detail.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\pages\\employees\\edit.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\pages\\employees\\edit.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FE8D9A4E-6117-4E76-8A3B-7558467CFE82}|SwissLohnSystem\\SwissLohnSystem.API.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem\\models\\company.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FE8D9A4E-6117-4E76-8A3B-7558467CFE82}|SwissLohnSystem\\SwissLohnSystem.API.csproj|solutionrelative:swisslohnsystem\\models\\company.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\pages\\companies\\employees\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\pages\\companies\\employees\\create.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\pages\\employees\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\pages\\employees\\details.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\pages\\companies\\employees\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\pages\\companies\\employees\\create.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\services\\apiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\services\\apiclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\dtos\\employees\\employeeupdatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\dtos\\employees\\employeeupdatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\dtos\\employees\\employeedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\dtos\\employees\\employeedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem.ui\\dtos\\employees\\employeecreatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{ABDD8A84-FE35-4126-B949-9D3D2A60C4C5}|SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj|solutionrelative:swisslohnsystem.ui\\dtos\\employees\\employeecreatedto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FE8D9A4E-6117-4E76-8A3B-7558467CFE82}|SwissLohnSystem\\SwissLohnSystem.API.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem\\controllers\\lohncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FE8D9A4E-6117-4E76-8A3B-7558467CFE82}|SwissLohnSystem\\SwissLohnSystem.API.csproj|solutionrelative:swisslohnsystem\\controllers\\lohncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FE8D9A4E-6117-4E76-8A3B-7558467CFE82}|SwissLohnSystem\\SwissLohnSystem.API.csproj|c:\\users\\smale\\source\\repos\\swisslohnsystem\\swisslohnsystem\\controllers\\employeecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FE8D9A4E-6117-4E76-8A3B-7558467CFE82}|SwissLohnSystem\\SwissLohnSystem.API.csproj|solutionrelative:swisslohnsystem\\controllers\\employeecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +46,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 8,
+          "SelectedChildIndex": 9,
           "Children": [
             {
               "$type": "Bookmark",
@@ -50,67 +66,119 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Company.cs",
-              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem\\Models\\Company.cs",
-              "RelativeDocumentMoniker": "SwissLohnSystem\\Models\\Company.cs",
-              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem\\Models\\Company.cs",
-              "RelativeToolTip": "SwissLohnSystem\\Models\\Company.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 5,
+              "Title": "EmployeeDto.cs",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeDto.cs",
+              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeDto.cs",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeDto.cs",
+              "RelativeToolTip": "SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeDto.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAA4wD8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-14T01:03:56.48Z",
+              "WhenOpened": "2025-11-16T22:11:02.381Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ApiClient.cs",
-              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Services\\ApiClient.cs",
-              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\Services\\ApiClient.cs",
-              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Services\\ApiClient.cs",
-              "RelativeToolTip": "SwissLohnSystem.UI\\Services\\ApiClient.cs",
-              "ViewState": "AgIAADUAAAAAAAAAAAAUwFgAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 6,
+              "Title": "EmployeeCreateDto.cs",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeCreateDto.cs",
+              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeCreateDto.cs",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeCreateDto.cs",
+              "RelativeToolTip": "SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeCreateDto.cs",
+              "ViewState": "AgIAAD0AAAAAAAAAAAA4wFMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-13T23:27:19.168Z",
+              "WhenOpened": "2025-11-16T22:10:56.945Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Details.cshtml.cs",
-              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Employees\\Details.cshtml.cs",
-              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\Pages\\Employees\\Details.cshtml.cs",
-              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Employees\\Details.cshtml.cs",
-              "RelativeToolTip": "SwissLohnSystem.UI\\Pages\\Employees\\Details.cshtml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC4AAAA3AAAAAAAAAA==",
+              "Title": "Create.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Companies\\Employees\\Create.cshtml.cs",
+              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\Pages\\Companies\\Employees\\Create.cshtml.cs",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Companies\\Employees\\Create.cshtml.cs",
+              "RelativeToolTip": "SwissLohnSystem.UI\\Pages\\Companies\\Employees\\Create.cshtml.cs",
+              "ViewState": "AgIAAAYBAAAAAAAAAAA0wCkBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-13T20:39:58.978Z",
+              "WhenOpened": "2025-11-16T22:04:59.538Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "lohnverlauf-detail.js",
-              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\wwwroot\\js\\lohnverlauf-detail.js",
-              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\wwwroot\\js\\lohnverlauf-detail.js",
-              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\wwwroot\\js\\lohnverlauf-detail.js",
-              "RelativeToolTip": "SwissLohnSystem.UI\\wwwroot\\js\\lohnverlauf-detail.js",
-              "ViewState": "AgIAAK0BAAAAAAAAAAAUwM8BAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2025-11-13T20:24:58.754Z",
+              "Title": "Edit.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Employees\\Edit.cshtml.cs",
+              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\Pages\\Employees\\Edit.cshtml.cs",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Employees\\Edit.cshtml.cs",
+              "RelativeToolTip": "SwissLohnSystem.UI\\Pages\\Employees\\Edit.cshtml.cs",
+              "ViewState": "AgIAAIMBAAAAAAAAAAA0wKYBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-16T22:03:47.563Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Create.cshtml",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Companies\\Employees\\Create.cshtml",
+              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\Pages\\Companies\\Employees\\Create.cshtml",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Companies\\Employees\\Create.cshtml",
+              "RelativeToolTip": "SwissLohnSystem.UI\\Pages\\Companies\\Employees\\Create.cshtml",
+              "ViewState": "AgIAAH0BAAAAAAAAAAAUwKABAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-16T03:36:57.611Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Details.cshtml",
-              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Employees\\Details.cshtml",
-              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\Pages\\Employees\\Details.cshtml",
-              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Employees\\Details.cshtml",
-              "RelativeToolTip": "SwissLohnSystem.UI\\Pages\\Employees\\Details.cshtml",
-              "ViewState": "AgIAAE8BAAAAAAAAAAAUwGABAAAAAAAAAAAAAA==",
+              "Title": "Edit.cshtml",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Employees\\Edit.cshtml",
+              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\Pages\\Employees\\Edit.cshtml",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\Pages\\Employees\\Edit.cshtml",
+              "RelativeToolTip": "SwissLohnSystem.UI\\Pages\\Employees\\Edit.cshtml",
+              "ViewState": "AgIAAIMBAAAAAAAAAAAUwKUBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-11-13T19:47:33.119Z",
+              "WhenOpened": "2025-11-16T03:35:53.924Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EmployeeUpdateDto.cs",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeUpdateDto.cs",
+              "RelativeDocumentMoniker": "SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeUpdateDto.cs",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeUpdateDto.cs",
+              "RelativeToolTip": "SwissLohnSystem.UI\\DTOs\\Employees\\EmployeeUpdateDto.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAiwEkAAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-16T22:11:08.695Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "EmployeeController.cs",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem\\Controllers\\EmployeeController.cs",
+              "RelativeDocumentMoniker": "SwissLohnSystem\\Controllers\\EmployeeController.cs",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem\\Controllers\\EmployeeController.cs",
+              "RelativeToolTip": "SwissLohnSystem\\Controllers\\EmployeeController.cs",
+              "ViewState": "AgIAAIoAAAAAAAAAAAAIwJkAAABVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-16T03:27:34.108Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "LohnController.cs",
+              "DocumentMoniker": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem\\Controllers\\LohnController.cs",
+              "RelativeDocumentMoniker": "SwissLohnSystem\\Controllers\\LohnController.cs",
+              "ToolTip": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem\\Controllers\\LohnController.cs",
+              "RelativeToolTip": "SwissLohnSystem\\Controllers\\LohnController.cs",
+              "ViewState": "AgIAAJQBAAAAAAAAAAAUwLcBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-16T03:27:12.082Z",
               "EditorCaption": ""
             }
           ]

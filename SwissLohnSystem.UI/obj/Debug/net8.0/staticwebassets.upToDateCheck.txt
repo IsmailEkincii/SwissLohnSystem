@@ -2067,8 +2067,10 @@ wwwroot\js\adminlte.js.map
 wwwroot\js\adminlte.min.js
 wwwroot\js\adminlte.min.js.map
 wwwroot\js\loehne-tab.js
+wwwroot\js\lohn-details.js
 wwwroot\js\lohnverlauf-detail.js
 wwwroot\js\site.js
+wwwroot\js\workdays.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css

@@ -148,95 +148,157 @@
                 </div>
             </div>
 
-            <!-- Lohnverlauf -->
+            <!-- Sağ taraf: Tabs (Löhne / Arbeitszeiten) -->
             <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title mb-0">Lohnverlauf</h3>
+                <ul class="nav nav-tabs" id="empTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           id="tab-loehne-link"
+                           data-toggle="tab"
+                           href="#tab-loehne"
+                           role="tab">Löhne</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link"
+                           id="tab-workdays-link"
+                           data-toggle="tab"
+                           href="#tab-workdays"
+                           role="tab">Arbeitszeiten</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content p-3">
+                    <!-- LÖHNE TAB -->
+                    <div class="tab-pane fade show active" id="tab-loehne" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title mb-0">Lohnverlauf</h3>
+                                <div>
+                                    <a class="btn btn-sm btn-primary"
+                                       href="~/Companies/Details/@(Model.Employee?.CompanyId ?? 0)#loehne">
+                                        <i class="fas fa-calculator"></i> Lohn berechnen
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="card-body table-responsive p-2">
+                                <table class="table table-striped table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:110px;">Monat/Jahr</th>
+                                            <th>Brutto</th>
+                                            <th>Abzüge</th>
+                                            <th>Netto</th>
+                                            <th>Überstunden</th>
+                                            <th>Ferien</th>
+                                            <th>Status</th>
+                                            <th style="width:140px;">Aktion</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @if (Model.LohnList is { } ll && ll.Any())
+                                        {
+                                            foreach (var l in ll)
+                                            {
+                                                <tr class="lohn-row"
+                                                    data-employee="@l.EmployeeId"
+                                                    data-year="@l.Year"
+                                                    data-month="@l.Month"
+                                                    data-brutto="@l.BruttoSalary"
+                                                    data-net="@l.NetSalary"
+                                                    data-totalded="@l.TotalDeductions"
+                                                    data-ot="@l.OvertimePay"
+                                                    data-holiday="@l.HolidayAllowance"
+                                                    data-mhours="@l.MonthlyHours"
+                                                    data-mot-hours="@l.MonthlyOvertimeHours">
+                                                    <td>@l.Month.ToString("00").@l.Year</td>
+                                                    <td>@l.BruttoSalary.ToString("N2")</td>
+                                                    <td>@l.TotalDeductions.ToString("N2")</td>
+                                                    <td><strong>@l.NetSalary.ToString("N2")</strong></td>
+                                                    <td>@l.OvertimePay.ToString("N2")</td>
+                                                    <td>@l.HolidayAllowance.ToString("N2")</td>
+                                                    <td>
+                                                        @if (l.IsFinal)
+                                                        {
+                                                            <span class="badge badge-success">Final</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge badge-warning">Entwurf</span>
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        <!-- Lohn/Details/{id} sayfası -->
+                                                        <a class="btn btn-xs btn-outline-secondary"
+                                                           href="~/Lohn/Details/@l.Id">
+                                                            <i class="fas fa-file-alt"></i> Details
+                                                        </a>
+
+                                                        <!-- Modal + PDF (mevcut JS: btn-lohn-detail) -->
+                                                        <button type="button"
+                                                                class="btn btn-xs btn-outline-primary btn-lohn-detail">
+                                                            <i class="fas fa-file-invoice"></i> PDF
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="8" class="text-center text-muted p-4">
+                                                    Keine Lohnabrechnungen vorhanden.
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="card-footer text-muted small">
+                                Klicken Sie auf eine Zeile oder den Button, um Details der Abrechnung zu sehen.
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="card-body table-responsive p-2">
-                        <!-- 🔹 HER ZAMAN GÖRÜNECEK BUTON -->
-                        <div class="mb-3 text-right">
-                            <a class="btn btn-sm btn-primary"
-                               href="~/Companies/Details/@(Model.Employee?.CompanyId ?? 0)#loehne">
-                                <i class="fas fa-calculator"></i> Lohn berechnen
-                            </a>
-                        </div>
-
-                        <table class="table table-striped table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th style="width:110px;">Monat/Jahr</th>
-                                    <th>Brutto</th>
-                                    <th>Abzüge</th>
-                                    <th>Netto</th>
-                                    <th>Überstunden</th>
-                                    <th>Ferien</th>
-                                    <th>Status</th>
-                                    <th style="width:140px;">Aktion</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @if (Model.LohnList is { } ll && ll.Any())
-                                {
-                                    @foreach (var l in ll)
-                                    {
-                                        <tr class="lohn-row"
-                                            data-employee="@l.EmployeeId"
-                                            data-year="@l.Year"
-                                            data-month="@l.Month"
-                                            data-brutto="@l.BruttoSalary"
-                                            data-net="@l.NetSalary"
-                                            data-totalded="@l.TotalDeductions"
-                                            data-ot="@l.OvertimePay"
-                                            data-holiday="@l.HolidayAllowance">
-                                            <td>@l.Month.ToString("00").@l.Year</td>
-                                            <td>@l.BruttoSalary.ToString("N2")</td>
-                                            <td>@l.TotalDeductions.ToString("N2")</td>
-                                            <td><strong>@l.NetSalary.ToString("N2")</strong></td>
-                                            <td>@l.OvertimePay.ToString("N2")</td>
-                                            <td>@l.HolidayAllowance.ToString("N2")</td>
-                                            <td>
-                                                @if (l.IsFinal)
-                                                {
-                                                    <span class="badge badge-success">Final</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge badge-warning">Entwurf</span>
-                                                }
-                                            </td>
-                                            <td>
-                                                <button type="button"
-                                                        class="btn btn-xs btn-outline-primary btn-lohn-detail">
-                                                    <i class="fas fa-file-invoice"></i> Details / PDF
-                                                </button>
+                    <!-- WORKDAYS TAB (sende dokunmuyoruz) -->
+                    <div class="tab-pane fade" id="tab-workdays" role="tabpanel">
+                        <div class="card card-outline card-info">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title mb-0">Arbeitszeiten (WorkDays)</h3>
+                                <button id="btnWdNew" type="button" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus"></i> Neuer Arbeitstag
+                                </button>
+                            </div>
+                            <div class="card-body table-responsive p-0">
+                                <table class="table table-sm table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:130px;">Datum</th>
+                                            <th>Stunden</th>
+                                            <th>Überstunden</th>
+                                            <th style="width:110px;" class="text-right">Aktionen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="wdTableBody">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted p-3">
+                                                Lade Arbeitszeiten...
                                             </td>
                                         </tr>
-                                    }
-                                }
-                                else
-                                {
-                                    <tr>
-                                        <td colspan="7" class="text-center text-muted p-4">
-                                            Keine Lohnabrechnungen vorhanden.
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="card-footer text-muted small">
-                        Klicken Sie auf eine Zeile, um Details der Abrechnung zu sehen.
-                    </div>
-                </div>
-            </div>
-        </div>
+                </div><!-- /.tab-content -->
+            </div><!-- /.col-md-8 -->
+        </div><!-- /.row -->
     </div>
 </section>
+
 <!-- 🔍 Lohn-Detail Modal -->
 <div class="modal fade" id="lohnDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -251,48 +313,10 @@
             </div>
 
             <div class="modal-body">
-                <!-- 🔹 ÖZET KUTULARI: SADECE MODALDA GÖRÜNSÜN, PDF'DE DEĞİL -->
-                <div class="row mb-3">
-                    <div class="col-md-3">
-                        <div class="info-box">
-                            <div class="info-box-content">
-                                <span class="info-box-text">Bruttolohn</span>
-                                <span class="info-box-number" id="ldmGross">0.00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="info-box">
-                            <div class="info-box-content">
-                                <span class="info-box-text">Abzüge (AN)</span>
-                                <span class="info-box-number" id="ldmEmpTotal">0.00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="info-box">
-                            <div class="info-box-content">
-                                <span class="info-box-text">AG-Kosten</span>
-                                <span class="info-box-number" id="ldmErTotal">0.00</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="info-box">
-                            <div class="info-box-content">
-                                <span class="info-box-text">Netto auszuzahlen</span>
-                                <span class="info-box-number" id="ldmNet">0.00</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- 🔹 SADECE BURASI PDF / YAZDIRMA İÇİN KULLANILACAK -->
+                <!-- Printable kısım -->
                 <div id="lohnDetailPrintable" class="p-3">
-
-                    <!-- ÜST HEADER: SOL = FIRMA, SAĞ = TARİH + PERSONEL -->
                     <div class="row mb-4">
-                        <!-- Firma bilgileri -->
                         <div class="col-sm-6 small">
                             <strong>@Model.Company?.Name</strong><br />
                             @Model.Company?.Address<br />
@@ -301,7 +325,6 @@
                             @Model.Company?.Canton
                         </div>
 
-                        <!-- Tarih + Mitarbeiter -->
                         <div class="col-sm-6 small text-right">
                             @DateTime.Today.ToString("dd.MM.yyyy")<br />
                             <br />
@@ -319,6 +342,18 @@
                         Lohnabrechnung&nbsp;<span id="ldmPeriodHeader" class="text-muted"></span>
                     </h5>
 
+                    <!-- 🔥 Saat özetleri -->
+                    <div class="row mb-2">
+                        <div class="col-sm-6 small">
+                            <strong>Gesamtstunden im Monat:</strong>
+                            <span id="ldmMonthlyHours">—</span>
+                        </div>
+                        <div class="col-sm-6 small text-right">
+                            <strong>Überstunden im Monat:</strong>
+                            <span id="ldmMonthlyOvertime">—</span>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-sm table-bordered" id="ldmSlipTable">
                             <thead class="thead-light">
@@ -335,9 +370,8 @@
                             </tbody>
                         </table>
                     </div>
-
-                </div><!-- /#lohnDetailPrintable -->
-            </div><!-- /.modal-body -->
+                </div>
+            </div>
 
             <div class="modal-footer">
                 <button id="btnLdmPrint" type="button" class="btn btn-outline-secondary">
@@ -351,6 +385,49 @@
     </div>
 </div>
 
+<!-- WorkDay Modal (WorkDays JS ile uyumlu) -->
+<div class="modal fade" id="workdayModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <form id="workdayForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="wdModalTitle">Arbeitszeit</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="wdId" />
+
+                    <div class="form-group">
+                        <label for="wdDate">Datum</label>
+                        <input id="wdDate" type="date" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wdHours">Arbeitsstunden</label>
+                        <input id="wdHours" type="number" step="0.25" min="0" max="24" class="form-control" />
+                    </div>
+
+                    <div class="form-group mb-0">
+                        <label for="wdOvertime">Überstunden</label>
+                        <input id="wdOvertime" type="number" step="0.25" min="0" max="24" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Abbrechen
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Speichern
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -359,6 +436,7 @@
         console.log("[lohnverlauf] (cshtml) EMPLOYEE_ID =", window.EMPLOYEE_ID);
         console.log("[lohnverlauf] (cshtml) API_BASE_URL =", window.API_BASE_URL);
     </script>
-    <script src="~/js/lohnverlauf-detail.js"></script>
-}
 
+    <script src="~/js/lohnverlauf-detail.js"></script>
+    <script src="~/js/workdays.js"></script>
+}

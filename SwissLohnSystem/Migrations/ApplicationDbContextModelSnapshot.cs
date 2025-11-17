@@ -232,10 +232,10 @@ namespace SwissLohnSystem.API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("BruttoSalary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("ChildAllowance")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -244,7 +244,7 @@ namespace SwissLohnSystem.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("HolidayAllowance")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<bool>("IsFinal")
                         .HasColumnType("bit");
@@ -252,24 +252,72 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<int>("Month")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("MonthlyHours")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("MonthlyOvertimeHours")
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("NetSalary")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("OvertimePay")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("TotalDeductions")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EmployeeId", "Month", "Year")
-                        .IsUnique();
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("Lohns");
+                });
+
+            modelBuilder.Entity("SwissLohnSystem.API.Models.QstTariff", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Canton")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<bool>("ChurchMember")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<decimal>("IncomeFrom")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("IncomeTo")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PermitType")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("QstTariffs", (string)null);
                 });
 
             modelBuilder.Entity("SwissLohnSystem.API.Models.Setting", b =>

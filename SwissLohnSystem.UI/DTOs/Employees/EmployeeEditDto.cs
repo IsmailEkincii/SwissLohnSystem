@@ -5,12 +5,12 @@
         public int Id { get; set; }
         public int CompanyId { get; set; }
 
-        // Zaten var olanlar (örnek)
+        // Stammdaten
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public string? AHVNumber { get; set; }
 
-        // Adres
+        // Adresse
         public string? Street { get; set; }
         public string? ZipCode { get; set; }
         public string? City { get; set; }
@@ -22,8 +22,8 @@
         public decimal OvertimeRate { get; set; }
 
         // İzin / Kanton / Kilise
-        public string? PermitType { get; set; }   // Eğer enum ise: PermitType? PermitType { get; set; }
-        public string? Canton { get; set; }       // Aynı şekilde enum olabilir
+        public string? PermitType { get; set; }
+        public string? Canton { get; set; }
         public bool ChurchMember { get; set; }
 
         // Sosyal sigortalar
@@ -43,5 +43,4 @@
         public bool ThirteenthEligible { get; set; }
         public bool ThirteenthProrated { get; set; }
     }
-
 }

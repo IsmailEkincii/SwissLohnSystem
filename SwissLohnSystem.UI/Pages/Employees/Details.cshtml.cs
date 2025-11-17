@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using SwissLohnSystem.UI.DTOs.Companies;
 using SwissLohnSystem.UI.DTOs.Employees;
 using SwissLohnSystem.UI.DTOs.Lohn;
+using SwissLohnSystem.UI.DTOs.WorkDay;
 using SwissLohnSystem.UI.Services;
 
 namespace SwissLohnSystem.UI.Pages.Employees
@@ -18,7 +19,10 @@ namespace SwissLohnSystem.UI.Pages.Employees
 
         public EmployeeDto? Employee { get; private set; }
         public CompanyDto? Company { get; private set; }
+
+        // API LohnDto (UI kopyasý)
         public List<LohnDto> LohnList { get; private set; } = new();
+
         public string? LoadError { get; private set; }
         public string DefaultPeriod { get; private set; } = $"{DateTime.Today:yyyy-MM}";
 
@@ -33,7 +37,7 @@ namespace SwissLohnSystem.UI.Pages.Employees
             // JS için API base URL
             ViewData["ApiBaseUrl"] = BaseUrl?.TrimEnd('/');
 
-            // Mitarbeiter laden
+            // --- Mitarbeiter laden ---
             var empRes = await _api.GetAsync<EmployeeDto>($"/api/Employee/{id}");
             if (!empRes.ok || empRes.data is null)
             {
@@ -42,18 +46,49 @@ namespace SwissLohnSystem.UI.Pages.Employees
             }
             Employee = empRes.data;
 
-            // Firma laden
+            // --- Firma laden ---
             var compRes = await _api.GetAsync<CompanyDto>($"/api/Company/{Employee.CompanyId}");
             if (compRes.ok && compRes.data is not null)
                 Company = compRes.data;
 
-            // Lohnverlauf laden
+            // --- Lohnverlauf laden ---
             var byEmpRes = await _api.GetAsync<IEnumerable<LohnDto>>($"/api/Lohn/by-employee/{id}");
             if (byEmpRes.ok && byEmpRes.data is not null)
             {
                 LohnList = byEmpRes.data
                     .OrderByDescending(x => x.Year)
                     .ThenByDescending(x => x.Month)
+                    .ToList();
+            }
+
+            // --- WorkDays'ten aylýk toplam saatleri hesapla ve LohnList'e yaz ---
+            var wdRes = await _api.GetAsync<IEnumerable<WorkDayDto>>($"/api/WorkDay/Employee/{id}");
+            if (wdRes.ok && wdRes.data is not null && LohnList.Count > 0)
+            {
+                var workDict = wdRes.data
+                    .GroupBy(w => new { w.Date.Year, w.Date.Month })
+                    .ToDictionary(
+                        g => (g.Key.Year, g.Key.Month),
+                        g => (
+                            Total: g.Sum(x => x.HoursWorked),
+                            Overtime: g.Sum(x => x.OvertimeHours)
+                        )
+                    );
+
+                LohnList = LohnList
+                    .Select(l =>
+                    {
+                        if (workDict.TryGetValue((l.Year, l.Month), out var sums))
+                        {
+                            return l with
+                            {
+                                MonthlyHours = sums.Total,
+                                MonthlyOvertimeHours = sums.Overtime
+                            };
+                        }
+
+                        return l;
+                    })
                     .ToList();
             }
         }

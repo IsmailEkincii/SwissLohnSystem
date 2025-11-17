@@ -21,7 +21,6 @@ namespace SwissLohnSystem.API.Controllers
         [HttpGet("Employee/{employeeId:int}")]
         public async Task<ActionResult<ApiResponse<IEnumerable<WorkDayDto>>>> GetEmployeeWorkDays(int employeeId)
         {
-            // Mitarbeiter existiert mi?
             var exists = await _context.Employees.AnyAsync(e => e.Id == employeeId);
             if (!exists)
                 return NotFound(ApiResponse<IEnumerable<WorkDayDto>>.Fail("Mitarbeiter wurde nicht gefunden."));
@@ -41,15 +40,25 @@ namespace SwissLohnSystem.API.Controllers
         public async Task<ActionResult<ApiResponse<WorkDayDto>>> PostWorkDay([FromBody] WorkDayCreateDto dto)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ApiResponse<WorkDayDto>.Fail("Ungültige Eingabedaten."));
+            {
+                var errors = string.Join(" | ",
+                    ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
 
-            // Mitarbeiter kontrol
+                return BadRequest(ApiResponse<WorkDayDto>.Fail(
+                    string.IsNullOrWhiteSpace(errors) ? "Ungültige Eingabedaten." : errors
+                ));
+            }
+
             var employeeExists = await _context.Employees.AnyAsync(e => e.Id == dto.EmployeeId);
             if (!employeeExists)
                 return BadRequest(ApiResponse<WorkDayDto>.Fail("Ungültige Mitarbeiter-ID (EmployeeId)."));
 
-            // Aynı gün için duplicate önleme (isteğe bağlı)
-            var duplicate = await _context.WorkDays.AnyAsync(w => w.EmployeeId == dto.EmployeeId && w.Date.Date == dto.Date.Date);
+            var duplicate = await _context.WorkDays.AnyAsync(w =>
+                w.EmployeeId == dto.EmployeeId &&
+                w.Date.Date == dto.Date.Date);
+
             if (duplicate)
                 return BadRequest(ApiResponse<WorkDayDto>.Fail("Für diesen Tag existiert bereits ein Eintrag."));
 
@@ -78,23 +87,32 @@ namespace SwissLohnSystem.API.Controllers
         {
             if (id != dto.Id)
                 return BadRequest(ApiResponse<string>.Fail("Ungültige Arbeitszeit-ID."));
+
             if (!ModelState.IsValid)
-                return BadRequest(ApiResponse<string>.Fail("Ungültige Eingabedaten."));
+            {
+                var errors = string.Join(" | ",
+                    ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage));
+
+                return BadRequest(ApiResponse<string>.Fail(
+                    string.IsNullOrWhiteSpace(errors) ? "Ungültige Eingabedaten." : errors
+                ));
+            }
 
             var entity = await _context.WorkDays.FindAsync(id);
             if (entity is null)
                 return NotFound(ApiResponse<string>.Fail("Arbeitszeit nicht gefunden."));
 
-            // Mitarbeiter kontrol (EmployeeId değişmiş olabilir)
             var employeeExists = await _context.Employees.AnyAsync(e => e.Id == dto.EmployeeId);
             if (!employeeExists)
                 return BadRequest(ApiResponse<string>.Fail("Ungültige Mitarbeiter-ID (EmployeeId)."));
 
-            // Duplicate kontrol (aynı güne ikinci kayıt)
             var duplicate = await _context.WorkDays.AnyAsync(w =>
                 w.EmployeeId == dto.EmployeeId &&
                 w.Date.Date == dto.Date.Date &&
                 w.Id != id);
+
             if (duplicate)
                 return BadRequest(ApiResponse<string>.Fail("Für diesen Tag existiert bereits ein Eintrag."));
 
@@ -117,5 +135,48 @@ namespace SwissLohnSystem.API.Controllers
 
             return ApiResponse<string>.Ok("Arbeitszeit erfolgreich gelöscht.");
         }
+        [ApiController]
+        [Route("api/[controller]")]
+        public class WorkDaysController : ControllerBase
+        {
+            private readonly ApplicationDbContext _db;
+
+            public WorkDaysController(ApplicationDbContext db)
+            {
+                _db = db;
+            }
+
+            // ... mevcut CRUD endpointleri ...
+
+            [HttpGet("summary")]
+            public async Task<ActionResult<WorkDaySummaryDto>> GetSummary(int employeeId, int year, int month)
+            {
+                if (employeeId <= 0 || year <= 0 || month <= 0 || month > 12)
+                    return BadRequest("Ungültige Parameter.");
+
+                var from = new DateTime(year, month, 1);
+                var to = from.AddMonths(1);
+
+                var query = _db.WorkDays
+                    .Where(w => w.EmployeeId == employeeId
+                                && w.Date >= from
+                                && w.Date < to);
+
+                var totalHours = await query.SumAsync(w => (decimal?)w.HoursWorked) ?? 0m;
+                var totalOvertime = await query.SumAsync(w => (decimal?)w.OvertimeHours) ?? 0m;
+
+                var dto = new WorkDaySummaryDto
+                {
+                    EmployeeId = employeeId,
+                    Year = year,
+                    Month = month,
+                    TotalHours = totalHours,
+                    TotalOvertimeHours = totalOvertime
+                };
+
+                return Ok(dto);
+            }
+        }
+
     }
 }

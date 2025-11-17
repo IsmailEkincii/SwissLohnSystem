@@ -4,7 +4,7 @@ using SwissLohnSystem.UI.DTOs.Companies;
 using SwissLohnSystem.UI.DTOs.Employees;
 using SwissLohnSystem.UI.DTOs.Lohn;
 using SwissLohnSystem.UI.Services;
-using SwissLohnSystem.UI.Services.Mapping;
+using SwissLohnSystem.UI.Services.Mapping; // ToDetails uzantýsý varsa
 
 namespace SwissLohnSystem.UI.Pages.Lohn
 {
@@ -20,13 +20,17 @@ namespace SwissLohnSystem.UI.Pages.Lohn
         {
             Id = id;
 
+            // ?? JS için API base URL
+            ViewData["ApiBaseUrl"] = _api.BaseUrl?.TrimEnd('/');
+
             var (okL, l, msgL) = await _api.GetAsync<LohnDto>($"/api/Lohn/{id}");
-            if (!okL || l is null) { ViewData["Error"] = msgL ?? "Lohn konnte nicht geladen werden."; return; }
+            if (!okL || l is null)
+            {
+                ViewData["Error"] = msgL ?? "Lohn konnte nicht geladen werden.";
+                return;
+            }
 
-            // Çalýþaný getir (firma bilgisi için)
             var (okE, e, _) = await _api.GetAsync<EmployeeDto>($"/api/Employee/{l.EmployeeId}");
-
-            // (Ýsteðe baðlý) þirketi getir
             CompanyDto? c = null;
             if (okE && e is not null)
             {
@@ -34,7 +38,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
                 if (okC) c = cdata;
             }
 
-            Vm = l.ToDetails(e, c);
+            Vm = l.ToDetails(e, c); // ya da basit mapping: Vm = new LohnDetailsDto { ... }
         }
     }
 }

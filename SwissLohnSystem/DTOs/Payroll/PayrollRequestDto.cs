@@ -1,32 +1,36 @@
-﻿// örnek: SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto
-using SwissLohnSystem.API.DTOs.Payroll;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
-public sealed class PayrollRequestDto
+namespace SwissLohnSystem.API.DTOs.Payroll
 {
-    public int EmployeeId { get; set; }
+    public class PayrollRequestDto
+    {
+        // 🔥 UI sadece bunları gönderiyor → bunlar Required
+        [Required]
+        public int EmployeeId { get; set; }
 
-    public DateOnly Period { get; set; }   // veya DateTime, sen nasıl tanımladıysan
-    public string? Canton { get; set; }
+        [Required]
+        public DateTime Period { get; set; }
 
-    /// <summary>
-    /// Bu alan UI’dan gelse bile, LohnController DB’deki Employee’den override etmeli.
-    /// </summary>
-    public decimal GrossMonthly { get; set; }
+        // 🔥 Geri kalan tüm alanlar optional
+        public string? Canton { get; set; }
 
-    // Employee -> Apply* flag’leri
-    public bool ApplyAHV { get; set; }
-    public bool ApplyALV { get; set; }
-    public bool ApplyBVG { get; set; }
-    public bool ApplyNBU { get; set; }
-    public bool ApplyBU { get; set; }
-    public bool ApplyFAK { get; set; }
-    public bool ApplyQST { get; set; }
+        public decimal GrossMonthly { get; set; }
 
-    public decimal WeeklyHours { get; set; }
+        public bool ApplyAHV { get; set; } = true;
+        public bool ApplyALV { get; set; } = true;
+        public bool ApplyBVG { get; set; } = true;
+        public bool ApplyNBU { get; set; } = true;
+        public bool ApplyBU { get; set; } = true;
+        public bool ApplyFAK { get; set; } = true;
+        public bool ApplyQST { get; set; } = false;
 
-    public string? PermitType { get; set; }
-    public string? WithholdingTaxCode { get; set; }
-    public bool ChurchMember { get; set; }
+        public int WeeklyHours { get; set; }
 
-    public BvgPlanDto? BvgPlan { get; set; }  // Zaten kullanıyorsun
+        public string? PermitType { get; set; }
+        public string? WithholdingTaxCode { get; set; }
+        public bool ChurchMember { get; set; }
+
+        public BvgPlanDto? BvgPlan { get; set; }
+    }
 }

@@ -1,15 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
-namespace SwissLohnSystem.API.DTOs.WorkDay;
-
-public class WorkDayCreateDto
+namespace SwissLohnSystem.API.DTOs.WorkDay
 {
-    [Required] public int EmployeeId { get; set; }
-    [Required] public DateTime Date { get; set; }
+    public class WorkDayCreateDto
+    {
+        [Required]
+        public int EmployeeId { get; set; }
 
-    [Range(0, 24, ErrorMessage = "Arbeitsstunden müssen zwischen 0 und 24 liegen.")]
-    public decimal HoursWorked { get; set; }
+        [Required]
+        public DateTime Date { get; set; }
 
-    [Range(0, 24, ErrorMessage = "Überstunden müssen zwischen 0 und 24 liegen.")]
-    public decimal OvertimeHours { get; set; }
+        [Range(0, 24, ErrorMessage = "Arbeitsstunden müssen zwischen 0 und 24 liegen.")]
+        public decimal HoursWorked { get; set; }
+
+        [Range(0, 24, ErrorMessage = "Überstunden müssen zwischen 0 und 24 liegen.")]
+        public decimal OvertimeHours { get; set; }
+    }
 }

@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SwissLohnSystem.UI.Services;
-
 
 namespace SwissLohnSystem.UI.Pages.Employees
 {
@@ -20,6 +21,13 @@ namespace SwissLohnSystem.UI.Pages.Employees
         [BindProperty] public InputModel Input { get; set; } = new();
 
         [TempData] public string? Toast { get; set; }
+
+        // Lookup listeleri (PermitType ve QST Tarif kodlarý)
+        public List<SelectListItem> PermitTypes { get; private set; } = new();
+        public List<SelectListItem> QstTariffCodes { get; private set; } = new();
+
+        // ?? BVG-Plan dropdown
+        public List<SelectListItem> BvgPlans { get; private set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -53,7 +61,6 @@ namespace SwissLohnSystem.UI.Pages.Employees
                 EndDate = emp.EndDate,
                 Active = emp.Active,
 
-                // Neue Payroll-Felder
                 WeeklyHours = emp.WeeklyHours,
                 PensumPercent = emp.PensumPercent,
                 HolidayRate = emp.HolidayRate,
@@ -86,16 +93,20 @@ namespace SwissLohnSystem.UI.Pages.Employees
                 Canton = emp.Canton
             };
 
+            LoadLookups();
+
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            LoadLookups();
+
             if (!ModelState.IsValid) return Page();
 
             var salaryType = Input.SalaryTypeOption == "Stundenlohn" ? "Hourly" : "Monthly";
 
-            // Basit AHV format kontrolü (UI tarafýnda da kullanýcýya geri bildirim)
+            // AHV format kontrolü
             if (!string.IsNullOrWhiteSpace(Input.AHVNumber))
             {
                 var ok = Regex.IsMatch(Input.AHVNumber.Trim(), @"^(756\.\d{4}\.\d{4}\.\d{2}|756\d{10})$");
@@ -198,10 +209,17 @@ namespace SwissLohnSystem.UI.Pages.Employees
             public bool Active { get; set; }
 
             // Payroll / Arbeitszeit
-            [Range(0, 80)] public int? WeeklyHours { get; set; }
-            [Range(0, 100)] public decimal? PensumPercent { get; set; }
-            [Range(0, 100)] public decimal? HolidayRate { get; set; }
-            [Range(0, 10)] public decimal? OvertimeRate { get; set; }
+            [Range(1, 60, ErrorMessage = "Wochenstunden muss zwischen 1 und 60 liegen.")]
+            public int? WeeklyHours { get; set; }
+
+            [Range(0, 100, ErrorMessage = "Pensum in % muss zwischen 0 und 100 liegen.")]
+            public decimal? PensumPercent { get; set; }
+
+            [Range(0, 100, ErrorMessage = "Ferienanspruch in % muss zwischen 0 und 100 liegen.")]
+            public decimal? HolidayRate { get; set; }
+
+            [Range(0, 10, ErrorMessage = "Überstundenzuschlag muss zwischen 0 und 10 liegen.")]
+            public decimal? OvertimeRate { get; set; }
 
             public bool HolidayEligible { get; set; }
             public bool ThirteenthEligible { get; set; }
@@ -217,9 +235,15 @@ namespace SwissLohnSystem.UI.Pages.Employees
             public bool ApplyQST { get; set; }
 
             // Steuer / Kanton
+            [Required(ErrorMessage = "Bewilligungstyp ist erforderlich.")]
             public string? PermitType { get; set; }
+
             public bool ChurchMember { get; set; }
-            [StringLength(2)] public string? Canton { get; set; }
+
+            [StringLength(2)]
+            public string? Canton { get; set; }
+
+            [StringLength(10)]
             public string? WithholdingTaxCode { get; set; }
 
             // Sozialversicherung
@@ -255,6 +279,77 @@ namespace SwissLohnSystem.UI.Pages.Employees
                 yield return new ValidationResult(
                     "Enddatum darf nicht vor dem Startdatum liegen.",
                     new[] { nameof(Input.EndDate) });
+
+            if (Input.Active)
+            {
+                if (Input.WeeklyHours is null || Input.WeeklyHours <= 0 || Input.WeeklyHours > 60)
+                {
+                    yield return new ValidationResult(
+                        "Wochenstunden muss zwischen 1 und 60 liegen.",
+                        new[] { nameof(Input.WeeklyHours) });
+                }
+            }
+
+            if (Input.ApplyQST && string.IsNullOrWhiteSpace(Input.WithholdingTaxCode))
+            {
+                yield return new ValidationResult(
+                    "Bitte wählen Sie einen QST Tarif, wenn Quellensteuer angewendet wird.",
+                    new[] { nameof(Input.WithholdingTaxCode) });
+            }
+
+            if (string.IsNullOrWhiteSpace(Input.PermitType))
+            {
+                yield return new ValidationResult(
+                    "Bewilligungstyp ist erforderlich.",
+                    new[] { nameof(Input.PermitType) });
+            }
+        }
+
+        // ----- Lookup doldurma -----
+        private void LoadLookups()
+        {
+            // Bewilligungstypen
+            PermitTypes = new List<SelectListItem>
+            {
+                new() { Value = "", Text = "-- Bitte wählen --" },
+                new() { Value = "B", Text = "B – Aufenthaltsbewilligung" },
+                new() { Value = "C", Text = "C – Niederlassungsbewilligung" },
+                new() { Value = "L", Text = "L – Kurzaufenthaltsbewilligung" },
+                new() { Value = "G", Text = "G – Grenzgängerbewilligung" },
+                new() { Value = "F", Text = "F – Vorläufig aufgenommene Ausländer" },
+                new() { Value = "N", Text = "N – Asylsuchende" }
+            };
+
+            // QST Tarife – þimdilik statik
+            QstTariffCodes = new List<SelectListItem>
+            {
+                new() { Value = "", Text = "-- Bitte wählen --" },
+                new() { Value = "A", Text = "A – ledig, 1 Einkommen" },
+                new() { Value = "B", Text = "B – verheiratet, 2 Einkommen" },
+                new() { Value = "C", Text = "C – verheiratet, 1 Einkommen" },
+                new() { Value = "D", Text = "D – Nebenerwerb" },
+                new() { Value = "H", Text = "H – Alleinerziehende" }
+            };
+
+            // ?? BVG-Plan – temel seçenekler
+            BvgPlans = new List<SelectListItem>
+            {
+                new() { Value = "", Text = "-- Bitte wählen --" },
+                new() { Value = "None", Text = "Kein BVG (unter Eintrittsschwelle)" },
+                new() { Value = "Standard", Text = "Standard BVG-Plan" },
+                new() { Value = "Kader", Text = "Kader- / Management-Plan" }
+            };
+
+            // Eðer çalýþan üzerinde daha önce farklý bir BVGPlan deðeri varsa, onu da listeye ekleyelim
+            if (!string.IsNullOrWhiteSpace(Input.BVGPlan)
+                && !BvgPlans.Exists(x => x.Value == Input.BVGPlan))
+            {
+                BvgPlans.Add(new SelectListItem
+                {
+                    Value = Input.BVGPlan,
+                    Text = $"{Input.BVGPlan} (bestehend)"
+                });
+            }
         }
 
         // ----- API DTO’larý -----
