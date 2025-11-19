@@ -465,81 +465,6 @@
         }
       }
     },
-    "/api/Employee": {
-      "get": {
-        "tags": [
-          "Employee"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDtoIEnumerableApiResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Employee"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmployeeCreateDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmployeeCreateDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmployeeCreateDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/Employee/{id}": {
       "get": {
         "tags": [
@@ -668,6 +593,54 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Employee": {
+      "post": {
+        "tags": [
+          "Employee"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDtoApiResponse"
                 }
               }
             }
@@ -1004,17 +977,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/LohnMonthlyRowDtoIEnumerableApiResponse"
+                  "$ref": "#/components/schemas/CompanyMonthlyLohnDtoListApiResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LohnMonthlyRowDtoIEnumerableApiResponse"
+                  "$ref": "#/components/schemas/CompanyMonthlyLohnDtoListApiResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LohnMonthlyRowDtoIEnumerableApiResponse"
+                  "$ref": "#/components/schemas/CompanyMonthlyLohnDtoListApiResponse"
                 }
               }
             }
@@ -1264,54 +1237,6 @@
         }
       }
     },
-    "/api/WorkDay": {
-      "post": {
-        "tags": [
-          "WorkDay"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WorkDayCreateDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/WorkDayCreateDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/WorkDayCreateDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/WorkDay/{id}": {
       "get": {
         "tags": [
@@ -1440,6 +1365,109 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StringApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WorkDay": {
+      "post": {
+        "tags": [
+          "WorkDay"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkDayCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkDayCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkDayCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDayDtoApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WorkDay/summary": {
+      "get": {
+        "tags": [
+          "WorkDay"
+        ],
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDaySummaryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDaySummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkDaySummaryDto"
                 }
               }
             }
@@ -1666,6 +1694,67 @@
         },
         "additionalProperties": false
       },
+      "CompanyMonthlyLohnDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employeeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bruttoSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "netSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalDeductions": {
+            "type": "number",
+            "format": "double"
+          },
+          "isFinal": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompanyMonthlyLohnDtoListApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompanyMonthlyLohnDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CompanyUpdateDto": {
         "required": [
           "canton",
@@ -1720,12 +1809,12 @@
             "format": "int32"
           },
           "firstName": {
-            "maxLength": 100,
+            "maxLength": 150,
             "minLength": 0,
             "type": "string"
           },
           "lastName": {
-            "maxLength": 100,
+            "maxLength": 150,
             "minLength": 0,
             "type": "string"
           },
@@ -1735,8 +1824,6 @@
             "nullable": true
           },
           "position": {
-            "maxLength": 100,
-            "minLength": 0,
             "type": "string",
             "nullable": true
           },
@@ -1755,12 +1842,9 @@
           },
           "salaryType": {
             "minLength": 1,
-            "pattern": "Monthly|Hourly",
             "type": "string"
           },
           "hourlyRate": {
-            "maximum": 1000000,
-            "minimum": 0,
             "type": "number",
             "format": "double"
           },
@@ -1769,8 +1853,6 @@
             "format": "int32"
           },
           "bruttoSalary": {
-            "maximum": 1000000,
-            "minimum": 0,
             "type": "number",
             "format": "double"
           },
@@ -1786,17 +1868,9 @@
           "active": {
             "type": "boolean"
           },
-          "ahvNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "krankenkasse": {
-            "type": "string",
-            "nullable": true
-          },
-          "bvgPlan": {
-            "type": "string",
-            "nullable": true
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
           },
           "pensumPercent": {
             "type": "number",
@@ -1813,13 +1887,14 @@
             "format": "double",
             "nullable": true
           },
-          "withholdingTaxCode": {
-            "type": "string",
-            "nullable": true
+          "holidayEligible": {
+            "type": "boolean"
           },
-          "weeklyHours": {
-            "type": "integer",
-            "format": "int32"
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
           },
           "applyAHV": {
             "type": "boolean"
@@ -1842,15 +1917,6 @@
           "applyQST": {
             "type": "boolean"
           },
-          "holidayEligible": {
-            "type": "boolean"
-          },
-          "thirteenthEligible": {
-            "type": "boolean"
-          },
-          "thirteenthProrated": {
-            "type": "boolean"
-          },
           "permitType": {
             "type": "string",
             "nullable": true
@@ -1859,6 +1925,22 @@
             "type": "boolean"
           },
           "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
             "type": "string",
             "nullable": true
           },
@@ -1949,17 +2031,9 @@
           "active": {
             "type": "boolean"
           },
-          "ahvNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "krankenkasse": {
-            "type": "string",
-            "nullable": true
-          },
-          "bvgPlan": {
-            "type": "string",
-            "nullable": true
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
           },
           "pensumPercent": {
             "type": "number",
@@ -1976,13 +2050,14 @@
             "format": "double",
             "nullable": true
           },
-          "withholdingTaxCode": {
-            "type": "string",
-            "nullable": true
+          "holidayEligible": {
+            "type": "boolean"
           },
-          "weeklyHours": {
-            "type": "integer",
-            "format": "int32"
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
           },
           "applyAHV": {
             "type": "boolean"
@@ -2005,15 +2080,6 @@
           "applyQST": {
             "type": "boolean"
           },
-          "holidayEligible": {
-            "type": "boolean"
-          },
-          "thirteenthEligible": {
-            "type": "boolean"
-          },
-          "thirteenthProrated": {
-            "type": "boolean"
-          },
           "permitType": {
             "type": "string",
             "nullable": true
@@ -2022,6 +2088,22 @@
             "type": "boolean"
           },
           "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
             "type": "string",
             "nullable": true
           },
@@ -2100,12 +2182,12 @@
             "format": "int32"
           },
           "firstName": {
-            "maxLength": 100,
+            "maxLength": 150,
             "minLength": 0,
             "type": "string"
           },
           "lastName": {
-            "maxLength": 100,
+            "maxLength": 150,
             "minLength": 0,
             "type": "string"
           },
@@ -2115,8 +2197,6 @@
             "nullable": true
           },
           "position": {
-            "maxLength": 100,
-            "minLength": 0,
             "type": "string",
             "nullable": true
           },
@@ -2135,12 +2215,9 @@
           },
           "salaryType": {
             "minLength": 1,
-            "pattern": "Monthly|Hourly",
             "type": "string"
           },
           "hourlyRate": {
-            "maximum": 1000000,
-            "minimum": 0,
             "type": "number",
             "format": "double"
           },
@@ -2149,8 +2226,6 @@
             "format": "int32"
           },
           "bruttoSalary": {
-            "maximum": 1000000,
-            "minimum": 0,
             "type": "number",
             "format": "double"
           },
@@ -2166,17 +2241,9 @@
           "active": {
             "type": "boolean"
           },
-          "ahvNumber": {
-            "type": "string",
-            "nullable": true
-          },
-          "krankenkasse": {
-            "type": "string",
-            "nullable": true
-          },
-          "bvgPlan": {
-            "type": "string",
-            "nullable": true
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
           },
           "pensumPercent": {
             "type": "number",
@@ -2193,13 +2260,14 @@
             "format": "double",
             "nullable": true
           },
-          "withholdingTaxCode": {
-            "type": "string",
-            "nullable": true
+          "holidayEligible": {
+            "type": "boolean"
           },
-          "weeklyHours": {
-            "type": "integer",
-            "format": "int32"
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
           },
           "applyAHV": {
             "type": "boolean"
@@ -2222,15 +2290,6 @@
           "applyQST": {
             "type": "boolean"
           },
-          "holidayEligible": {
-            "type": "boolean"
-          },
-          "thirteenthEligible": {
-            "type": "boolean"
-          },
-          "thirteenthProrated": {
-            "type": "boolean"
-          },
           "permitType": {
             "type": "string",
             "nullable": true
@@ -2239,6 +2298,22 @@
             "type": "boolean"
           },
           "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
             "type": "string",
             "nullable": true
           },
@@ -2262,9 +2337,6 @@
         "additionalProperties": false
       },
       "LohnCalculateDto": {
-        "required": [
-          "employeeId"
-        ],
         "type": "object",
         "properties": {
           "employeeId": {
@@ -2272,14 +2344,10 @@
             "format": "int32"
           },
           "month": {
-            "maximum": 12,
-            "minimum": 1,
             "type": "integer",
             "format": "int32"
           },
           "year": {
-            "maximum": 2100,
-            "minimum": 2000,
             "type": "integer",
             "format": "int32"
           }
@@ -2337,12 +2405,76 @@
             "type": "number",
             "format": "double"
           },
+          "bonus": {
+            "type": "number",
+            "format": "double"
+          },
+          "extraAllowance": {
+            "type": "number",
+            "format": "double"
+          },
+          "unpaidDeduction": {
+            "type": "number",
+            "format": "double"
+          },
+          "otherDeduction": {
+            "type": "number",
+            "format": "double"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
           },
           "isFinal": {
             "type": "boolean"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "holidayRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayEligible": {
+            "type": "boolean"
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2377,68 +2509,6 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/LohnDto"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "LohnMonthlyRowDto": {
-        "type": "object",
-        "properties": {
-          "employeeId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "employeeName": {
-            "type": "string",
-            "nullable": true
-          },
-          "month": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "year": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "bruttoSalary": {
-            "type": "number",
-            "format": "double"
-          },
-          "netSalary": {
-            "type": "number",
-            "format": "double"
-          },
-          "totalDeductions": {
-            "type": "number",
-            "format": "double"
-          },
-          "overtimePay": {
-            "type": "number",
-            "format": "double"
-          },
-          "holidayAllowance": {
-            "type": "number",
-            "format": "double"
-          }
-        },
-        "additionalProperties": false
-      },
-      "LohnMonthlyRowDtoIEnumerableApiResponse": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean"
-          },
-          "message": {
-            "type": "string",
-            "nullable": true
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LohnMonthlyRowDto"
             },
             "nullable": true
           }
@@ -2515,10 +2585,6 @@
         "additionalProperties": false
       },
       "PayrollRequestDto": {
-        "required": [
-          "employeeId",
-          "period"
-        ],
         "type": "object",
         "properties": {
           "employeeId": {
@@ -2529,11 +2595,23 @@
             "type": "string",
             "format": "date-time"
           },
-          "canton": {
-            "type": "string",
-            "nullable": true
-          },
           "grossMonthly": {
+            "type": "number",
+            "format": "double"
+          },
+          "bonus": {
+            "type": "number",
+            "format": "double"
+          },
+          "extraAllowance": {
+            "type": "number",
+            "format": "double"
+          },
+          "unpaidDeduction": {
+            "type": "number",
+            "format": "double"
+          },
+          "otherDeduction": {
             "type": "number",
             "format": "double"
           },
@@ -2562,11 +2640,15 @@
             "type": "integer",
             "format": "int32"
           },
-          "permitType": {
+          "canton": {
             "type": "string",
             "nullable": true
           },
           "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "permitType": {
             "type": "string",
             "nullable": true
           },
@@ -2689,10 +2771,6 @@
         "additionalProperties": false
       },
       "WorkDayCreateDto": {
-        "required": [
-          "date",
-          "employeeId"
-        ],
         "type": "object",
         "properties": {
           "employeeId": {
@@ -2703,15 +2781,15 @@
             "type": "string",
             "format": "date-time"
           },
+          "dayType": {
+            "type": "string",
+            "nullable": true
+          },
           "hoursWorked": {
-            "maximum": 24,
-            "minimum": 0,
             "type": "number",
             "format": "double"
           },
           "overtimeHours": {
-            "maximum": 24,
-            "minimum": 0,
             "type": "number",
             "format": "double"
           }
@@ -2732,6 +2810,10 @@
           "date": {
             "type": "string",
             "format": "date-time"
+          },
+          "dayType": {
+            "type": "string",
+            "nullable": true
           },
           "hoursWorked": {
             "type": "number",
@@ -2780,14 +2862,39 @@
         },
         "additionalProperties": false
       },
-      "WorkDayUpdateDto": {
-        "required": [
-          "date",
-          "employeeId",
-          "id"
-        ],
+      "WorkDaySummaryDto": {
         "type": "object",
         "properties": {
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalOvertimeHours": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkDayUpdateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
           "employeeId": {
             "type": "integer",
             "format": "int32"
@@ -2796,21 +2903,17 @@
             "type": "string",
             "format": "date-time"
           },
+          "dayType": {
+            "type": "string",
+            "nullable": true
+          },
           "hoursWorked": {
-            "maximum": 24,
-            "minimum": 0,
             "type": "number",
             "format": "double"
           },
           "overtimeHours": {
-            "maximum": 24,
-            "minimum": 0,
             "type": "number",
             "format": "double"
-          },
-          "id": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false

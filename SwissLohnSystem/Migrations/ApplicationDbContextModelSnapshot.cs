@@ -85,14 +85,15 @@ namespace SwissLohnSystem.API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AHVNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
                     b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<bool>("ApplyAHV")
                         .HasColumnType("bit");
@@ -116,17 +117,19 @@ namespace SwissLohnSystem.API.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("BVGPlan")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("BruttoSalary")
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Canton")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
 
                     b.Property<int>("ChildCount")
                         .HasColumnType("int");
@@ -135,65 +138,72 @@ namespace SwissLohnSystem.API.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<bool>("HolidayEligible")
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("HolidayRate")
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("HourlyRate")
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Krankenkasse")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("MaritalStatus")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("MonthlyHours")
                         .HasColumnType("int");
 
-                    b.Property<int>("OvertimeHours")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("OvertimeRate")
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("PensumPercent")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PermitType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Position")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("SalaryType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -208,13 +218,12 @@ namespace SwissLohnSystem.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("WithholdingTaxCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("WorkedHours")
-                        .HasColumnType("int");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Zip")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -231,11 +240,45 @@ namespace SwissLohnSystem.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("ApplyAHV")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyALV")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyBU")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyBVG")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyFAK")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyNBU")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ApplyQST")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Bonus")
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("BruttoSalary")
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<string>("Canton")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
                     b.Property<decimal>("ChildAllowance")
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<bool>("ChurchMember")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -243,7 +286,16 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("ExtraAllowance")
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("HolidayAllowance")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<bool>("HolidayEligible")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("HolidayRate")
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<bool>("IsFinal")
@@ -261,11 +313,25 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<decimal>("NetSalary")
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<decimal>("OtherDeduction")
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("OvertimePay")
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<string>("PermitType")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<decimal>("TotalDeductions")
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("UnpaidDeduction")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("WithholdingTaxCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -356,14 +422,19 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DayType")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("HoursWorked")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("OvertimeHours")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 

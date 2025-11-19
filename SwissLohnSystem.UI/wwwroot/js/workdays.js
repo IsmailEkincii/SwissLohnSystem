@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const otInput = document.getElementById("wdOvertime");
     const idInput = document.getElementById("wdId");
     const modalTitle = document.getElementById("wdModalTitle");
+    const dayTypeSelect = document.getElementById("wdDayType");
 
     let bootstrapModal = null;
     if (window.bootstrap && bootstrap.Modal) {
@@ -49,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function toIsoDate(dateStr) {
-        // input type="date" → YYYY-MM-DD (bunu API rahat okur)
+        // input type="date" → YYYY-MM-DD
         if (!dateStr) return null;
         return dateStr;
     }
@@ -86,11 +87,23 @@ document.addEventListener("DOMContentLoaded", function () {
             for (const w of list) {
                 const tr = document.createElement("tr");
                 const dateOnly = w.date ? w.date.split("T")[0] : "";
+
+                // DayType etiketi (isteğe bağlı, sadece gösterim için)
+                let dayTypeLabel = "";
+                switch (w.dayType) {
+                    case 0: dayTypeLabel = "Arbeitstag"; break;
+                    case 1: dayTypeLabel = "Krankheit"; break;
+                    case 2: dayTypeLabel = "Ferien"; break;
+                    case 3: dayTypeLabel = "Unbezahlt"; break;
+                    default: dayTypeLabel = ""; break;
+                }
+
                 tr.innerHTML = `
                     <td>${dateOnly}</td>
                     <td>${w.hoursWorked.toFixed(2)}</td>
                     <td>${w.overtimeHours.toFixed(2)}</td>
                     <td class="text-right">
+                        <span class="badge badge-light mr-1">${dayTypeLabel}</span>
                         <button class="btn btn-xs btn-outline-secondary btn-wd-edit" data-id="${w.id}">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -110,6 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function openNewModal() {
         console.log("[workdays] openNewModal");
         idInput.value = "";
+
         // Bugün
         if (dateInput) {
             const today = new Date();
@@ -118,8 +132,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const dd = String(today.getDate()).padStart(2, "0");
             dateInput.value = `${yyyy}-${mm}-${dd}`;
         }
+
         hoursInput.value = "8";
         otInput.value = "0";
+
+        // 🔥 Varsayılan: Arbeitstag (0)
+        if (dayTypeSelect) {
+            dayTypeSelect.value = "0";
+        }
+
         modalTitle.textContent = "Neue Arbeitszeit";
 
         if (bootstrapModal) bootstrapModal.show();
@@ -132,6 +153,16 @@ document.addEventListener("DOMContentLoaded", function () {
         dateInput.value = workDay.date ? workDay.date.split("T")[0] : "";
         hoursInput.value = workDay.hoursWorked.toString().replace('.', ',');
         otInput.value = workDay.overtimeHours.toString().replace('.', ',');
+
+        // 🔥 Var olan dayType’ı dropdown’a set et
+        if (dayTypeSelect) {
+            if (workDay.dayType !== null && workDay.dayType !== undefined) {
+                dayTypeSelect.value = String(workDay.dayType);
+            } else {
+                dayTypeSelect.value = "0"; // fallback
+            }
+        }
+
         modalTitle.textContent = "Arbeitszeit bearbeiten";
 
         if (bootstrapModal) bootstrapModal.show();
@@ -162,11 +193,18 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // 🔥 DayType değeri (0=Arbeitstag, 1=Krank, 2=Ferien, 3=Unbezahlt)
+        let dayType = 0;
+        if (dayTypeSelect && dayTypeSelect.value !== "") {
+            dayType = parseInt(dayTypeSelect.value, 10);
+        }
+
         const body = {
             employeeId: EMPLOYEE_ID,
             date: dateVal,
             hoursWorked: hours,
-            overtimeHours: overtime
+            overtimeHours: overtime,
+            dayType: dayType
         };
 
         let url, method;

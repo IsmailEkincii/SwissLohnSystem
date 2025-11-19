@@ -14,18 +14,36 @@
         public decimal HolidayAllowance { get; set; }
         public decimal OvertimePay { get; set; }
 
-        // 🔥 Saat alanları
         public decimal MonthlyHours { get; set; }
         public decimal MonthlyOvertimeHours { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public bool IsFinal { get; set; }
 
-        // Employee / Company display alanların varsa buraya ekli
+        // Display alanları
         public string? EmployeeFullName { get; set; }
         public string? CompanyName { get; set; }
         public string? EmployeeName { get; internal set; }
         public int? CompanyId { get; internal set; }
-        public object Items { get; internal set; }
+        public object? Items { get; internal set; }
+
+        // --- Snapshot parametreler (UI'de detay tabında gösterebilirsin) ---
+        public bool ApplyAHV { get; set; }
+        public bool ApplyALV { get; set; }
+        public bool ApplyBVG { get; set; }
+        public bool ApplyNBU { get; set; }
+        public bool ApplyBU { get; set; }
+        public bool ApplyFAK { get; set; }
+        public bool ApplyQST { get; set; }
+
+        public string? PermitType { get; set; }
+        public string? Canton { get; set; }
+        public bool ChurchMember { get; set; }
+        public string? WithholdingTaxCode { get; set; }
+
+        public decimal? HolidayRate { get; set; }
+        public bool HolidayEligible { get; set; }
+
+        public string? Comment { get; set; }
     }
 }

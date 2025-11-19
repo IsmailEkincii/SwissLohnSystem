@@ -12,38 +12,49 @@ namespace SwissLohnSystem.UI.Pages.Companies
     public class DetailsModel : PageModel
     {
         private readonly ApiClient _api;
+
         public DetailsModel(ApiClient api)
         {
             _api = api;
         }
 
         public int Id { get; set; }
+
+        // View'da kullandığımız ViewModel
         public CompanyDetailsDto Vm { get; set; } = new();
 
-        // 🔴 Swagger adresine göre BURASI:
-        // https://localhost:7090/swagger/index.html => BaseUrl: https://localhost:7090
-        public string ApiBaseUrl => "https://localhost:7090";
+        // API base adresi (appsettings / ApiClient'tan gelir)
+        public string ApiBaseUrl => _api.BaseUrl?.TrimEnd('/') ?? string.Empty;
 
         public async Task OnGetAsync(int id)
         {
             Id = id;
 
-            var companyRes = await _api.GetAsync<CompanyDto>($"/api/Company/{id}");
-            var employeesRes = await _api.GetAsync<IEnumerable<EmployeeDto>>($"/api/Company/{id}/Employees");
+            // JS tarafı için base URL
+            ViewData["ApiBaseUrl"] = ApiBaseUrl;
 
-            if (!companyRes.ok || companyRes.data is null)
+            // Firma
+            var (okCompany, company, companyMsg) =
+                await _api.GetAsync<CompanyDto>($"/api/Company/{id}");
+
+            // Firma bulunamazsa
+            if (!okCompany || company is null)
             {
-                ViewData["Error"] = companyRes.message ?? "Firma konnte nicht geladen werden.";
+                ViewData["Error"] = companyMsg ?? "Firma konnte nicht geladen werden.";
                 Vm = new CompanyDetailsDto();
                 return;
             }
 
-            var company = companyRes.data;
-            var employees = employeesRes.ok && employeesRes.data is not null
-                ? employeesRes.data
+            // Mitarbeiter listesi
+            var (okEmployees, employees, employeesMsg) =
+                await _api.GetAsync<IEnumerable<EmployeeDto>>($"/api/Company/{id}/Employees");
+
+            var employeeList = okEmployees && employees is not null
+                ? employees
                 : Array.Empty<EmployeeDto>();
 
-            Vm = ApiToUiMapper.BuildDetails(company!, employees!);
+            // UI ViewModel’e map et
+            Vm = ApiToUiMapper.BuildDetails(company, employeeList);
         }
     }
 }

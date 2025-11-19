@@ -6,6 +6,7 @@ namespace SwissLohnSystem.API.DTOs.WorkDay
         int Id,
         int EmployeeId,
         DateTime Date,
+        string DayType,
         decimal HoursWorked,
         decimal OvertimeHours
     );

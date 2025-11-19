@@ -6,20 +6,31 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
     /// Tek bir Lohn kaydının tam temsili (detay ve liste için).
     /// API LohnDto ile birebir uyumlu olmalı.
     /// </summary>
-    public record LohnDto(
-        int Id,
-        int EmployeeId,
-        int Month,
-        int Year,
-        decimal BruttoSalary,
-        decimal TotalDeductions,
-        decimal NetSalary,
-        decimal ChildAllowance,
-        decimal HolidayAllowance,
-        decimal OvertimePay,
-        decimal MonthlyHours,          // 🔥
-        decimal MonthlyOvertimeHours,  // 🔥
-        DateTime CreatedAt,
-        bool IsFinal
-    );
+    public class LohnDto
+    {
+        public int Id { get; set; }
+        public int EmployeeId { get; set; }
+
+        public int Month { get; set; }
+        public int Year { get; set; }
+
+        public decimal BruttoSalary { get; set; }
+        public decimal TotalDeductions { get; set; }
+        public decimal NetSalary { get; set; }
+
+        public decimal ChildAllowance { get; set; }
+        public decimal HolidayAllowance { get; set; }
+        public decimal OvertimePay { get; set; }
+
+        public decimal MonthlyHours { get; set; }
+        public decimal MonthlyOvertimeHours { get; set; }
+
+        public decimal Bonus { get; set; }
+        public decimal ExtraAllowance { get; set; }
+        public decimal UnpaidDeduction { get; set; }
+        public decimal OtherDeduction { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+        public bool IsFinal { get; set; }
+    }
 }

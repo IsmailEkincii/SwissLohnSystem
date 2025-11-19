@@ -2066,7 +2066,6 @@ wwwroot\js\adminlte.js
 wwwroot\js\adminlte.js.map
 wwwroot\js\adminlte.min.js
 wwwroot\js\adminlte.min.js.map
-wwwroot\js\loehne-tab.js
 wwwroot\js\lohn-details.js
 wwwroot\js\lohnverlauf-detail.js
 wwwroot\js\site.js
@@ -2128,3 +2127,4 @@ wwwroot\lib\jquery\dist\jquery.js
 wwwroot\lib\jquery\dist\jquery.min.js
 wwwroot\lib\jquery\dist\jquery.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\js\loehne-tab.js

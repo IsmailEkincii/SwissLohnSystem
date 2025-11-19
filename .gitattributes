@@ -1,5 +1,7 @@
 # Auto normalize line endings for Windows devs
 * text=auto eol=crlf
+obj/
+bin/
 
 # C#, Razor, Solution, Config, JSON, YAML → enforce CRLF
 *.cs      text eol=crlf

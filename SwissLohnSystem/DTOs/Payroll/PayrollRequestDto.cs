@@ -1,36 +1,33 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using SwissLohnSystem.API.DTOs.Payroll;
 
-namespace SwissLohnSystem.API.DTOs.Payroll
+public class PayrollRequestDto
 {
-    public class PayrollRequestDto
-    {
-        // 🔥 UI sadece bunları gönderiyor → bunlar Required
-        [Required]
-        public int EmployeeId { get; set; }
+    public int EmployeeId { get; set; }
+    public DateTime Period { get; set; }
 
-        [Required]
-        public DateTime Period { get; set; }
+    public decimal GrossMonthly { get; set; }
+    public decimal Bonus { get; set; }
+    public decimal ExtraAllowance { get; set; }
+    public decimal UnpaidDeduction { get; set; }
+    public decimal OtherDeduction { get; set; }
 
-        // 🔥 Geri kalan tüm alanlar optional
-        public string? Canton { get; set; }
+    // Sosyal sigorta bayrakları
+    public bool ApplyAHV { get; set; }
+    public bool ApplyALV { get; set; }
+    public bool ApplyBVG { get; set; }
+    public bool ApplyNBU { get; set; }
+    public bool ApplyBU { get; set; }
+    public bool ApplyFAK { get; set; }
+    public bool ApplyQST { get; set; }
 
-        public decimal GrossMonthly { get; set; }
+    public int WeeklyHours { get; set; }
 
-        public bool ApplyAHV { get; set; } = true;
-        public bool ApplyALV { get; set; } = true;
-        public bool ApplyBVG { get; set; } = true;
-        public bool ApplyNBU { get; set; } = true;
-        public bool ApplyBU { get; set; } = true;
-        public bool ApplyFAK { get; set; } = true;
-        public bool ApplyQST { get; set; } = false;
+    // QST / Steuer
+    public string? Canton { get; set; }
+    public string? WithholdingTaxCode { get; set; }
+    public string? PermitType { get; set; }
+    public bool ChurchMember { get; set; }
 
-        public int WeeklyHours { get; set; }
-
-        public string? PermitType { get; set; }
-        public string? WithholdingTaxCode { get; set; }
-        public bool ChurchMember { get; set; }
-
-        public BvgPlanDto? BvgPlan { get; set; }
-    }
+    // 🔥 BVG plan override (isteğe bağlı)
+    public BvgPlanDto? BvgPlan { get; set; }
 }

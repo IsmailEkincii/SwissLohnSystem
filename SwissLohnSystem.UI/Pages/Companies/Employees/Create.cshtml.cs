@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using SwissLohnSystem.UI.DTOs.Employees;
 using SwissLohnSystem.UI.Services;
 
@@ -19,70 +18,64 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
         [BindProperty(SupportsGet = true)]
         public int CompanyId { get; set; }
 
+        /// <summary>
+        /// API'deki EmployeeCreateDto ile bire bir aynı DTO.
+        /// </summary>
         [BindProperty]
-        public InputModel Input { get; set; } = new();
-
-        // QST dropdown için
-        public List<SelectListItem> QstTariffCodes { get; set; } = new();
-
-        // 🔹 BVG-Plan dropdown için
-        public List<SelectListItem> BvgPlans { get; set; } = new();
+        public EmployeeCreateDto Input { get; set; } = new();
 
         [TempData] public string? Toast { get; set; }
 
         public void OnGet(int companyId)
         {
             CompanyId = companyId;
-            Input.CompanyId = companyId;
 
-            // Varsayılanlar
-            Input.StartDate = DateTime.Today;
-            Input.Active = true;
-            Input.WeeklyHours = 42;
-            Input.PensumPercent = 100;
-            Input.PermitType = "B";
-            Input.Canton = "ZH";
-
-            Input.ApplyAHV = true;
-            Input.ApplyALV = true;
-            Input.ApplyNBU = true;
-            Input.ApplyBU = true;
-            Input.ApplyFAK = true;
-
-            LoadLookups();
-        }
-
-        private void LoadLookups()
-        {
-            QstTariffCodes = new List<SelectListItem>
+            // Varsayılanları tek yerde dolduralım
+            Input = new EmployeeCreateDto
             {
-                new() { Value = "", Text = "-- bitte wählen --" },
-                new() { Value = "A", Text = "A – ledig, ohne Kinder" },
-                new() { Value = "B", Text = "B – verheiratet, 1 Verdiener" },
-                new() { Value = "C", Text = "C – verheiratet, 2 Verdiener" },
-                new() { Value = "H", Text = "H – alleinerziehend" }
-                // İleride echtes QST-Setup aus DB
-            };
+                CompanyId = companyId,
+                StartDate = DateTime.Today,
+                Active = true,
 
-            // 🔹 BVG-Plan seçenekleri
-            BvgPlans = new List<SelectListItem>
-            {
-                new() { Value = "", Text = "-- bitte wählen --" },
-                new() { Value = "None", Text = "Kein BVG (unter Eintrittsschwelle)" },
-                new() { Value = "Standard", Text = "Standard BVG-Plan" },
-                new() { Value = "Kader", Text = "Kader- / Management-Plan" }
+                // Gehaltsart
+                SalaryType = "Monthly",
+
+                // Arbeitszeit
+                WeeklyHours = 42,
+                PensumPercent = 100m,
+
+                // Kanton / Steuer
+                Canton = "ZH",
+                PermitType = "B",
+                ApplyQST = false,
+                ChurchMember = false,
+
+                // Sozialversicherungen (default: hepsi açık)
+                ApplyAHV = true,
+                ApplyALV = true,
+                ApplyNBU = true,
+                ApplyBU = true,
+                ApplyBVG = true,
+                ApplyFAK = true,
+
+                // Lohnparameter default’ları
+                HolidayEligible = true,
+                ThirteenthEligible = false,
+                ThirteenthProrated = false
             };
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Post’ta da dropdown boş kalmasın diye
-            LoadLookups();
-
             if (!ModelState.IsValid)
                 return Page();
 
-            var salaryType = Input.SalaryTypeOption == "Stundenlohn" ? "Hourly" : "Monthly";
+            // Gehaltsart zorunlu
+            if (string.IsNullOrWhiteSpace(Input.SalaryType))
+            {
+                ModelState.AddModelError(nameof(Input.SalaryType), "Gehaltsart ist erforderlich.");
+                return Page();
+            }
 
             // Basit AHV format kontrolü
             if (!string.IsNullOrWhiteSpace(Input.AHVNumber))
@@ -95,59 +88,30 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
                 }
             }
 
-            var body = new EmployeeCreateDtoForApi
-            {
-                CompanyId = Input.CompanyId,
-                FirstName = Input.FirstName!.Trim(),
-                LastName = Input.LastName!.Trim(),
-                Email = string.IsNullOrWhiteSpace(Input.Email) ? null : Input.Email!.Trim(),
-                Position = string.IsNullOrWhiteSpace(Input.Position) ? null : Input.Position!.Trim(),
-                BirthDate = Input.BirthDate,
-                MaritalStatus = string.IsNullOrWhiteSpace(Input.MaritalStatus) ? null : Input.MaritalStatus!,
-                ChildCount = Input.ChildCount ?? 0,
-                SalaryType = salaryType,
-                HourlyRate = Input.HourlyRate ?? 0m,
-                MonthlyHours = Input.MonthlyHours ?? 0,
-                BruttoSalary = Input.BruttoSalary ?? 0m,
-                StartDate = Input.StartDate!.Value,
-                EndDate = Input.EndDate,
-                Active = Input.Active,
+            // Trim’ler
+            Input.FirstName = Input.FirstName?.Trim() ?? "";
+            Input.LastName = Input.LastName?.Trim() ?? "";
+            Input.Email = string.IsNullOrWhiteSpace(Input.Email) ? null : Input.Email.Trim();
+            Input.Position = string.IsNullOrWhiteSpace(Input.Position) ? null : Input.Position.Trim();
+            Input.MaritalStatus = string.IsNullOrWhiteSpace(Input.MaritalStatus) ? null : Input.MaritalStatus;
+            Input.AHVNumber = string.IsNullOrWhiteSpace(Input.AHVNumber) ? null : Input.AHVNumber.Trim();
+            Input.Krankenkasse = string.IsNullOrWhiteSpace(Input.Krankenkasse) ? null : Input.Krankenkasse.Trim();
+            Input.BVGPlan = string.IsNullOrWhiteSpace(Input.BVGPlan) ? null : Input.BVGPlan.Trim();
+            Input.Address = string.IsNullOrWhiteSpace(Input.Address) ? null : Input.Address.Trim();
+            Input.Zip = string.IsNullOrWhiteSpace(Input.Zip) ? null : Input.Zip.Trim();
+            Input.City = string.IsNullOrWhiteSpace(Input.City) ? null : Input.City.Trim();
+            Input.Phone = string.IsNullOrWhiteSpace(Input.Phone) ? null : Input.Phone.Trim();
+            Input.Canton = string.IsNullOrWhiteSpace(Input.Canton)
+                ? "ZH"
+                : Input.Canton.Trim().ToUpperInvariant();
 
-                AHVNumber = string.IsNullOrWhiteSpace(Input.AHVNumber) ? null : Input.AHVNumber.Trim(),
-                Krankenkasse = string.IsNullOrWhiteSpace(Input.Krankenkasse) ? null : Input.Krankenkasse.Trim(),
-                BVGPlan = string.IsNullOrWhiteSpace(Input.BVGPlan) ? null : Input.BVGPlan.Trim(),
+            // PermitType boş gelirse default B
+            if (string.IsNullOrWhiteSpace(Input.PermitType))
+                Input.PermitType = "B";
 
-                PensumPercent = Input.PensumPercent,
-                HolidayRate = Input.HolidayRate,
-                OvertimeRate = Input.OvertimeRate,
-                WithholdingTaxCode = string.IsNullOrWhiteSpace(Input.WithholdingTaxCode)
-                    ? null
-                    : Input.WithholdingTaxCode.Trim(),
+            var (success, createdEmployee, message) =
+                await _api.PostAsync<EmployeeDto>("/api/Employee", Input);
 
-                Address = string.IsNullOrWhiteSpace(Input.Address) ? null : Input.Address.Trim(),
-                Zip = string.IsNullOrWhiteSpace(Input.Zip) ? null : Input.Zip.Trim(),
-                City = string.IsNullOrWhiteSpace(Input.City) ? null : Input.City.Trim(),
-                Phone = string.IsNullOrWhiteSpace(Input.Phone) ? null : Input.Phone.Trim(),
-
-                WeeklyHours = Input.WeeklyHours ?? 0,
-                ApplyAHV = Input.ApplyAHV,
-                ApplyALV = Input.ApplyALV,
-                ApplyNBU = Input.ApplyNBU,
-                ApplyBU = Input.ApplyBU,
-                ApplyBVG = Input.ApplyBVG,
-                ApplyFAK = Input.ApplyFAK,
-                ApplyQST = Input.ApplyQST,
-
-                HolidayEligible = Input.HolidayEligible,
-                ThirteenthEligible = Input.ThirteenthEligible,
-                ThirteenthProrated = Input.ThirteenthProrated,
-
-                PermitType = string.IsNullOrWhiteSpace(Input.PermitType) ? "B" : Input.PermitType.Trim(),
-                ChurchMember = Input.ChurchMember,
-                Canton = string.IsNullOrWhiteSpace(Input.Canton) ? "ZH" : Input.Canton.Trim()
-            };
-
-            var (success, createdEmployee, message) = await _api.PostAsync<EmployeeDto>("/api/Employee", body);
             if (!success)
             {
                 ModelState.AddModelError(string.Empty, message ?? "Erstellung fehlgeschlagen.");
@@ -158,140 +122,30 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
             return RedirectToPage("/Companies/Details", new { id = Input.CompanyId });
         }
 
-        // ----- ViewModel (Create) -----
-        public class InputModel
-        {
-            [Required] public int CompanyId { get; set; }
-
-            [Required, StringLength(150)] public string? FirstName { get; set; }
-            [Required, StringLength(150)] public string? LastName { get; set; }
-            [EmailAddress] public string? Email { get; set; }
-            public string? Position { get; set; }
-
-            public DateTime? BirthDate { get; set; }
-            public string? MaritalStatus { get; set; }
-            [Range(0, 20)] public int? ChildCount { get; set; }
-
-            [Required, RegularExpression("Monatslohn|Stundenlohn")]
-            public string? SalaryTypeOption { get; set; }
-
-            [Range(0, 1000)] public decimal? HourlyRate { get; set; }
-            [Range(0, 300)] public int? MonthlyHours { get; set; }
-            [Range(0, 1_000_000)] public decimal? BruttoSalary { get; set; }
-
-            [Required] public DateTime? StartDate { get; set; }
-            public DateTime? EndDate { get; set; }
-
-            public bool Active { get; set; }
-
-            // Payroll / Arbeitszeit
-            [Range(0, 80)] public int? WeeklyHours { get; set; }
-            [Range(0, 100)] public decimal? PensumPercent { get; set; }
-            [Range(0, 100)] public decimal? HolidayRate { get; set; }
-            [Range(0, 10)] public decimal? OvertimeRate { get; set; }
-
-            public bool HolidayEligible { get; set; }
-            public bool ThirteenthEligible { get; set; }
-            public bool ThirteenthProrated { get; set; }
-
-            // Sozialversicherungen Flags
-            public bool ApplyAHV { get; set; }
-            public bool ApplyALV { get; set; }
-            public bool ApplyNBU { get; set; }
-            public bool ApplyBU { get; set; }
-            public bool ApplyBVG { get; set; }
-            public bool ApplyFAK { get; set; }
-            public bool ApplyQST { get; set; }
-
-            // Steuer / Kanton
-            public string? PermitType { get; set; }
-            public bool ChurchMember { get; set; }
-            [StringLength(2)] public string? Canton { get; set; }
-            public string? WithholdingTaxCode { get; set; }
-
-            // Sozialversicherung
-            public string? AHVNumber { get; set; }
-            public string? Krankenkasse { get; set; }
-            public string? BVGPlan { get; set; }
-
-            // Adresse & Kontakt
-            public string? Address { get; set; }
-            public string? Zip { get; set; }
-            public string? City { get; set; }
-            public string? Phone { get; set; }
-        }
-
+        // Ek UI doğrulamaları (SalaryType/Brutto/Hourly)
         public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
         {
-            if (Input.SalaryTypeOption == "Stundenlohn")
+            if (Input.SalaryType == "Hourly")
             {
-                if (Input.HourlyRate is null or <= 0)
+                if (Input.HourlyRate <= 0)
                     yield return new ValidationResult(
                         "Stundenlohn ist erforderlich und muss größer als 0 sein.",
                         new[] { nameof(Input.HourlyRate) });
             }
-            else if (Input.SalaryTypeOption == "Monatslohn")
+            else if (Input.SalaryType == "Monthly")
             {
-                if (Input.BruttoSalary is null or <= 0)
+                if (Input.BruttoSalary <= 0)
                     yield return new ValidationResult(
                         "Bruttolohn ist erforderlich und muss größer als 0 sein.",
                         new[] { nameof(Input.BruttoSalary) });
             }
 
-            if (Input.EndDate.HasValue && Input.StartDate.HasValue && Input.EndDate < Input.StartDate)
+            if (Input.EndDate.HasValue && Input.EndDate.Value < Input.StartDate)
+            {
                 yield return new ValidationResult(
                     "Enddatum darf nicht vor dem Startdatum liegen.",
                     new[] { nameof(Input.EndDate) });
-        }
-
-        // ----- API DTO -----
-        public class EmployeeCreateDtoForApi
-        {
-            public int CompanyId { get; set; }
-            public string FirstName { get; set; } = null!;
-            public string LastName { get; set; } = null!;
-            public string? Email { get; set; }
-            public string? Position { get; set; }
-            public DateTime? BirthDate { get; set; }
-            public string? MaritalStatus { get; set; }
-            public int ChildCount { get; set; }
-            public string SalaryType { get; set; } = null!; // "Monthly" | "Hourly"
-            public decimal HourlyRate { get; set; }
-            public int MonthlyHours { get; set; }
-            public decimal BruttoSalary { get; set; }
-            public DateTime StartDate { get; set; }
-            public DateTime? EndDate { get; set; }
-            public bool Active { get; set; }
-
-            public string? AHVNumber { get; set; }
-            public string? Krankenkasse { get; set; }
-            public string? BVGPlan { get; set; }
-            public decimal? PensumPercent { get; set; }
-            public decimal? HolidayRate { get; set; }
-            public decimal? OvertimeRate { get; set; }
-            public string? WithholdingTaxCode { get; set; }
-
-            public int WeeklyHours { get; set; }
-            public bool ApplyAHV { get; set; }
-            public bool ApplyALV { get; set; }
-            public bool ApplyNBU { get; set; }
-            public bool ApplyBU { get; set; }
-            public bool ApplyBVG { get; set; }
-            public bool ApplyFAK { get; set; }
-            public bool ApplyQST { get; set; }
-
-            public bool HolidayEligible { get; set; }
-            public bool ThirteenthEligible { get; set; }
-            public bool ThirteenthProrated { get; set; }
-
-            public string PermitType { get; set; } = "B";
-            public bool ChurchMember { get; set; }
-            public string Canton { get; set; } = "ZH";
-
-            public string? Address { get; set; }
-            public string? Zip { get; set; }
-            public string? City { get; set; }
-            public string? Phone { get; set; }
+            }
         }
     }
 }

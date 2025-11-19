@@ -285,27 +285,7 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.EmployeeController",
-    "Method": "GetEmployees",
-    "RelativePath": "api/Employee",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "SwissLohnSystem.API.Controllers.EmployeeController",
-    "Method": "PostEmployee",
+    "Method": "Create",
     "RelativePath": "api/Employee",
     "HttpMethod": "POST",
     "IsController": true,
@@ -331,7 +311,7 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.EmployeeController",
-    "Method": "GetEmployee",
+    "Method": "GetById",
     "RelativePath": "api/Employee/{id}",
     "HttpMethod": "GET",
     "IsController": true,
@@ -357,7 +337,7 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.EmployeeController",
-    "Method": "PutEmployee",
+    "Method": "Update",
     "RelativePath": "api/Employee/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
@@ -388,7 +368,7 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.EmployeeController",
-    "Method": "DeleteEmployee",
+    "Method": "Delete",
     "RelativePath": "api/Employee/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
@@ -491,7 +471,7 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "GetCompanyMonthly",
+    "Method": "GetByCompanyMonthly",
     "RelativePath": "api/Lohn/by-company/{companyId}/monthly",
     "HttpMethod": "GET",
     "IsController": true,
@@ -510,7 +490,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnMonthlyRowDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[SwissLohnSystem.API.DTOs.Lohn.CompanyMonthlyLohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -556,7 +536,7 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto",
+        "Type": "PayrollRequestDto",
         "IsRequired": true
       }
     ],
@@ -582,7 +562,7 @@
     "Parameters": [
       {
         "Name": "request",
-        "Type": "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto",
+        "Type": "PayrollRequestDto",
         "IsRequired": true
       }
     ],
@@ -839,6 +819,42 @@
     "ReturnTypes": [
       {
         "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.WorkDayController",
+    "Method": "GetSummary",
+    "RelativePath": "api/WorkDay/summary",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "employeeId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "month",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.DTOs.WorkDay.WorkDaySummaryDto",
         "MediaTypes": [
           "text/plain",
           "application/json",

@@ -20,6 +20,12 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
         public decimal HolidayAllowance { get; set; }
         public decimal OvertimePay { get; set; }
 
+        // 🔥 Ek brüt kalemleri
+        public decimal Bonus { get; set; }
+        public decimal ExtraAllowance { get; set; }
+        public decimal UnpaidDeduction { get; set; }
+        public decimal OtherDeduction { get; set; }
+
         // 🔥 Aylık çalışma saatleri
         public decimal MonthlyHours { get; set; }
         public decimal MonthlyOvertimeHours { get; set; }
@@ -38,12 +44,12 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
 
     public class LohnItemDto
     {
-        public string Code { get; set; } = "";         // AHV, ALV, NBU, BU, BVG, QST, FAK, etc.
-        public string Title { get; set; } = "";        // DE başlık
-        public string Type { get; set; } = "info";     // deduction | contribution | info
-        public string Basis { get; set; } = "";        // Örn: Brutto, Koord. Lohn
-        public decimal Rate { get; set; }              // 0.053 vb.
-        public decimal Amount { get; set; }            // +/- tutar
-        public string Side { get; set; } = "employee"; // employee | employer
+        public string Code { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Type { get; set; } = "info";
+        public string Basis { get; set; } = "";
+        public decimal Rate { get; set; }
+        public decimal Amount { get; set; }
+        public string Side { get; set; } = "employee";
     }
 }

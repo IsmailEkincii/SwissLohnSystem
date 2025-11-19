@@ -3,81 +3,63 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SwissLohnSystem.UI.DTOs.Employees
 {
-    public sealed record EmployeeCreateDto
+    public class EmployeeCreateDto
     {
-        [Required]
-        public int CompanyId { get; init; }
+        public int CompanyId { get; set; }
 
-        [Required, StringLength(100)]
-        public string FirstName { get; init; } = null!;
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
+        public string? Email { get; set; }
+        public string? Position { get; set; }
 
-        [Required, StringLength(100)]
-        public string LastName { get; init; } = null!;
+        public DateTime? BirthDate { get; set; }
+        public string? MaritalStatus { get; set; }
+        public int ChildCount { get; set; }
 
-        [EmailAddress]
-        public string? Email { get; init; }
+        // "Monthly" | "Hourly"
+        public string SalaryType { get; set; } = null!;
+        public decimal HourlyRate { get; set; }
+        public int MonthlyHours { get; set; }
+        public decimal BruttoSalary { get; set; }
 
-        [StringLength(100)]
-        public string? Position { get; init; }
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public bool Active { get; set; }
 
-        public DateTime? BirthDate { get; init; }
-        public string? MaritalStatus { get; init; }
-        public int ChildCount { get; init; }
+        // Sozialversicherung / Vorsorge
+        public string? AHVNumber { get; set; }
+        public string? Krankenkasse { get; set; }
+        public string? BVGPlan { get; set; }
 
-        [Required]
-        [RegularExpression("Monthly|Hourly", ErrorMessage = "SalaryType muss 'Monthly' oder 'Hourly' sein.")]
-        public string SalaryType { get; init; } = "Monthly";
+        public decimal? PensumPercent { get; set; }
+        public decimal? HolidayRate { get; set; }
+        public decimal? OvertimeRate { get; set; }
+        public string? WithholdingTaxCode { get; set; }
 
-        // SalaryType == "Hourly" ise kullanılır
-        [Range(0, 1_000_000)]
-        public decimal HourlyRate { get; init; }
+        public int WeeklyHours { get; set; }
 
-        public int MonthlyHours { get; init; }
+        // --- Sozialversicherungs-Flags ---
+        public bool ApplyAHV { get; set; }
+        public bool ApplyALV { get; set; }
+        public bool ApplyNBU { get; set; }
+        public bool ApplyBU { get; set; }
+        public bool ApplyBVG { get; set; }
+        public bool ApplyFAK { get; set; }
+        public bool ApplyQST { get; set; }
 
-        // SalaryType == "Monthly" ise kullanılır
-        [Range(0, 1_000_000)]
-        public decimal BruttoSalary { get; init; }
+        public bool HolidayEligible { get; set; }
+        public bool ThirteenthEligible { get; set; }
+        public bool ThirteenthProrated { get; set; }
 
-        [Required]
-        public DateTime StartDate { get; init; }
+        // Steuer
+        public string PermitType { get; set; } = "B";
+        public bool ChurchMember { get; set; }
+        public string Canton { get; set; } = "ZH";
 
-        public DateTime? EndDate { get; init; }
-
-        public bool Active { get; init; } = true;
-
-        // Sigorta & kimlik
-        public string? AHVNumber { get; init; }
-        public string? Krankenkasse { get; init; }
-        public string? BVGPlan { get; init; }
-
-        // Parametreler
-        public decimal? PensumPercent { get; init; }
-        public decimal? HolidayRate { get; init; }
-        public decimal? OvertimeRate { get; init; }
-        public string? WithholdingTaxCode { get; init; }
-
-        public int WeeklyHours { get; init; } = 42;   // istersen değiştir
-
-        public bool ApplyAHV { get; init; } = true;
-        public bool ApplyALV { get; init; } = true;
-        public bool ApplyNBU { get; init; } = true;
-        public bool ApplyBU { get; init; } = true;
-        public bool ApplyBVG { get; init; } = true;
-        public bool ApplyFAK { get; init; } = true;
-        public bool ApplyQST { get; init; }
-
-        public bool HolidayEligible { get; init; } = true;
-        public bool ThirteenthEligible { get; init; } = true;
-        public bool ThirteenthProrated { get; init; } = true;
-
-        public string PermitType { get; init; } = "B";
-        public bool ChurchMember { get; init; }
-        public string Canton { get; init; } = "ZH";
-
-        // Adres & iletişim
-        public string? Address { get; init; }
-        public string? Zip { get; init; }
-        public string? City { get; init; }
-        public string? Phone { get; init; }
+        // Adresse & Kontakt
+        public string? Address { get; set; }
+        public string? Zip { get; set; }
+        public string? City { get; set; }
+        public string? Phone { get; set; }
     }
 }

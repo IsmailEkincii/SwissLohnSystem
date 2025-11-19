@@ -56,6 +56,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Smale/source/repos/SwissLohnSystem/SwissLohnSystem.UI/Pages/Lohn/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9oblxDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Smale/source/repos/SwissLohnSystem/SwissLohnSystem.UI/Pages/Lohn/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9oblxEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

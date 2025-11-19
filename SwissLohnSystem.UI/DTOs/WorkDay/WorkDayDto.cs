@@ -1,9 +1,11 @@
-﻿namespace SwissLohnSystem.UI.DTOs.WorkDay;
-
+﻿namespace SwissLohnSystem.UI.DTOs.WorkDay
+{
 public record WorkDayDto(
-    int Id,
-    int EmployeeId,
-    DateTime Date,
-    decimal HoursWorked,
-    decimal OvertimeHours
-);
+       int Id,
+       int EmployeeId,
+       DateTime Date,
+       string DayType,
+       decimal HoursWorked,
+       decimal OvertimeHours
+   );
+}

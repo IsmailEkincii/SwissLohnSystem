@@ -100,23 +100,23 @@
 
                     <!-- Gehaltsart -->
                     <hr />
-                    <h5>Gehaltsart & Grundlohn</h5>
+                    <h5>Gehaltsart &amp; Grundlohn</h5>
 
                     <div class="form-row">
                         <div class="form-group col-md-4">
-                            <label asp-for="Input.SalaryTypeOption">Gehaltsart</label>
-                            <select asp-for="Input.SalaryTypeOption" class="form-control" id="salaryTypeSelect">
+                            <label asp-for="Input.SalaryType">Gehaltsart</label>
+                            <select asp-for="Input.SalaryType" class="form-control" id="salaryTypeSelect">
                                 <option value="">-- bitte wählen --</option>
-                                <option value="Monatslohn">Monatslohn</option>
-                                <option value="Stundenlohn">Stundenlohn</option>
+                                <option value="Monthly">Monatslohn</option>
+                                <option value="Hourly">Stundenlohn</option>
                             </select>
-                            <span asp-validation-for="Input.SalaryTypeOption" class="text-danger"></span>
+                            <span asp-validation-for="Input.SalaryType" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-4">
                             <label asp-for="Input.HourlyRate">Stundenlohn</label>
                             <input asp-for="Input.HourlyRate"
                                    type="number"
-                                   step="any"
+                                   step="0.01"
                                    class="form-control" />
                             <span asp-validation-for="Input.HourlyRate" class="text-danger"></span>
                         </div>
@@ -132,7 +132,7 @@
                             <label asp-for="Input.BruttoSalary">Bruttolohn (Monat)</label>
                             <input asp-for="Input.BruttoSalary"
                                    type="number"
-                                   step="any"
+                                   step="0.01"
                                    class="form-control" />
                             <span asp-validation-for="Input.BruttoSalary" class="text-danger"></span>
                         </div>
@@ -148,161 +148,9 @@
                         </div>
                     </div>
 
-                    <!-- Arbeitszeit & Lohnparameter -->
-                    <hr />
-                    <h5>Arbeitszeit & Lohnparameter</h5>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label asp-for="Input.WeeklyHours">Wochenstunden</label>
-                            <input asp-for="Input.WeeklyHours"
-                                   type="number"
-                                   min="1"
-                                   max="60"
-                                   step="0.5"
-                                   class="form-control" />
-                            <span asp-validation-for="Input.WeeklyHours" class="text-danger"></span>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label asp-for="Input.PensumPercent">Pensum %</label>
-                            <input asp-for="Input.PensumPercent"
-                                   type="number"
-                                   step="any"
-                                   min="0"
-                                   max="100"
-                                   class="form-control" />
-                            <span asp-validation-for="Input.PensumPercent" class="text-danger"></span>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label asp-for="Input.HolidayRate">Ferienentschädigung %</label>
-                            <input asp-for="Input.HolidayRate"
-                                   type="number"
-                                   step="any"
-                                   min="0"
-                                   max="100"
-                                   class="form-control" />
-                            <span asp-validation-for="Input.HolidayRate" class="text-danger"></span>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label asp-for="Input.OvertimeRate">Überstundenzuschlag Faktor</label>
-                            <input asp-for="Input.OvertimeRate"
-                                   type="number"
-                                   step="any"
-                                   min="0"
-                                   max="10"
-                                   class="form-control" />
-                            <span asp-validation-for="Input.OvertimeRate" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <div class="form-check">
-                                <input asp-for="Input.HolidayEligible" class="form-check-input" />
-                                <label asp-for="Input.HolidayEligible" class="form-check-label">Ferienanspruch (ausbezahlt / berechnet)</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <div class="form-check">
-                                <input asp-for="Input.ThirteenthEligible" class="form-check-input" />
-                                <label asp-for="Input.ThirteenthEligible" class="form-check-label">13. Monatslohn</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <div class="form-check">
-                                <input asp-for="Input.ThirteenthProrated" class="form-check-input" />
-                                <label asp-for="Input.ThirteenthProrated" class="form-check-label">13. Lohn pro rata verteilen</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sozialversicherungen -->
-                    <hr />
-                    <h5>Sozialversicherungen (AN/AG Beiträge anwenden)</h5>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-2">
-                            <div class="form-check">
-                                <input asp-for="Input.ApplyAHV" class="form-check-input" />
-                                <label asp-for="Input.ApplyAHV" class="form-check-label">AHV/IV/EO</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <div class="form-check">
-                                <input asp-for="Input.ApplyALV" class="form-check-input" />
-                                <label asp-for="Input.ApplyALV" class="form-check-label">ALV</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <div class="form-check">
-                                <input asp-for="Input.ApplyBVG" class="form-check-input" />
-                                <label asp-for="Input.ApplyBVG" class="form-check-label">BVG</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <div class="form-check">
-                                <input asp-for="Input.ApplyNBU" class="form-check-input" />
-                                <label asp-for="Input.ApplyNBU" class="form-check-label">NBU</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <div class="form-check">
-                                <input asp-for="Input.ApplyBU" class="form-check-input" />
-                                <label asp-for="Input.ApplyBU" class="form-check-label">BU</label>
-                            </div>
-                        </div>
-                        <div class="form-group col-md-2">
-                            <div class="form-check">
-                                <input asp-for="Input.ApplyFAK" class="form-check-input" />
-                                <label asp-for="Input.ApplyFAK" class="form-check-label">FAK</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quellensteuer & Kanton -->
-                    <hr />
-                    <h5>Quellensteuer & Kanton</h5>
-
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label asp-for="Input.PermitType">Bewilligung</label>
-                            <select asp-for="Input.PermitType"
-                                    class="form-control"
-                                    asp-items="Model.PermitTypes">
-                            </select>
-                            <span asp-validation-for="Input.PermitType" class="text-danger"></span>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label asp-for="Input.Canton">Kanton</label>
-                            <input asp-for="Input.Canton" class="form-control" maxlength="2" />
-                            <span asp-validation-for="Input.Canton" class="text-danger"></span>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label asp-for="Input.WithholdingTaxCode">Quellensteuer-Tarif</label>
-                            <select asp-for="Input.WithholdingTaxCode"
-                                    class="form-control"
-                                    asp-items="Model.QstTariffCodes"
-                                    id="QstTarifSelect">
-                            </select>
-                            <span asp-validation-for="Input.WithholdingTaxCode" class="text-danger"></span>
-                        </div>
-                        <div class="form-group col-md-3">
-                            <div class="form-check mt-4">
-                                <input asp-for="Input.ApplyQST"
-                                       class="form-check-input"
-                                       id="ApplyQstCheckbox" />
-                                <label asp-for="Input.ApplyQST" class="form-check-label">Quellensteuer anwenden</label>
-                            </div>
-                            <div class="form-check mt-1">
-                                <input asp-for="Input.ChurchMember" class="form-check-input" />
-                                <label asp-for="Input.ChurchMember" class="form-check-label">Kirchensteuerpflichtig</label>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Sozialversicherung & Vorsorge -->
                     <hr />
-                    <h5>Sozialversicherung & Vorsorge</h5>
+                    <h5>Sozialversicherung &amp; Vorsorge</h5>
 
                     <div class="form-row">
                         <div class="form-group col-md-4">
@@ -317,12 +165,9 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label asp-for="Input.BVGPlan">BVG-Plan</label>
-                            <select asp-for="Input.BVGPlan"
-                                    class="form-control"
-                                    asp-items="Model.BvgPlans">
-                            </select>
+                            <input asp-for="Input.BVGPlan" class="form-control" />
                             <span class="form-text text-muted">
-                                Wählen Sie den BVG-Plan des Mitarbeiters oder behalten Sie den bestehenden Eintrag.
+                                Freitext (z.B. Standard / Kader / Kein BVG).
                             </span>
                             <span asp-validation-for="Input.BVGPlan" class="text-danger"></span>
                         </div>
@@ -330,10 +175,43 @@
 
                     <!-- Adresse & Kontakt -->
                     <hr />
-                    <h5>Adresse & Kontakt</h5>
+                    <h5>Adresse &amp; Kontakt</h5>
 
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.Canton">Kanton</label>
+                            <select asp-for="Input.Canton" class="form-control">
+                                <option value="">-- bitte wählen --</option>
+                                <option value="ZH">ZH</option>
+                                <option value="BE">BE</option>
+                                <option value="LU">LU</option>
+                                <option value="UR">UR</option>
+                                <option value="SZ">SZ</option>
+                                <option value="OW">OW</option>
+                                <option value="NW">NW</option>
+                                <option value="GL">GL</option>
+                                <option value="ZG">ZG</option>
+                                <option value="FR">FR</option>
+                                <option value="SO">SO</option>
+                                <option value="BS">BS</option>
+                                <option value="BL">BL</option>
+                                <option value="SH">SH</option>
+                                <option value="AR">AR</option>
+                                <option value="AI">AI</option>
+                                <option value="SG">SG</option>
+                                <option value="GR">GR</option>
+                                <option value="AG">AG</option>
+                                <option value="TG">TG</option>
+                                <option value="TI">TI</option>
+                                <option value="VD">VD</option>
+                                <option value="VS">VS</option>
+                                <option value="NE">NE</option>
+                                <option value="GE">GE</option>
+                                <option value="JU">JU</option>
+                            </select>
+                            <span asp-validation-for="Input.Canton" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-3">
                             <label asp-for="Input.Address">Adresse</label>
                             <input asp-for="Input.Address" class="form-control" />
                             <span asp-validation-for="Input.Address" class="text-danger"></span>
@@ -386,10 +264,10 @@
             function updateReq() {
                 if (!select || !hourly || !brutto) return;
                 const v = select.value;
-                if (v === 'Stundenlohn') {
+                if (v === 'Hourly') {
                     hourly.setAttribute('required', 'required');
                     brutto.removeAttribute('required');
-                } else if (v === 'Monatslohn') {
+                } else if (v === 'Monthly') {
                     brutto.setAttribute('required', 'required');
                     hourly.removeAttribute('required');
                 } else {
@@ -401,20 +279,6 @@
             if (select) {
                 select.addEventListener('change', updateReq);
                 updateReq();
-            }
-
-            // QST dropdown enable/disable
-            const qstCheckbox = document.getElementById('ApplyQstCheckbox');
-            const qstSelect = document.getElementById('QstTarifSelect');
-
-            function toggleQstSelect() {
-                if (!qstCheckbox || !qstSelect) return;
-                qstSelect.disabled = !qstCheckbox.checked;
-            }
-
-            document.addEventListener('DOMContentLoaded', toggleQstSelect);
-            if (qstCheckbox) {
-                qstCheckbox.addEventListener('change', toggleQstSelect);
             }
         })();
     </script>

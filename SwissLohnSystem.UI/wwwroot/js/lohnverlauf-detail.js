@@ -1,7 +1,7 @@
-﻿console.log("[lohnverlauf] external script loaded");
+﻿// wwwroot/js/lohnverlauf-detail.js
+console.log("[lohnverlauf] external script loaded");
 
 // ---- Yardımcı format fonksiyonları ----
-
 function normalizeNumber(value) {
     if (value === null || value === undefined || value === "") return null;
     var n = Number(value);
@@ -39,7 +39,7 @@ function formatCurrency(amount, typeHint) {
     return sign + " CHF " + n.toFixed(2);
 }
 
-// 5 kolonlu satır ekle: Legende | % | Menge | Ansatz | Betrag
+// 5 kolonlu satır ekle
 function appendRow(tbody, cols, isSectionRow) {
     if (!tbody) return;
     var tr = document.createElement("tr");
@@ -55,7 +55,7 @@ function appendRow(tbody, cols, isSectionRow) {
     tbody.appendChild(tr);
 }
 
-// ---- Ay ismi (Januar 2025 gibi) ----
+// ---- Ay isimleri ----
 var monthNamesDe = [
     "", "Januar", "Februar", "März", "April", "Mai", "Juni",
     "Juli", "August", "September", "Oktober", "November", "Dezember"
@@ -78,7 +78,6 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // 🔥 WorkDays'ten belirli bir ay için toplam saat hesapla
     async function loadMonthHoursFromWorkDays(year, month) {
         if (!EMPLOYEE_ID || !API_BASE_URL) return { total: null, overtime: null };
 
@@ -105,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             list.forEach(function (w) {
                 if (!w.date) return;
-                var dateStr = w.date.split("T")[0]; // "2025-11-14"
+                var dateStr = w.date.split("T")[0];
                 if (dateStr.indexOf(ym) !== 0) return;
 
                 var h = normalizeNumber(w.hoursWorked);
@@ -142,7 +141,6 @@ document.addEventListener("DOMContentLoaded", function () {
         var netFromRow = row.getAttribute("data-net");
         var totalDedFromRow = row.getAttribute("data-totalded");
 
-        // 🔥 Aylık saatler (row attribute'larından)
         var mhoursFromRow = row.getAttribute("data-mhours");
         var motHoursFromRow = row.getAttribute("data-mot-hours");
         console.log("[lohnverlauf] mhoursFromRow =", mhoursFromRow, "motHoursFromRow =", motHoursFromRow);
@@ -154,7 +152,6 @@ document.addEventListener("DOMContentLoaded", function () {
         var motNum = normalizeNumber(motHoursFromRow);
 
         if (mhoursNum !== null || motNum !== null) {
-            // Lohn tablosunda saatler varsa direkt kullan
             if (spanMonthlyHours) {
                 spanMonthlyHours.textContent = formatNumber(mhoursNum || 0, 2, true) + " h";
             }
@@ -162,7 +159,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 spanMonthlyOvertime.textContent = formatNumber(motNum || 0, 2, true) + " h";
             }
         } else {
-            // 🔥 Fallback: WorkDays'ten hesapla
             var hoursResult = await loadMonthHoursFromWorkDays(parseInt(year, 10), parseInt(month, 10));
             console.log("[lohnverlauf] hoursResult =", hoursResult);
 
@@ -176,24 +172,21 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Modal başlığındaki küçük yazı
         var spanPeriodTitle = document.getElementById("ldmPeriod");
         if (spanPeriodTitle) spanPeriodTitle.textContent = period;
 
-        // "Lohnabrechnung November 2025" gibi
         var spanPeriodHeader = document.getElementById("ldmPeriodHeader");
         if (spanPeriodHeader) {
             var monthName = monthNamesDe[monthNum] || period;
             spanPeriodHeader.textContent = monthName + " " + year;
         }
 
-        var url = API_BASE_URL + "/api/Lohn/calc";
-
         if (!EMPLOYEE_ID) {
             alert("EMPLOYEE_ID fehlt – Mitarbeiter konnte nicht ermittelt werden.");
             return;
         }
 
+        var url = API_BASE_URL + "/api/Lohn/calc";
         var payload = {
             employeeId: Number(EMPLOYEE_ID),
             period: periodDate
@@ -204,9 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             var res = await fetch(url, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
@@ -236,7 +227,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             var items = d.items || [];
 
-            // ---- 1) AN ve AG toplamları ----
             var totalEmployeeDed = 0;
             var totalEmployerCost = 0;
 
@@ -252,11 +242,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // ---- 2) NETTO: API -> satır ----
             var netVal = (d.netToPay !== undefined && d.netToPay !== null) ? d.netToPay : netFromRow;
             var netNum = normalizeNumber(netVal);
 
-            // ---- 3) BRUTTO: API -> satır -> (net + AN) ----
             var grossVal = (d.grossSalary !== undefined && d.grossSalary !== null)
                 ? d.grossSalary
                 : (d.bruttoSalary !== undefined && d.bruttoSalary !== null
@@ -273,13 +261,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             grossVal = grossNum;
 
-            // Eğer net hâlâ yoksa brutto - AN ile hesapla
             if (netNum === null) {
                 netNum = grossNum - totalEmployeeDed;
                 netVal = netNum;
             }
 
-            // ---- 4) Üst özetler (printable + kartlar) ----
             var sumGross = document.getElementById("sumGross");
             var sumEmp = document.getElementById("sumEmp");
             var sumEr = document.getElementById("sumEr");
@@ -290,7 +276,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (sumEr) sumEr.textContent = formatNumber(totalEmployerCost);
             if (sumNet) sumNet.textContent = formatNumber(netVal);
 
-            // Modal başındaki küçük kartlar
             var cardGross = document.getElementById("ldmGross");
             var cardEmp = document.getElementById("ldmEmpTotal");
             var cardEr = document.getElementById("ldmErTotal");
@@ -301,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (cardEr) cardEr.textContent = formatNumber(totalEmployerCost);
             if (cardNet) cardNet.textContent = formatNumber(netVal);
 
-            // ---- 5) GELİR KALEMLERİ ----
+            // GELİR KALEMLERİ
             items.forEach(function (x) {
                 var typeRaw = (x.type || "").toString().toLowerCase();
                 var side = (x.side || "").toString().toLowerCase();
@@ -338,7 +323,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 ], false);
             });
 
-            // ---- 6) BRUTTOLOHN ----
+            // BRUTTOLOHN
             appendRow(tbody, [
                 "<strong>BRUTTOLOHN</strong>",
                 "",
@@ -349,7 +334,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             appendRow(tbody, ["", "", "", "", ""], false);
 
-            // ---- 7) AN-KESİNTİLER ----
+            // AN-KESİNTİLER
             items.forEach(function (x) {
                 var side = (x.side || "").toString().toLowerCase();
                 var amt = normalizeNumber(x.amount);
@@ -383,7 +368,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 ], false);
             });
 
-            // ---- 8) TOTAL ABZUEGE (sadece AN) ----
             appendRow(tbody, [
                 "<strong>TOTAL ABZUEGE</strong>",
                 "",
@@ -394,7 +378,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             appendRow(tbody, ["", "", "", "", ""], false);
 
-            // ---- 9) AG-KOSTEN BLOĞU ----
+            // AG-KOSTEN
             appendRow(tbody, [
                 "<strong>AG-KOSTEN</strong>",
                 "",
@@ -444,7 +428,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "<strong>" + formatCurrency(totalEmployerCost, "employer") + "</strong>"
             ], true);
 
-            // ---- 10) NETTOLOHN ----
+            // NETTO
             appendRow(tbody, [
                 "<strong>NETTOLOHN</strong>",
                 "",
@@ -453,7 +437,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "<strong>" + formatCurrency(netVal, "netto") + "</strong>"
             ], true);
 
-            // ---- Modal aç ----
+            // Modal aç
             if (window.$ && window.$("#lohnDetailModal").modal) {
                 window.$("#lohnDetailModal").modal("show");
             } else {
@@ -472,9 +456,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Satır ve buton event'leri
     rows.forEach(function (row) {
-
         row.addEventListener("click", function (e) {
             if (e.target.closest(".btn-lohn-detail")) return;
             console.log("[lohnverlauf] row click");
@@ -491,7 +473,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // PDF / Print butonu
     var btnPrint = document.getElementById("btnLdmPrint");
     if (btnPrint) {
         btnPrint.addEventListener("click", function () {

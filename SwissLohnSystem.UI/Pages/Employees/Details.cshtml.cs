@@ -75,22 +75,17 @@ namespace SwissLohnSystem.UI.Pages.Employees
                         )
                     );
 
-                LohnList = LohnList
-                    .Select(l =>
+                // LohnDto class olduðu için direkt property set ediyoruz
+                foreach (var l in LohnList)
+                {
+                    if (workDict.TryGetValue((l.Year, l.Month), out var sums))
                     {
-                        if (workDict.TryGetValue((l.Year, l.Month), out var sums))
-                        {
-                            return l with
-                            {
-                                MonthlyHours = sums.Total,
-                                MonthlyOvertimeHours = sums.Overtime
-                            };
-                        }
-
-                        return l;
-                    })
-                    .ToList();
+                        l.MonthlyHours = sums.Total;
+                        l.MonthlyOvertimeHours = sums.Overtime;
+                    }
+                }
             }
+
         }
     }
 }

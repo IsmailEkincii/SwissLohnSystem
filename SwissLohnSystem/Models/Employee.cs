@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace SwissLohnSystem.API.Models
 {
@@ -10,38 +9,41 @@ namespace SwissLohnSystem.API.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey(nameof(Company))]
-        public int CompanyId { get; set; }
-
-        [JsonIgnore]
-        public Company? Company { get; set; }
-
         [Required]
+        public int CompanyId { get; set; }
+        public Company Company { get; set; } = null!;
+
+        // ---- Basisdaten ----
+        [Required, MaxLength(150)]
         public string FirstName { get; set; } = null!;
 
-        [Required]
+        [Required, MaxLength(150)]
         public string LastName { get; set; } = null!;
 
+        [MaxLength(256)]
         public string? Email { get; set; }
+
+        [MaxLength(150)]
         public string? Position { get; set; }
 
         public DateTime? BirthDate { get; set; }
 
-        // DE UI kullanıyorsun ama API içinde istersen "single/married"e normalize edebilirsin
+        [MaxLength(50)]
         public string? MaritalStatus { get; set; }
 
         public int ChildCount { get; set; }
 
-        // Çalışma tipi & ücret
-        [Required]
-        public string SalaryType { get; set; } = "Monthly";   // "Monthly" | "Hourly"
+        // ---- Gehalt ----
+        // "Monthly" | "Hourly"
+        [Required, MaxLength(20)]
+        public string SalaryType { get; set; } = "Monthly";
 
-        [Column(TypeName = "decimal(18,4)")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal HourlyRate { get; set; }
 
         public int MonthlyHours { get; set; }
 
-        [Column(TypeName = "decimal(18,4)")]
+        [Column(TypeName = "decimal(18,2)")]
         public decimal BruttoSalary { get; set; }
 
         [Required]
@@ -49,54 +51,66 @@ namespace SwissLohnSystem.API.Models
 
         public DateTime? EndDate { get; set; }
 
-        public int WorkedHours { get; set; }
-        public int OvertimeHours { get; set; }
         public bool Active { get; set; } = true;
 
-        // Sigorta & kimlik
-        [MaxLength(20)]
-        public string? AHVNumber { get; set; }
+        // ---- Arbeitszeit / Lohnparameter ----
+        public int WeeklyHours { get; set; } = 42;
 
-        public string? Krankenkasse { get; set; }
-        public string? BVGPlan { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? PensumPercent { get; set; }
 
-        // Parametreler (vardı, dokunmadık)
-        [Range(0, 100)]
-        public decimal? PensumPercent { get; set; }      // %
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? HolidayRate { get; set; }
 
-        [Column(TypeName = "decimal(18,4)")]
-        public decimal? HolidayRate { get; set; }        // örn 0.0833
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? OvertimeRate { get; set; }
 
-        [Column(TypeName = "decimal(18,4)")]
-        public decimal? OvertimeRate { get; set; }       // örn 1.25
+        public bool HolidayEligible { get; set; }
+        public bool ThirteenthEligible { get; set; }
+        public bool ThirteenthProrated { get; set; }
 
-        public string? WithholdingTaxCode { get; set; }
-
-        // --- YENİ: Bordro varsayılanları / flag'ler ---
-
-        public int WeeklyHours { get; set; } 
-
+        // ---- Sozialversicherungs-Flags ----
         public bool ApplyAHV { get; set; } = true;
         public bool ApplyALV { get; set; } = true;
         public bool ApplyNBU { get; set; } = true;
         public bool ApplyBU { get; set; } = true;
         public bool ApplyBVG { get; set; } = true;
         public bool ApplyFAK { get; set; } = true;
-        public bool ApplyQST { get; set; } = false;
+        public bool ApplyQST { get; set; }
 
-        public bool HolidayEligible { get; set; } = false;
-        public bool ThirteenthEligible { get; set; } = false;
-        public bool ThirteenthProrated { get; set; } = false;
-
+        // ---- Steuer / Kanton ----
+        [MaxLength(5)]
         public string PermitType { get; set; } = "B";
+
+        public bool ChurchMember { get; set; }
+
+        [MaxLength(2)]
         public string Canton { get; set; } = "ZH";
-        public bool ChurchMember { get; set; } = false;
 
+        [MaxLength(10)]
+        public string? WithholdingTaxCode { get; set; }
 
-        // İletişim & adres
+        // ---- Sozialversicherung ----
+        [MaxLength(50)]
+        public string? AHVNumber { get; set; }
+
+        [MaxLength(100)]
+        public string? Krankenkasse { get; set; }
+
+        [MaxLength(100)]
+        public string? BVGPlan { get; set; }
+
+        // ---- Adresse & Kontakt ----
+        [MaxLength(250)]
         public string? Address { get; set; }
+
+        [MaxLength(20)]
         public string? Zip { get; set; }
+
+        [MaxLength(150)]
         public string? City { get; set; }
+
+        [MaxLength(50)]
         public string? Phone { get; set; }
     }
 }

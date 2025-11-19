@@ -4,6 +4,7 @@ using SwissLohnSystem.API.Data;
 using SwissLohnSystem.API.DTOs.WorkDay;
 using SwissLohnSystem.API.Mappings;
 using SwissLohnSystem.API.Responses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,6 +36,16 @@ namespace SwissLohnSystem.API.Controllers
             return ApiResponse<IEnumerable<WorkDayDto>>.Ok(workDays, "Arbeitszeiten erfolgreich geladen.");
         }
 
+        // GET: api/WorkDay/5
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<ApiResponse<WorkDayDto>>> GetById(int id)
+        {
+            var w = await _context.WorkDays.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (w is null)
+                return NotFound(ApiResponse<WorkDayDto>.Fail("Arbeitszeit nicht gefunden."));
+
+            return ApiResponse<WorkDayDto>.Ok(w.ToDto(), "Arbeitszeit erfolgreich geladen.");
+        }
         // POST: api/WorkDay
         [HttpPost]
         public async Task<ActionResult<ApiResponse<WorkDayDto>>> PostWorkDay([FromBody] WorkDayCreateDto dto)
@@ -50,6 +61,10 @@ namespace SwissLohnSystem.API.Controllers
                     string.IsNullOrWhiteSpace(errors) ? "Ungültige Eingabedaten." : errors
                 ));
             }
+
+            // 🔥 Negatif saatlere izin verme
+            if (dto.HoursWorked < 0 || dto.OvertimeHours < 0)
+                return BadRequest(ApiResponse<WorkDayDto>.Fail("Arbeitsstunden dürfen nicht negativ sein."));
 
             var employeeExists = await _context.Employees.AnyAsync(e => e.Id == dto.EmployeeId);
             if (!employeeExists)
@@ -69,18 +84,6 @@ namespace SwissLohnSystem.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = entity.Id },
                 ApiResponse<WorkDayDto>.Ok(entity.ToDto(), "Arbeitszeit erfolgreich hinzugefügt."));
         }
-
-        // GET: api/WorkDay/5
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<ApiResponse<WorkDayDto>>> GetById(int id)
-        {
-            var w = await _context.WorkDays.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            if (w is null)
-                return NotFound(ApiResponse<WorkDayDto>.Fail("Arbeitszeit nicht gefunden."));
-
-            return ApiResponse<WorkDayDto>.Ok(w.ToDto(), "Arbeitszeit erfolgreich geladen.");
-        }
-
         // PUT: api/WorkDay/5
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ApiResponse<string>>> PutWorkDay(int id, [FromBody] WorkDayUpdateDto dto)
@@ -99,6 +102,10 @@ namespace SwissLohnSystem.API.Controllers
                     string.IsNullOrWhiteSpace(errors) ? "Ungültige Eingabedaten." : errors
                 ));
             }
+
+            // 🔥 Negatif saatlere izin verme
+            if (dto.HoursWorked < 0 || dto.OvertimeHours < 0)
+                return BadRequest(ApiResponse<string>.Fail("Arbeitsstunden dürfen nicht negativ sein."));
 
             var entity = await _context.WorkDays.FindAsync(id);
             if (entity is null)
@@ -135,48 +142,35 @@ namespace SwissLohnSystem.API.Controllers
 
             return ApiResponse<string>.Ok("Arbeitszeit erfolgreich gelöscht.");
         }
-        [ApiController]
-        [Route("api/[controller]")]
-        public class WorkDaysController : ControllerBase
+
+        // GET: api/WorkDay/summary?employeeId=1&year=2025&month=11
+        [HttpGet("summary")]
+        public async Task<ActionResult<WorkDaySummaryDto>> GetSummary(int employeeId, int year, int month)
         {
-            private readonly ApplicationDbContext _db;
+            if (employeeId <= 0 || year <= 0 || month <= 0 || month > 12)
+                return BadRequest("Ungültige Parameter.");
 
-            public WorkDaysController(ApplicationDbContext db)
+            var from = new DateTime(year, month, 1);
+            var to = from.AddMonths(1);
+
+            var query = _context.WorkDays
+                .Where(w => w.EmployeeId == employeeId
+                            && w.Date >= from
+                            && w.Date < to);
+
+            var totalHours = await query.SumAsync(w => (decimal?)w.HoursWorked) ?? 0m;
+            var totalOvertime = await query.SumAsync(w => (decimal?)w.OvertimeHours) ?? 0m;
+
+            var dto = new WorkDaySummaryDto
             {
-                _db = db;
-            }
+                EmployeeId = employeeId,
+                Year = year,
+                Month = month,
+                TotalHours = totalHours,
+                TotalOvertimeHours = totalOvertime
+            };
 
-            // ... mevcut CRUD endpointleri ...
-
-            [HttpGet("summary")]
-            public async Task<ActionResult<WorkDaySummaryDto>> GetSummary(int employeeId, int year, int month)
-            {
-                if (employeeId <= 0 || year <= 0 || month <= 0 || month > 12)
-                    return BadRequest("Ungültige Parameter.");
-
-                var from = new DateTime(year, month, 1);
-                var to = from.AddMonths(1);
-
-                var query = _db.WorkDays
-                    .Where(w => w.EmployeeId == employeeId
-                                && w.Date >= from
-                                && w.Date < to);
-
-                var totalHours = await query.SumAsync(w => (decimal?)w.HoursWorked) ?? 0m;
-                var totalOvertime = await query.SumAsync(w => (decimal?)w.OvertimeHours) ?? 0m;
-
-                var dto = new WorkDaySummaryDto
-                {
-                    EmployeeId = employeeId,
-                    Year = year,
-                    Month = month,
-                    TotalHours = totalHours,
-                    TotalOvertimeHours = totalOvertime
-                };
-
-                return Ok(dto);
-            }
+            return Ok(dto);
         }
-
     }
 }

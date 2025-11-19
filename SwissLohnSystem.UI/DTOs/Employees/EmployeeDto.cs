@@ -2,62 +2,58 @@
 
 namespace SwissLohnSystem.UI.DTOs.Employees
 {
-    public sealed record EmployeeDto
+    public class EmployeeDto
     {
-        public int Id { get; init; }
-        public int CompanyId { get; init; }
+        public int Id { get; set; }
+        public int CompanyId { get; set; }
 
-        public string FirstName { get; init; } = null!;
-        public string LastName { get; init; } = null!;
-        public string? Email { get; init; }
-        public string? Position { get; init; }
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
+        public string? Email { get; set; }
+        public string? Position { get; set; }
 
-        public DateTime? BirthDate { get; init; }
-        public string? MaritalStatus { get; init; }
-        public int ChildCount { get; init; }
+        public DateTime? BirthDate { get; set; }
+        public string? MaritalStatus { get; set; }
+        public int ChildCount { get; set; }
 
-        public string SalaryType { get; init; } = "Monthly";
-        public decimal HourlyRate { get; init; }
-        public int MonthlyHours { get; init; }
-        public decimal BruttoSalary { get; init; }
+        public string SalaryType { get; set; } = "Monthly";
+        public decimal HourlyRate { get; set; }
+        public int MonthlyHours { get; set; }
+        public decimal BruttoSalary { get; set; }
 
-        public DateTime StartDate { get; init; }
-        public DateTime? EndDate { get; init; }
-        public bool Active { get; init; }
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public bool Active { get; set; }
 
-        // Sigorta & kimlik
-        public string? AHVNumber { get; init; }
-        public string? Krankenkasse { get; init; }
-        public string? BVGPlan { get; init; }
+        public int WeeklyHours { get; set; }
+        public decimal? PensumPercent { get; set; }
+        public decimal? HolidayRate { get; set; }
+        public decimal? OvertimeRate { get; set; }
 
-        // Parametreler
-        public decimal? PensumPercent { get; init; }
-        public decimal? HolidayRate { get; init; }
-        public decimal? OvertimeRate { get; init; }
-        public string? WithholdingTaxCode { get; init; }
+        public bool HolidayEligible { get; set; }
+        public bool ThirteenthEligible { get; set; }
+        public bool ThirteenthProrated { get; set; }
 
-        // Bordro varsayılanları
-        public int WeeklyHours { get; init; }
-        public bool ApplyAHV { get; init; }
-        public bool ApplyALV { get; init; }
-        public bool ApplyNBU { get; init; }
-        public bool ApplyBU { get; init; }
-        public bool ApplyBVG { get; init; }
-        public bool ApplyFAK { get; init; }
-        public bool ApplyQST { get; init; }
+        public bool ApplyAHV { get; set; }
+        public bool ApplyALV { get; set; }
+        public bool ApplyNBU { get; set; }
+        public bool ApplyBU { get; set; }
+        public bool ApplyBVG { get; set; }
+        public bool ApplyFAK { get; set; }
+        public bool ApplyQST { get; set; }
 
-        public bool HolidayEligible { get; init; }
-        public bool ThirteenthEligible { get; init; }
-        public bool ThirteenthProrated { get; init; }
+        public string PermitType { get; set; } = "B";
+        public bool ChurchMember { get; set; }
+        public string Canton { get; set; } = "ZH";
+        public string? WithholdingTaxCode { get; set; }
 
-        public string PermitType { get; init; } = "B";
-        public bool ChurchMember { get; init; }
-        public string Canton { get; init; } = "ZH";
+        public string? AHVNumber { get; set; }
+        public string? Krankenkasse { get; set; }
+        public string? BVGPlan { get; set; }
 
-        // Adres & iletişim
-        public string? Address { get; init; }
-        public string? Zip { get; init; }
-        public string? City { get; init; }
-        public string? Phone { get; init; }
+        public string? Address { get; set; }
+        public string? Zip { get; set; }
+        public string? City { get; set; }
+        public string? Phone { get; set; }
     }
 }

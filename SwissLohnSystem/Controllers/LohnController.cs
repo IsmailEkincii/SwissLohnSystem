@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SwissLohnSystem.API.Data;
 using SwissLohnSystem.API.DTOs.Lohn;
@@ -11,6 +7,11 @@ using SwissLohnSystem.API.Mappings;
 using SwissLohnSystem.API.Models;
 using SwissLohnSystem.API.Responses;
 using SwissLohnSystem.API.Services.Payroll;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SwissLohnSystem.API.Controllers
 {
@@ -30,7 +31,7 @@ namespace SwissLohnSystem.API.Controllers
         // =====================================================
         // POST: api/Lohn/calc
         // - Sadece hesaplama, DB'ye yazmaz
-        // - Flag ve Stammdaten her zaman Employee'den alınır
+        // - JS: Employees/Details -> lohnverlauf-detail.js
         // =====================================================
         [HttpPost("calc")]
         public async Task<ActionResult<ApiResponse<PayrollResponseDto>>> Calculate([FromBody] PayrollRequestDto request)
@@ -45,19 +46,28 @@ namespace SwissLohnSystem.API.Controllers
             if (employee is null)
                 return NotFound(ApiResponse<PayrollResponseDto>.Fail("Mitarbeiter wurde nicht gefunden."));
 
-            // --- Zeitraum & Active-Flag prüfen ---
-            var periodMonthStart = new DateTime(request.Period.Year, request.Period.Month, 1);
+            var year = request.Period.Year;
+            var month = request.Period.Month;
+            var monthStart = new DateTime(year, month, 1);
+            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+            var employmentStart = employee.StartDate.Date;
+            var employmentEnd = (employee.EndDate ?? DateTime.MaxValue).Date;
+
+            // Mitarbeiter in diesem Monat aktiv?
             if (!employee.Active ||
-                employee.StartDate > periodMonthStart ||
-                (employee.EndDate.HasValue && employee.EndDate.Value < periodMonthStart))
+                employmentEnd < monthStart ||
+                employmentStart > monthEnd)
             {
                 return BadRequest(ApiResponse<PayrollResponseDto>.Fail(
                     "Mitarbeiter ist in diesem Monat nicht aktiv."
                 ));
             }
 
-            // --- Stammdaten & Flags IMMER vom Employee lesen ---
-            request.Canton = string.IsNullOrWhiteSpace(employee.Canton) ? "ZH" : employee.Canton;
+            // ---- Default parametreleri Employee'den doldur ----
+            if (string.IsNullOrWhiteSpace(request.Canton))
+                request.Canton = string.IsNullOrWhiteSpace(employee.Canton) ? "ZH" : employee.Canton;
+
             request.ApplyAHV = employee.ApplyAHV;
             request.ApplyALV = employee.ApplyALV;
             request.ApplyBVG = employee.ApplyBVG;
@@ -65,22 +75,42 @@ namespace SwissLohnSystem.API.Controllers
             request.ApplyBU = employee.ApplyBU;
             request.ApplyFAK = employee.ApplyFAK;
             request.ApplyQST = employee.ApplyQST;
-            request.WeeklyHours = employee.WeeklyHours;
-            request.PermitType = employee.PermitType;
-            request.ChurchMember = employee.ChurchMember;
-            request.WithholdingTaxCode = employee.WithholdingTaxCode;
 
-            // --- Bruttolohn (Monat) bestimmen ---
+            request.WeeklyHours = employee.WeeklyHours;
+
+            request.PermitType ??= employee.PermitType;
+            request.ChurchMember = employee.ChurchMember;
+            if (string.IsNullOrWhiteSpace(request.WithholdingTaxCode))
+                request.WithholdingTaxCode = employee.WithholdingTaxCode;
+
+            // ---- Bruttolohn-Basis + Stundenberechnung ----
+            decimal monthlyHours = 0m;
+            decimal monthlyOvertimeHours = 0m;
+            decimal overtimePay = 0m;
+            decimal holidayAllowance = 0m; // Şimdilik otomatik hesaplamıyoruz
+            decimal baseGross;
+
             if (employee.SalaryType == "Monthly")
             {
-                // Fixer Monatslohn
-                request.GrossMonthly = employee.BruttoSalary;
-            }
-            else // SalaryType == "Hourly"
-            {
-                var year = request.Period.Year;
-                var month = request.Period.Month;
+                var monthDays = (monthEnd - monthStart).Days + 1;
 
+                var effectiveStart = employmentStart < monthStart ? monthStart : employmentStart;
+                var effectiveEnd = employmentEnd > monthEnd ? monthEnd : employmentEnd;
+
+                var activeDays = (effectiveEnd - effectiveStart).Days + 1;
+                if (activeDays < 0) activeDays = 0;
+
+                var factor = monthDays == 0 ? 0m : (decimal)activeDays / monthDays;
+
+                var baseMonthly = employee.BruttoSalary;
+                var proratedBase = Math.Round(baseMonthly * factor, 2);
+
+                baseGross = proratedBase;
+                monthlyHours = employee.MonthlyHours * factor;
+                monthlyOvertimeHours = 0m;
+            }
+            else // "Hourly"
+            {
                 var workDays = await _context.WorkDays
                     .AsNoTracking()
                     .Where(w => w.EmployeeId == employee.Id &&
@@ -95,26 +125,24 @@ namespace SwissLohnSystem.API.Controllers
                     ));
                 }
 
-                var totalHours = workDays.Sum(w => w.HoursWorked);
-                var totalOvertime = workDays.Sum(w => w.OvertimeHours);
+                monthlyHours = workDays.Sum(w => w.HoursWorked);
+                monthlyOvertimeHours = workDays.Sum(w => w.OvertimeHours);
 
-                var overtimeFactor = (employee.OvertimeRate.HasValue && employee.OvertimeRate.Value > 0m)
-                    ? employee.OvertimeRate.Value
-                    : 1m;
+                var normalPay = employee.HourlyRate * monthlyHours;
+                overtimePay = employee.HourlyRate * monthlyOvertimeHours;
 
-                var normalPay = employee.HourlyRate * totalHours;
-                var overtimePay = employee.HourlyRate * overtimeFactor * totalOvertime;
-
-                // ⭐ Ferienentschädigung (nur Stundenlohn)
-                decimal holidayAllowance = 0m;
-                if (employee.HolidayRate.HasValue && employee.HolidayRate.Value > 0m)
-                {
-                    var holidayRateFactor = employee.HolidayRate.Value / 100m;
-                    holidayAllowance = Math.Round(normalPay * holidayRateFactor, 2);
-                }
-
-                request.GrossMonthly = normalPay + overtimePay + holidayAllowance;
+                baseGross = normalPay + overtimePay; // Ferienentschädigung yok (ileride HolidayRate ile eklenebilir)
             }
+
+            // Bonus / Zulagen / Abzüge (request’ten)
+            var bonus = request.Bonus;
+            var extra = request.ExtraAllowance;
+            var unpaid = request.UnpaidDeduction;
+            var otherDed = request.OtherDeduction;
+
+            var adjustments = bonus + extra - unpaid - otherDed;
+
+            request.GrossMonthly = baseGross + adjustments;
 
             var result = _calculator.Calculate(request);
             return Ok(ApiResponse<PayrollResponseDto>.Ok(result, "Berechnung erfolgreich."));
@@ -123,6 +151,7 @@ namespace SwissLohnSystem.API.Controllers
         // =====================================================
         // POST: api/Lohn/calc-and-save
         // - Hesapla + Lohn tablosuna ENTWURF olarak upsert et
+        // - UI: Companies/Details -> Löhne tabı (loehne-tab.js)
         // =====================================================
         [HttpPost("calc-and-save")]
         public async Task<ActionResult<ApiResponse<LohnDto>>> CalculateAndSave([FromBody] PayrollRequestDto request)
@@ -136,19 +165,27 @@ namespace SwissLohnSystem.API.Controllers
             if (employee is null)
                 return NotFound(ApiResponse<LohnDto>.Fail("Mitarbeiter wurde nicht gefunden."));
 
-            // ---- Zeitraum & Active-Flag prüfen ----
-            var periodMonthStart = new DateTime(request.Period.Year, request.Period.Month, 1);
+            var year = request.Period.Year;
+            var month = request.Period.Month;
+            var monthStart = new DateTime(year, month, 1);
+            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+            var employmentStart = employee.StartDate.Date;
+            var employmentEnd = (employee.EndDate ?? DateTime.MaxValue).Date;
+
             if (!employee.Active ||
-                employee.StartDate > periodMonthStart ||
-                (employee.EndDate.HasValue && employee.EndDate.Value < periodMonthStart))
+                employmentEnd < monthStart ||
+                employmentStart > monthEnd)
             {
                 return BadRequest(ApiResponse<LohnDto>.Fail(
                     "Mitarbeiter ist in diesem Monat nicht aktiv."
                 ));
             }
 
-            // ---- Stammdaten & Flags IMMER vom Employee ----
-            request.Canton = string.IsNullOrWhiteSpace(employee.Canton) ? "ZH" : employee.Canton;
+            // ---- Default parametreleri Employee'den doldur ----
+            if (string.IsNullOrWhiteSpace(request.Canton))
+                request.Canton = string.IsNullOrWhiteSpace(employee.Canton) ? "ZH" : employee.Canton;
+
             request.ApplyAHV = employee.ApplyAHV;
             request.ApplyALV = employee.ApplyALV;
             request.ApplyBVG = employee.ApplyBVG;
@@ -156,31 +193,44 @@ namespace SwissLohnSystem.API.Controllers
             request.ApplyBU = employee.ApplyBU;
             request.ApplyFAK = employee.ApplyFAK;
             request.ApplyQST = employee.ApplyQST;
-            request.WeeklyHours = employee.WeeklyHours;
-            request.PermitType = employee.PermitType;
-            request.ChurchMember = employee.ChurchMember;
-            request.WithholdingTaxCode = employee.WithholdingTaxCode;
 
-            // ---- Bruttolohn (Monat) + Überstundenbetrag + Ferienentschädigung ----
-            decimal overtimePayForLohn = 0m;
+            request.WeeklyHours = employee.WeeklyHours;
+
+            request.PermitType ??= employee.PermitType;
+            request.ChurchMember = employee.ChurchMember;
+            if (string.IsNullOrWhiteSpace(request.WithholdingTaxCode))
+                request.WithholdingTaxCode = employee.WithholdingTaxCode;
+
+            // ---- Bruttolohn-Basis + Stundenberechnung ----
             decimal monthlyHours = 0m;
             decimal monthlyOvertimeHours = 0m;
-            decimal holidayAllowance = 0m;
-            decimal childAllowance = 0m; // TODO: später Kindergeld-Logik
+            decimal overtimePayForLohn = 0m;
+            decimal holidayAllowance = 0m;    // Şimdilik hesaplamıyoruz
+            decimal childAllowance = 0m;      // TODO: später Kindergeld-Logik
+
+            decimal baseGross;
 
             if (employee.SalaryType == "Monthly")
             {
-                request.GrossMonthly = employee.BruttoSalary;
+                var monthDays = (monthEnd - monthStart).Days + 1;
 
-                // Aylık çalışan için şimdilik sadece planlanan aylık saat saklıyoruz
-                monthlyHours = employee.MonthlyHours;
+                var effectiveStart = employmentStart < monthStart ? monthStart : employmentStart;
+                var effectiveEnd = employmentEnd > monthEnd ? monthEnd : employmentEnd;
+
+                var activeDays = (effectiveEnd - effectiveStart).Days + 1;
+                if (activeDays < 0) activeDays = 0;
+
+                var factor = monthDays == 0 ? 0m : (decimal)activeDays / monthDays;
+
+                var baseMonthly = employee.BruttoSalary;
+                var proratedBase = Math.Round(baseMonthly * factor, 2);
+
+                baseGross = proratedBase;
+                monthlyHours = employee.MonthlyHours * factor;
                 monthlyOvertimeHours = 0m;
             }
             else // "Hourly"
             {
-                var year = request.Period.Year;
-                var month = request.Period.Month;
-
                 var workDays = await _context.WorkDays
                     .AsNoTracking()
                     .Where(w => w.EmployeeId == employee.Id &&
@@ -198,40 +248,36 @@ namespace SwissLohnSystem.API.Controllers
                 monthlyHours = workDays.Sum(w => w.HoursWorked);
                 monthlyOvertimeHours = workDays.Sum(w => w.OvertimeHours);
 
-                var overtimeFactor = (employee.OvertimeRate.HasValue && employee.OvertimeRate.Value > 0m)
-                    ? employee.OvertimeRate.Value
-                    : 1m;
-
                 var normalPay = employee.HourlyRate * monthlyHours;
-                overtimePayForLohn = employee.HourlyRate * overtimeFactor * monthlyOvertimeHours;
+                overtimePayForLohn = employee.HourlyRate * monthlyOvertimeHours;
 
-                // ⭐ Ferienentschädigung (nur Stundenlohn)
-                if (employee.HolidayRate.HasValue && employee.HolidayRate.Value > 0m)
-                {
-                    var holidayRateFactor = employee.HolidayRate.Value / 100m;
-                    holidayAllowance = Math.Round(normalPay * holidayRateFactor, 2);
-                }
-
-                request.GrossMonthly = normalPay + overtimePayForLohn + holidayAllowance;
+                baseGross = normalPay + overtimePayForLohn;
             }
+
+            // ---- Bonus / Zulagen / Abzüge ----
+            var bonus = request.Bonus;
+            var extra = request.ExtraAllowance;
+            var unpaid = request.UnpaidDeduction;
+            var otherDed = request.OtherDeduction;
+
+            var adjustments = bonus + extra - unpaid - otherDed;
+
+            request.GrossMonthly = baseGross + adjustments;
 
             // ---- Modern hesap motorunu çağır ----
             var result = _calculator.Calculate(request);
-
-            var yearForLohn = request.Period.Year;
-            var monthForLohn = request.Period.Month;
 
             var gross = request.GrossMonthly;
             var net = result.NetToPay;
             var empDeductions = result.Employee.Total;
             var overtimePay = overtimePayForLohn;
 
-            // Idempotent upsert...
+            // Idempotent upsert (pro Mitarbeiter+Monat)
             var existing = await _context.Lohns
                 .FirstOrDefaultAsync(l =>
                     l.EmployeeId == employee.Id &&
-                    l.Year == yearForLohn &&
-                    l.Month == monthForLohn);
+                    l.Year == year &&
+                    l.Month == month);
 
             Lohn lohn;
             if (existing is not null)
@@ -249,7 +295,27 @@ namespace SwissLohnSystem.API.Controllers
                 existing.ChildAllowance = childAllowance;
                 existing.MonthlyHours = monthlyHours;
                 existing.MonthlyOvertimeHours = monthlyOvertimeHours;
+                existing.Bonus = bonus;
+                existing.ExtraAllowance = extra;
+                existing.UnpaidDeduction = unpaid;
+                existing.OtherDeduction = otherDed;
                 existing.CreatedAt = DateTime.Now;
+
+                // 🔥 Snapshot parametreleri kaydet
+                existing.ApplyAHV = request.ApplyAHV;
+                existing.ApplyALV = request.ApplyALV;
+                existing.ApplyBVG = request.ApplyBVG;
+                existing.ApplyNBU = request.ApplyNBU;
+                existing.ApplyBU = request.ApplyBU;
+                existing.ApplyFAK = request.ApplyFAK;
+                existing.ApplyQST = request.ApplyQST;
+
+                existing.PermitType = request.PermitType;
+                existing.Canton = request.Canton;
+                existing.ChurchMember = request.ChurchMember;
+                existing.WithholdingTaxCode = request.WithholdingTaxCode;
+
+                existing.Comment = result.Period; // şimdilik period'u snapshot olarak yazıyoruz
 
                 lohn = existing;
             }
@@ -258,8 +324,8 @@ namespace SwissLohnSystem.API.Controllers
                 lohn = new Lohn
                 {
                     EmployeeId = employee.Id,
-                    Month = monthForLohn,
-                    Year = yearForLohn,
+                    Month = month,
+                    Year = year,
                     BruttoSalary = gross,
                     NetSalary = net,
                     TotalDeductions = empDeductions,
@@ -268,8 +334,28 @@ namespace SwissLohnSystem.API.Controllers
                     ChildAllowance = childAllowance,
                     MonthlyHours = monthlyHours,
                     MonthlyOvertimeHours = monthlyOvertimeHours,
+                    Bonus = bonus,
+                    ExtraAllowance = extra,
+                    UnpaidDeduction = unpaid,
+                    OtherDeduction = otherDed,
                     CreatedAt = DateTime.Now,
-                    IsFinal = false
+                    IsFinal = false,
+
+                    // 🔥 Snapshot parametreler
+                    ApplyAHV = request.ApplyAHV,
+                    ApplyALV = request.ApplyALV,
+                    ApplyBVG = request.ApplyBVG,
+                    ApplyNBU = request.ApplyNBU,
+                    ApplyBU = request.ApplyBU,
+                    ApplyFAK = request.ApplyFAK,
+                    ApplyQST = request.ApplyQST,
+
+                    PermitType = request.PermitType,
+                    Canton = request.Canton,
+                    ChurchMember = request.ChurchMember,
+                    WithholdingTaxCode = request.WithholdingTaxCode,
+
+                    Comment = null
                 };
 
                 _context.Lohns.Add(lohn);
@@ -391,37 +477,59 @@ namespace SwissLohnSystem.API.Controllers
         // GET: api/Lohn/by-company/{companyId}/monthly?period=YYYY-MM
         // =========================================================
         [HttpGet("by-company/{companyId:int}/monthly")]
-        public async Task<ActionResult<ApiResponse<IEnumerable<LohnMonthlyRowDto>>>> GetCompanyMonthly(
+        public async Task<ActionResult<ApiResponse<List<CompanyMonthlyLohnDto>>>> GetByCompanyMonthly(
             int companyId,
-            [FromQuery] string? period = null)
+            [FromQuery] string? period = null,
+            CancellationToken ct = default)
         {
-            if (!IsValidPeriod(period))
-                return BadRequest(ApiResponse<IEnumerable<LohnMonthlyRowDto>>.Fail("Ungültiger Zeitraum. Erwartet: YYYY-MM."));
+            // period: "YYYY-MM" (örn. "2025-11")
+            int year;
+            int month;
 
-            var (year, month) = ParsePeriod(period!);
+            if (IsValidPeriod(period))
+            {
+                (year, month) = ParsePeriod(period!);
+            }
+            else
+            {
+                var today = DateTime.Today;
+                year = today.Year;
+                month = today.Month;
+            }
 
-            var rows = await _context.Lohns
+            var q = _context.Lohns
                 .AsNoTracking()
                 .Include(l => l.Employee)
-                .Where(l => l.Employee.CompanyId == companyId &&
-                            l.Year == year &&
-                            l.Month == month)
-                .OrderBy(l => l.Employee.LastName)
-                .ThenBy(l => l.Employee.FirstName)
-                .Select(l => new LohnMonthlyRowDto(
-                    l.EmployeeId,
-                    l.Employee.FirstName + " " + l.Employee.LastName,
-                    l.Month,
-                    l.Year,
-                    l.BruttoSalary,
-                    l.NetSalary,
-                    l.TotalDeductions,
-                    l.OvertimePay,
-                    l.HolidayAllowance
-                ))
-                .ToListAsync();
+                .Where(l =>
+                    l.Employee.CompanyId == companyId &&
+                    l.Year == year &&
+                    l.Month == month);
 
-            return ApiResponse<IEnumerable<LohnMonthlyRowDto>>.Ok(rows, "Monatliche Löhne erfolgreich geladen.");
+            // Her Mitarbeiter için, ilgili ayda en son (CreatedAt) oluşan satırı al
+            var list = await q
+                .GroupBy(l => l.EmployeeId)
+                .Select(g => g
+                    .OrderByDescending(x => x.CreatedAt)
+                    .Select(x => new CompanyMonthlyLohnDto
+                    {
+                        Id = x.Id,
+                        EmployeeId = x.EmployeeId,
+                        EmployeeName = x.Employee.FirstName + " " + x.Employee.LastName,
+                        Year = x.Year,
+                        Month = x.Month,
+                        BruttoSalary = x.BruttoSalary,
+                        NetSalary = x.NetSalary,
+                        TotalDeductions = x.TotalDeductions,
+                        IsFinal = x.IsFinal
+                    })
+                    .First())
+                .OrderBy(x => x.EmployeeName)
+                .ToListAsync(ct);
+
+            return ApiResponse<List<CompanyMonthlyLohnDto>>.Ok(
+                list,
+                "Löhne für den ausgewählten Monat wurden erfolgreich geladen."
+            );
         }
 
         // --------- helpers ---------

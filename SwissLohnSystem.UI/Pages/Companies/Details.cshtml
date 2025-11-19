@@ -75,22 +75,30 @@
 
                             <dt class="col-sm-3">Adresse</dt>
                             <dd class="col-sm-9">
-                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Address) ? Model.Vm!.Company!.Address : "—")
+                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Address)
+                                                                ? Model.Vm!.Company!.Address
+                                                                : "—")
                             </dd>
 
                             <dt class="col-sm-3">E-Mail</dt>
                             <dd class="col-sm-9">
-                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Email) ? Model.Vm!.Company!.Email : "—")
+                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Email)
+                                                                ? Model.Vm!.Company!.Email
+                                                                : "—")
                             </dd>
 
                             <dt class="col-sm-3">Telefon</dt>
                             <dd class="col-sm-9">
-                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Phone) ? Model.Vm!.Company!.Phone : "—")
+                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.Phone)
+                                                                ? Model.Vm!.Company!.Phone
+                                                                : "—")
                             </dd>
 
                             <dt class="col-sm-3">Steuernummer</dt>
                             <dd class="col-sm-9">
-                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.TaxNumber) ? Model.Vm!.Company!.TaxNumber : "—")
+                                @(!string.IsNullOrWhiteSpace(Model.Vm?.Company?.TaxNumber)
+                                                                ? Model.Vm!.Company!.TaxNumber
+                                                                : "—")
                             </dd>
                         </dl>
                     </div>
@@ -151,7 +159,9 @@
                                     else
                                     {
                                         <tr>
-                                            <td colspan="6" class="text-center text-muted p-4">Keine Mitarbeiter vorhanden.</td>
+                                            <td colspan="6" class="text-center text-muted p-4">
+                                                Keine Mitarbeiter vorhanden.
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -173,11 +183,15 @@
                                     <i class="fas fa-sync-alt"></i> Laden
                                 </button>
                             </div>
-                            <div class="col-md-6 d-flex align-items-end justify-content-end">
-                                <button id="btnOpenCalcModal" class="btn btn-success" type="button" data-toggle="modal" data-target="#calcModal">
+                            @* <div class="col-md-6 d-flex align-items-end justify-content-end">
+                                <button id="btnOpenCalcModal"
+                                        class="btn btn-success"
+                                        type="button"
+                                        data-toggle="modal"
+                                        data-target="#calcModal">
                                     <i class="fas fa-calculator"></i> Lohn berechnen
                                 </button>
-                            </div>
+                            </div> *@
                         </div>
 
                         <div class="card">
@@ -190,7 +204,7 @@
                                             <th>Brutto</th>
                                             <th>Netto</th>
                                             <th>Status</th>
-                                            <th>Aktionen</th>
+                                            <th>Aktionen</th>  <!-- ✅ burası -->
                                         </tr>
                                     </thead>
                                     <tbody><!-- rows via JS --></tbody>
@@ -242,7 +256,8 @@
 
                         <div class="form-group">
                             <label>Notiz</label>
-                            <textarea class="form-control" rows="3" placeholder="Interne Notizen zur Firma..."></textarea>
+                            <textarea class="form-control" rows="3"
+                                      placeholder="Interne Notizen zur Firma..."></textarea>
                         </div>
 
                         <div class="form-group">
@@ -290,10 +305,9 @@
 
 @section Scripts {
     <script>
-        // Razor tarafında JS'e context aktarma //
+        // Razor tarafında JS'e context aktarma
         window.COMPANY_ID = @Model.Id;
-        // API'nin base adresi (Swagger'da gördüğün API URL)
-        window.API_BASE_URL = 'https://localhost:7090'; // <- kendi API portuna göre ayarla
+        window.API_BASE_URL = "@(ViewData["ApiBaseUrl"] ?? "")";
         console.log('[loehne] (cshtml) COMPANY_ID =', window.COMPANY_ID);
         console.log('[loehne] (cshtml) API_BASE_URL =', window.API_BASE_URL);
     </script>
@@ -302,13 +316,22 @@
         (function () {
             function showTabByEl(el) {
                 if (!el) return;
-                if (typeof $ !== 'undefined' && $.fn && $.fn.tab) { $(el).tab('show'); return; }
-                if (window.bootstrap && bootstrap.Tab) { new bootstrap.Tab(el).show(); return; }
+                if (typeof $ !== 'undefined' && $.fn && $.fn.tab) {
+                    $(el).tab('show');
+                    return;
+                }
+                if (window.bootstrap && bootstrap.Tab) {
+                    new bootstrap.Tab(el).show();
+                    return;
+                }
             }
+
             if (window.location.hash) {
-                var sel = 'a[data-bs-toggle="tab"][href="' + window.location.hash + '"], a[data-toggle="tab"][href="' + window.location.hash + '"]';
+                var sel = 'a[data-bs-toggle="tab"][href="' + window.location.hash +
+                          '"], a[data-toggle="tab"][href="' + window.location.hash + '"]';
                 showTabByEl(document.querySelector(sel));
             }
+
             if (typeof $ !== 'undefined' && $.fn && $.fn.tab) {
                 $('a[data-toggle="tab"], a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
                     var href = e.target.getAttribute('href');
