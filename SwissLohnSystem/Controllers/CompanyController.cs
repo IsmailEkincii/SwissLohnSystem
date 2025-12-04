@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SwissLohnSystem.API.Data;
 using SwissLohnSystem.API.DTOs.Companies;
 using SwissLohnSystem.API.DTOs.Employees;
+using SwissLohnSystem.API.DTOs.Lohn;
 using SwissLohnSystem.API.Mappings;
 using SwissLohnSystem.API.Models;
 using SwissLohnSystem.API.Responses;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SwissLohnSystem.API.Controllers
 {
@@ -110,23 +111,24 @@ namespace SwissLohnSystem.API.Controllers
 
             return ApiResponse<string>.Ok("Firma wurde erfolgreich gelöscht.");
         }
+        
 
         // GET: api/Company/5/Employees
         [HttpGet("{id:int}/Employees")]
         public async Task<ActionResult<ApiResponse<IEnumerable<EmployeeDto>>>> GetCompanyEmployees(int id)
         {
-            var exists = await _context.Companies.AsNoTracking().AnyAsync(c => c.Id == id);
-            if (!exists)
-                return NotFound(ApiResponse<IEnumerable<EmployeeDto>>.Fail("Firma wurde nicht gefunden."));
-
             var list = await _context.Employees
                 .AsNoTracking()
                 .Where(e => e.CompanyId == id)
                 .OrderBy(e => e.LastName).ThenBy(e => e.FirstName)
-                .Select(e => e.ToDto())   // 🔴 BURASI DÜZENLENDİ
+                .Select(e => e.ToDto())
                 .ToListAsync();
 
-            return ApiResponse<IEnumerable<EmployeeDto>>.Ok(list, "Mitarbeiterliste wurde erfolgreich geladen.");
+            return ApiResponse<IEnumerable<EmployeeDto>>.Ok(
+                list,
+                "Mitarbeiterliste wurde erfolgreich geladen."
+            );
         }
+        
     }
 }

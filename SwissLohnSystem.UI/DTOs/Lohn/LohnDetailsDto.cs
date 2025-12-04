@@ -20,13 +20,13 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
         public decimal HolidayAllowance { get; set; }
         public decimal OvertimePay { get; set; }
 
-        // 🔥 Ek brüt kalemleri
+        // Ek brüt kalemleri
         public decimal Bonus { get; set; }
         public decimal ExtraAllowance { get; set; }
         public decimal UnpaidDeduction { get; set; }
         public decimal OtherDeduction { get; set; }
 
-        // 🔥 Aylık çalışma saatleri
+        // Aylık çalışma saatleri
         public decimal MonthlyHours { get; set; }
         public decimal MonthlyOvertimeHours { get; set; }
 
@@ -38,8 +38,34 @@ namespace SwissLohnSystem.UI.DTOs.Lohn
         public int? CompanyId { get; set; }
         public string? CompanyName { get; set; }
 
-        // İleride kalem dökümü için (şimdilik boş)
+        // İleride kalem dökümü için (şimdilik opsiyonel)
         public List<LohnItemDto> Items { get; set; } = new();
+
+        // --- Snapshot parametreler (Lohn tablosundan) ---
+        public bool ApplyAHV { get; set; }
+        public bool ApplyALV { get; set; }
+        public bool ApplyBVG { get; set; }
+        public bool ApplyNBU { get; set; }
+        public bool ApplyBU { get; set; }
+        public bool ApplyFAK { get; set; }
+        public bool ApplyQST { get; set; }
+
+        public string? PermitType { get; set; }
+        public string? Canton { get; set; }
+        public bool ChurchMember { get; set; }
+        public string? WithholdingTaxCode { get; set; }
+
+        public decimal? HolidayRate { get; set; }
+        public bool HolidayEligible { get; set; }
+
+        public string? Comment { get; set; }
+
+        // --- Arbeitnehmer-Abzüge Snapshot (AHV/ALV/NBU/BVG/QST) ---
+        public decimal EmployeeAhvIvEo { get; set; }
+        public decimal EmployeeAlv { get; set; }
+        public decimal EmployeeNbu { get; set; }
+        public decimal EmployeeBvg { get; set; }
+        public decimal EmployeeQst { get; set; }
     }
 
     public class LohnItemDto

@@ -195,8 +195,9 @@
                                 </div>
                             </div>
 
-                            <h5 class="mt-3">Zulagen &amp; Abzüge</h5>
-                            <div class="table-responsive">
+                            @* --- ZULAGEN --- *@
+                            <h5 class="mt-3">Zulagen</h5>
+                            <div class="table-responsive mb-3">
                                 <table class="table table-sm table-bordered mb-0">
                                     <thead class="thead-light">
                                         <tr>
@@ -204,7 +205,7 @@
                                             <th class="text-right">Betrag</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="itemsBody">
+                                    <tbody>
                                         <tr>
                                             <td>Ferienentschädigung</td>
                                             <td class="text-right">
@@ -229,22 +230,45 @@
                                                 @l.ExtraAllowance.ToString("N2") CHF
                                             </td>
                                         </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            @* --- ABZÜGE (AN) --- *@
+                            <h5 class="mt-3">Abzüge (Arbeitnehmer)</h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered mb-0">
+                                    <thead class="thead-light">
                                         <tr>
-                                            <td>Unbezahlte Abzüge</td>
-                                            <td class="text-right">
-                                                -@l.UnpaidDeduction.ToString("N2") CHF
-                                            </td>
+                                            <th>Art</th>
+                                            <th class="text-right">Betrag</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>AHV/IV/EO</td>
+                                            <td class="text-right">@l.EmployeeAhvIvEo.ToString("N2") CHF</td>
                                         </tr>
                                         <tr>
-                                            <td>Sonstige Abzüge</td>
-                                            <td class="text-right">
-                                                -@l.OtherDeduction.ToString("N2") CHF
-                                            </td>
+                                            <td>ALV</td>
+                                            <td class="text-right">@l.EmployeeAlv.ToString("N2") CHF</td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Netto auszuzahlen</strong></td>
+                                            <td>NBU</td>
+                                            <td class="text-right">@l.EmployeeNbu.ToString("N2") CHF</td>
+                                        </tr>
+                                        <tr>
+                                            <td>BVG</td>
+                                            <td class="text-right">@l.EmployeeBvg.ToString("N2") CHF</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Quellensteuer (QST)</td>
+                                            <td class="text-right">@l.EmployeeQst.ToString("N2") CHF</td>
+                                        </tr>
+                                        <tr class="table-secondary">
+                                            <td><strong>Total Arbeitnehmer-Abzüge</strong></td>
                                             <td class="text-right">
-                                                <strong>@l.NetSalary.ToString("N2") CHF</strong>
+                                                <strong>@l.TotalDeductions.ToString("N2") CHF</strong>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -252,11 +276,11 @@
                             </div>
 
                             <p class="text-muted small mt-3 mb-0">
-                                Hinweis: Detailpositionen (AHV/ALV/BVG/QST usw.) werden aktuell
-                                über den Payroll-Calculator ermittelt und nicht einzeln gespeichert.
-                                Bei Bedarf können wir diese Seite später mit einer detaillierten
-                                Positionsliste erweitern.
+                                Hinweis: Sozialabzüge (AHV/ALV/BVG/NBU) und Quellensteuer werden als Snapshot
+                                pro Abrechnung gespeichert. Arbeitgeberanteile können bei Bedarf in einer
+                                separaten Übersicht ergänzt werden.
                             </p>
+
                         </div>
                     </div>
                 </div>
@@ -264,8 +288,10 @@
         }
     </div>
 </section>
+
 @section Scripts {
     <script>
+        // TODO: İstersen burayı ViewData["ApiBaseUrl"] ile dinamik yapabiliriz
         window.API_BASE_URL = "https://localhost:7090"; // kendi portuna göre düzelt
 
         window.LOHN_EMPLOYEE_ID = @((Model.Lohn?.EmployeeId ?? 0));

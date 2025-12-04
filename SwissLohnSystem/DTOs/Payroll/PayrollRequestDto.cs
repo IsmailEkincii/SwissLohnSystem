@@ -30,4 +30,8 @@ public class PayrollRequestDto
 
     // 🔥 BVG plan override (isteğe bağlı)
     public BvgPlanDto? BvgPlan { get; set; }
+    public decimal? WorkedDays { get; set; }
+    public decimal? SickDays { get; set; }
+    public decimal? UnpaidDays { get; set; }
+
 }

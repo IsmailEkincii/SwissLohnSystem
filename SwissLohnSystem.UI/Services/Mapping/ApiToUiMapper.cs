@@ -10,7 +10,9 @@ namespace SwissLohnSystem.UI.Services.Mapping
     /// <summary>API'den gelen DTO’ları UI DTO’larına dönüştürür ve zenginleştirir.</summary>
     public static class ApiToUiMapper
     {
+        // =========================
         // Company
+        // =========================
         public static CompanyDto ToUi(this CompanyDto api) => new CompanyDto
         {
             Id = api.Id,
@@ -39,36 +41,38 @@ namespace SwissLohnSystem.UI.Services.Mapping
                 Employees = employees ?? Enumerable.Empty<EmployeeDto>()
             };
 
+        // =========================
         // Employees
+        // =========================
         public static EmployeeListItemDto ToListItem(this EmployeeDto e) => new EmployeeListItemDto
         {
             Id = e.Id,
             CompanyId = e.CompanyId,
             FirstName = $"{e.FirstName} {e.LastName}".Trim(),
             Email = e.Email,
-            Phone =e.Phone,
+            Phone = e.Phone,
             Position = e.Position,
             Active = e.Active
         };
 
-        // Lohn - liste satırı
+        // =========================
+        // Lohn – Liste satırı
+        // =========================
         public static LohnMonthlyRowDto ToMonthlyRow(this LohnDto l, string? employeeName = null) =>
-    new LohnMonthlyRowDto
-    {
-        Id = l.Id,
-        EmployeeId = l.EmployeeId,
-        Month = l.Month,
-        Year = l.Year,
-        BruttoSalary = l.BruttoSalary,
-        NetSalary = l.NetSalary,
-        TotalDeductions = l.TotalDeductions,
-        OvertimePay = l.OvertimePay,
-        HolidayAllowance = l.HolidayAllowance,
-        IsFinal = l.IsFinal,
-        EmployeeName = employeeName ?? ""
-    };
-
-
+            new LohnMonthlyRowDto
+            {
+                Id = l.Id,
+                EmployeeId = l.EmployeeId,
+                Month = l.Month,
+                Year = l.Year,
+                BruttoSalary = l.BruttoSalary,
+                NetSalary = l.NetSalary,
+                TotalDeductions = l.TotalDeductions,
+                OvertimePay = l.OvertimePay,
+                HolidayAllowance = l.HolidayAllowance,
+                IsFinal = l.IsFinal,
+                EmployeeName = employeeName ?? ""
+            };
 
         public static IEnumerable<LohnMonthlyRowDto> ToMonthlyRows(
             this IEnumerable<LohnDto> loehne,
@@ -88,7 +92,9 @@ namespace SwissLohnSystem.UI.Services.Mapping
             }
         }
 
-        // Lohn - detay
+        // =========================
+        // Lohn – Detay
+        // =========================
         public static LohnDetailsDto ToDetails(this LohnDto l, EmployeeDto? e = null, CompanyDto? c = null) =>
             new LohnDetailsDto
             {
@@ -105,20 +111,54 @@ namespace SwissLohnSystem.UI.Services.Mapping
                 HolidayAllowance = l.HolidayAllowance,
                 OvertimePay = l.OvertimePay,
 
-                // 🔥 yeni alanlar
-                MonthlyHours = l.MonthlyHours,
-                MonthlyOvertimeHours = l.MonthlyOvertimeHours,
+                // Ek brüt kalemleri
                 Bonus = l.Bonus,
                 ExtraAllowance = l.ExtraAllowance,
                 UnpaidDeduction = l.UnpaidDeduction,
                 OtherDeduction = l.OtherDeduction,
 
+                // Aylık çalışma saatleri
+                MonthlyHours = l.MonthlyHours,
+                MonthlyOvertimeHours = l.MonthlyOvertimeHours,
+
                 CreatedAt = l.CreatedAt,
                 IsFinal = l.IsFinal,
 
-                EmployeeName = e is null ? null : $"{e.FirstName} {e.LastName}".Trim(),
+                // UI enrichments
+                EmployeeName = e is null
+                    ? (string?)null
+                    : $"{e.FirstName} {e.LastName}".Trim(),
                 CompanyId = e?.CompanyId,
-                CompanyName = c?.Name
+                CompanyName = c?.Name,
+
+                // Snapshot parametreler (Lohn tablosundan)
+                ApplyAHV = l.ApplyAHV,
+                ApplyALV = l.ApplyALV,
+                ApplyBVG = l.ApplyBVG,
+                ApplyNBU = l.ApplyNBU,
+                ApplyBU = l.ApplyBU,
+                ApplyFAK = l.ApplyFAK,
+                ApplyQST = l.ApplyQST,
+
+                PermitType = l.PermitType,
+                Canton = l.Canton,
+                ChurchMember = l.ChurchMember,
+                WithholdingTaxCode = l.WithholdingTaxCode,
+
+                HolidayRate = l.HolidayRate,
+                HolidayEligible = l.HolidayEligible,
+
+                Comment = l.Comment,
+
+                // Arbeitnehmer-Abzüge Snapshot (AHV/ALV/NBU/BVG/QST)
+                EmployeeAhvIvEo = l.EmployeeAhvIvEo,
+                EmployeeAlv = l.EmployeeAlv,
+                EmployeeNbu = l.EmployeeNbu,
+                EmployeeBvg = l.EmployeeBvg,
+                EmployeeQst = l.EmployeeQst,
+
+                // Şimdilik boş; ileride PayrollItemDto'dan doldurabiliriz
+                Items = new List<LohnItemDto>()
             };
     }
 }

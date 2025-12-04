@@ -36,5 +36,10 @@
         public decimal ExtraAllowance { get; set; }
         public decimal UnpaidDeduction { get; set; }
         public decimal OtherDeduction { get; set; }
+
+        public decimal? WorkedDays { get; set; }
+        public decimal? SickDays { get; set; }
+        public decimal? UnpaidDays { get; set; }
+
     }
 }

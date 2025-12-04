@@ -32,21 +32,14 @@
 <section class="content">
     <div class="container-fluid">
 
-       @if (!string.IsNullOrWhiteSpace(Model.Error))
-{
-    <div class="alert alert-danger">@Model.Error</div>
-}
-
-@if (Model.Employee is null && string.IsNullOrWhiteSpace(Model.Error))
-{
-    <div class="alert alert-warning">
-        Mitarbeiterdaten konnten nicht geladen werden.
-    </div>
-}
-
-
-        @if (Model.Employee is null)
+        @* HATA MESAJI *@
+        @if (!string.IsNullOrWhiteSpace(Model.Error))
         {
+            <div class="alert alert-danger">@Model.Error</div>
+        }
+        else if (Model.Employee is null)
+        {
+            @* Sadece Employee hiç gelmediyse göster *@
             <div class="alert alert-warning">
                 Mitarbeiterdaten konnten nicht geladen werden.
             </div>
@@ -56,8 +49,8 @@
             var e = Model.Employee;
             var co = Model.Company;
 
-            <!-- Mitarbeiter / Firma Info -->
             <div class="row">
+                <!-- Mitarbeiter / Firma Info -->
                 <div class="col-md-4">
                     <div class="card card-outline card-primary">
                         <div class="card-header">
@@ -316,9 +309,7 @@
                         </div>
                     </div>
                 </div> <!-- col-md-8 -->
-            </div>
-
-            <!-- row -->
+            </div> <!-- row -->
         }
     </div>
 </section>

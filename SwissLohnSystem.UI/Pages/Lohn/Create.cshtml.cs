@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
@@ -23,6 +23,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
         public EmployeeDto? Employee { get; private set; }
         public CompanyDto? Company { get; private set; }
 
+        // Dropdownlar
         public List<SelectListItem> PermitTypes { get; private set; } = new();
         public List<SelectListItem> QstTariffCodes { get; private set; } = new();
 
@@ -37,12 +38,15 @@ namespace SwissLohnSystem.UI.Pages.Lohn
         // ================================
         public async Task<IActionResult> OnGetAsync(int employeeId, string? period)
         {
+            // ðŸ”¥ JS tarafÄ± iÃ§in API base URL'yi ViewData'ya veriyoruz
+            ViewData["ApiBaseUrl"] = _api.BaseUrl?.TrimEnd('/');
+
             // Querystring'ten gelen id'yi property'ye yaz
             EmployeeId = employeeId;
 
             if (employeeId <= 0)
             {
-                Error = "Ungültige Mitarbeiter-ID.";
+                Error = "UngÃ¼ltige Mitarbeiter-ID.";
                 return Page();
             }
 
@@ -53,7 +57,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             if (!okEmp || emp is null)
             {
                 Error = empMsg ?? "Mitarbeiterdaten konnten nicht geladen werden.";
-                // Employee null kalacak, cshtml'deki uyarý tetiklenir
+                // Employee null kalacak, cshtml'deki uyarÄ± tetiklenir
                 return Page();
             }
 
@@ -67,10 +71,10 @@ namespace SwissLohnSystem.UI.Pages.Lohn
                 Company = comp;
             }
 
-            // 3) Dropdownlarý doldur
+            // 3) DropdownlarÄ± doldur
             LoadLookups();
 
-            // 4) Period (varsayýlan bu ayýn 1’i)
+            // 4) Period (varsayÄ±lan bu ayÄ±n 1â€™i)
             DateTime periodDate;
             if (!string.IsNullOrWhiteSpace(period) && DateTime.TryParse(period, out var parsed))
             {
@@ -81,7 +85,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
                 periodDate = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
             }
 
-            // 5) Input defaultlarý (Employee’den)
+            // 5) Input defaultlarÄ± (Employeeâ€™den)
             Input.EmployeeId = emp.Id;
             Input.Period = periodDate;
             Input.GrossMonthly = emp.BruttoSalary;
@@ -100,7 +104,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             Input.ApplyQST = emp.ApplyQST;
             Input.ChurchMember = emp.ChurchMember;
 
-            // Gün / izin alanlarý (þimdilik sadece UI için)
+            // GÃ¼n / izin alanlarÄ± (ÅŸimdilik sadece UI iÃ§in)
             Input.WorkedDays = null;
             Input.SickDays = null;
             Input.UnpaidDays = null;
@@ -115,10 +119,34 @@ namespace SwissLohnSystem.UI.Pages.Lohn
         }
 
         // ================================
-        // POST (buna dokunmamýza gerek yok)
+        // POST
         // ================================
         public async Task<IActionResult> OnPostAsync()
         {
+            // JS iÃ§in yine BaseUrl
+            ViewData["ApiBaseUrl"] = _api.BaseUrl?.TrimEnd('/');
+
+            // ðŸ”¥ Employee & Company'yi POST'ta da yeniden yÃ¼kleyelim
+            if (Input.EmployeeId > 0)
+            {
+                var (okEmp, emp, empMsg) =
+                    await _api.GetAsync<EmployeeDto>($"/api/Employee/{Input.EmployeeId}");
+
+                if (okEmp && emp is not null)
+                {
+                    Employee = emp;
+
+                    var (okCo, comp, _) =
+                        await _api.GetAsync<CompanyDto>($"/api/Company/{emp.CompanyId}");
+                    if (okCo && comp is not null)
+                        Company = comp;
+                }
+                else
+                {
+                    Error = empMsg ?? "Mitarbeiterdaten konnten nicht geladen werden.";
+                }
+            }
+
             LoadLookups();
 
             if (!ModelState.IsValid)
@@ -128,13 +156,11 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             {
                 EmployeeId = Input.EmployeeId,
                 Period = Input.Period,
-
                 GrossMonthly = Input.GrossMonthly,
                 Bonus = Input.Bonus,
                 ExtraAllowance = Input.ExtraAllowance,
                 UnpaidDeduction = Input.UnpaidDeduction,
                 OtherDeduction = Input.OtherDeduction,
-
                 ApplyAHV = Input.ApplyAHV,
                 ApplyALV = Input.ApplyALV,
                 ApplyBVG = Input.ApplyBVG,
@@ -142,12 +168,15 @@ namespace SwissLohnSystem.UI.Pages.Lohn
                 ApplyBU = Input.ApplyBU,
                 ApplyFAK = Input.ApplyFAK,
                 ApplyQST = Input.ApplyQST,
-
                 WeeklyHours = Input.WeeklyHours,
                 Canton = Input.Canton,
                 WithholdingTaxCode = Input.WithholdingTaxCode,
                 PermitType = Input.PermitType,
                 ChurchMember = Input.ChurchMember,
+                // ðŸ”¥ YENÄ°: gÃ¼n bilgileri APIâ€™ye gitsin
+                WorkedDays = Input.WorkedDays,
+                SickDays = Input.SickDays,
+                UnpaidDays = Input.UnpaidDays,
 
                 BvgPlan = null
             };
@@ -165,32 +194,37 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             return RedirectToPage("/Lohn/Details", new { id = lohn.Id });
         }
 
+
         // ================================
         // Dropdown doldurma
         // ================================
         private void LoadLookups()
         {
             PermitTypes = new List<SelectListItem>
-            {
-                new("B", "B – Aufenthaltsbewilligung"),
-                new("C", "C – Niederlassungsbewilligung"),
-                new("L", "L – Kurzaufenthaltsbewilligung"),
-                new("G", "G – Grenzgängerbewilligung"),
-                new("F", "F – Vorläufig aufgenommen"),
-                new("N", "N – Asylsuchende")
-            };
+{
+    new() { Value = "B", Text = "B â€“ Aufenthaltsbewilligung" },
+    new() { Value = "C", Text = "C â€“ Niederlassungsbewilligung" },
+    new() { Value = "L", Text = "L â€“ Kurzaufenthaltsbewilligung" },
+    new() { Value = "G", Text = "G â€“ GrenzgÃ¤ngerbewilligung" },
+    new() { Value = "F", Text = "F â€“ VorlÃ¤ufig aufgenommen" },
+    new() { Value = "N", Text = "N â€“ Asylsuchende" }
+};
+
 
             QstTariffCodes = new List<SelectListItem>
             {
-                new("",  "-- Bitte wählen --"),
-                new("A0", "A0 – ledig, 1 Einkommen, keine Kinder"),
-                new("A1", "A1 – ledig, 1 Einkommen, 1 Kind"),
-                new("B0", "B0 – verheiratet, 2 Einkommen"),
-                new("C0", "C0 – verheiratet, 1 Einkommen"),
-                new("H",  "H – Alleinerziehende")
+                new("",  "-- Bitte wÃ¤hlen --"),
+                new("A0", "A0 â€“ ledig, 1 Einkommen, keine Kinder"),
+                new("A1", "A1 â€“ ledig, 1 Einkommen, 1 Kind"),
+                new("B0", "B0 â€“ verheiratet, 2 Einkommen"),
+                new("C0", "C0 â€“ verheiratet, 1 Einkommen"),
+                new("H",  "H â€“ Alleinerziehende")
             };
         }
 
+        // ================================
+        // Form ViewModel
+        // ================================
         public class InputModel
         {
             [Required]
@@ -208,6 +242,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             public decimal UnpaidDeduction { get; set; }
             public decimal OtherDeduction { get; set; }
 
+            // GÃ¼n bazlÄ± alanlar (ÅŸimdilik sadece UI, API kullanmÄ±yor)
             [Range(0, 31)]
             public decimal? WorkedDays { get; set; }
 
@@ -217,6 +252,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             [Range(0, 31)]
             public decimal? UnpaidDays { get; set; }
 
+            // Flags
             public bool ApplyAHV { get; set; }
             public bool ApplyALV { get; set; }
             public bool ApplyBVG { get; set; }
@@ -237,6 +273,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             public string PermitType { get; set; } = "B";
 
             public bool ChurchMember { get; set; }
+
         }
     }
 }

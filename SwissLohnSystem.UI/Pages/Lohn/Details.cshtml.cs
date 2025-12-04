@@ -31,7 +31,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
         {
             Id = id;
 
-            // JS için BaseUrl (ileride slip hesaplama istersek kullanýrýz)
+            // JS için BaseUrl
             ViewData["ApiBaseUrl"] = _api.BaseUrl?.TrimEnd('/');
 
             // 1) Lohn kaydýný çek
@@ -39,6 +39,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             if (!lohnRes.ok || lohnRes.data is null)
             {
                 Error = lohnRes.message ?? "Lohnabrechnung wurde nicht gefunden.";
+                Lohn = null;
                 return Page();
             }
 
@@ -61,7 +62,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
                 }
             }
 
-            // 4) UI DTO’su (ApiToUiMapper kullanýyoruz)
+            // 4) UI DTO’su
             Lohn = ApiToUiMapper.ToDetails(lohn, emp, comp);
 
             return Page();

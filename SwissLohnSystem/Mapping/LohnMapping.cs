@@ -6,49 +6,58 @@ namespace SwissLohnSystem.API.Mappings
     public static class LohnMappings
     {
         public static LohnDto ToDto(this Lohn l)
-            => new LohnDto
-            {
-                Id = l.Id,
-                EmployeeId = l.EmployeeId,
-                Month = l.Month,
-                Year = l.Year,
+     => new LohnDto
+     {
+         Id = l.Id,
+         EmployeeId = l.EmployeeId,
+         Month = l.Month,
+         Year = l.Year,
 
-                BruttoSalary = l.BruttoSalary,
-                TotalDeductions = l.TotalDeductions,
-                NetSalary = l.NetSalary,
-                ChildAllowance = l.ChildAllowance,
-                HolidayAllowance = l.HolidayAllowance,
-                OvertimePay = l.OvertimePay,
+         BruttoSalary = l.BruttoSalary,
+         TotalDeductions = l.TotalDeductions,
+         NetSalary = l.NetSalary,
 
-                MonthlyHours = l.MonthlyHours,
-                MonthlyOvertimeHours = l.MonthlyOvertimeHours,
+         ChildAllowance = l.ChildAllowance,
+         HolidayAllowance = l.HolidayAllowance,
+         OvertimePay = l.OvertimePay,
 
-                Bonus = l.Bonus,
-                ExtraAllowance = l.ExtraAllowance,
-                UnpaidDeduction = l.UnpaidDeduction,
-                OtherDeduction = l.OtherDeduction,
+         MonthlyHours = l.MonthlyHours,
+         MonthlyOvertimeHours = l.MonthlyOvertimeHours,
 
-                CreatedAt = l.CreatedAt,
-                IsFinal = l.IsFinal,
+         Bonus = l.Bonus,
+         ExtraAllowance = l.ExtraAllowance,
+         UnpaidDeduction = l.UnpaidDeduction,
+         OtherDeduction = l.OtherDeduction,
 
-                // Snapshot parametreler
-                ApplyAHV = l.ApplyAHV,
-                ApplyALV = l.ApplyALV,
-                ApplyBVG = l.ApplyBVG,
-                ApplyNBU = l.ApplyNBU,
-                ApplyBU = l.ApplyBU,
-                ApplyFAK = l.ApplyFAK,
-                ApplyQST = l.ApplyQST,
+         CreatedAt = l.CreatedAt,
+         IsFinal = l.IsFinal,
 
-                PermitType = l.PermitType,
-                Canton = l.Canton,
-                ChurchMember = l.ChurchMember,
-                WithholdingTaxCode = l.WithholdingTaxCode,
+         // Snapshot parametreler
+         ApplyAHV = l.ApplyAHV,
+         ApplyALV = l.ApplyALV,
+         ApplyBVG = l.ApplyBVG,
+         ApplyNBU = l.ApplyNBU,
+         ApplyBU = l.ApplyBU,
+         ApplyFAK = l.ApplyFAK,
+         ApplyQST = l.ApplyQST,
 
-                HolidayRate = l.HolidayRate,
-                HolidayEligible = l.HolidayEligible,
+         PermitType = l.PermitType,
+         Canton = l.Canton,
+         ChurchMember = l.ChurchMember,
+         WithholdingTaxCode = l.WithholdingTaxCode,
 
-                Comment = l.Comment
-            };
+         HolidayRate = l.HolidayRate,
+         HolidayEligible = l.HolidayEligible,
+
+         Comment = l.Comment,
+
+         // 🔥 AN–Abzüge Snapshot (UI için gerekli!)
+         EmployeeAhvIvEo = l.EmployeeAhvIvEo,
+         EmployeeAlv = l.EmployeeAlv,
+         EmployeeNbu = l.EmployeeNbu,
+         EmployeeBvg = l.EmployeeBvg,
+         EmployeeQst = l.EmployeeQst
+     };
+
     }
 }

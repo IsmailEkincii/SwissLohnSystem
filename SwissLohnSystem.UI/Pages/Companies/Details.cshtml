@@ -183,15 +183,6 @@
                                     <i class="fas fa-sync-alt"></i> Laden
                                 </button>
                             </div>
-                            @* <div class="col-md-6 d-flex align-items-end justify-content-end">
-                                <button id="btnOpenCalcModal"
-                                        class="btn btn-success"
-                                        type="button"
-                                        data-toggle="modal"
-                                        data-target="#calcModal">
-                                    <i class="fas fa-calculator"></i> Lohn berechnen
-                                </button>
-                            </div> *@
                         </div>
 
                         <div class="card">
@@ -202,111 +193,27 @@
                                             <th>Mitarbeiter</th>
                                             <th>Monat</th>
                                             <th>Brutto</th>
+                                            <th>Abzüge (AN)</th> <!-- 🔥 eklendi -->
                                             <th>Netto</th>
                                             <th>Status</th>
-                                            <th>Aktionen</th>  <!-- ✅ burası -->
+                                            <th>Aktionen</th>
                                         </tr>
                                     </thead>
                                     <tbody><!-- rows via JS --></tbody>
                                 </table>
                             </div>
                         </div>
-
-                        <!-- Lohn berechnen Modal -->
-                        <div class="modal fade" id="calcModal" tabindex="-1" role="dialog" aria-hidden="true">
-                            <div class="modal-dialog modal-md" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Lohn berechnen</h5>
-                                        <button type="button" class="close" data-dismiss="modal">
-                                            <span>&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form id="calcForm">
-                                            <div class="form-group">
-                                                <label for="employeeId">Mitarbeiter</label>
-                                                <select id="employeeId" class="form-control"></select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="calcMonth">Monat</label>
-                                                <input id="calcMonth" type="month" class="form-control" />
-                                            </div>
-                                        </form>
-                                        <small class="text-muted">
-                                            Bestehende Entwürfe werden aktualisiert; finale Löhne bleiben unverändert.
-                                        </small>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-secondary" data-dismiss="modal">Schließen</button>
-                                        <button id="btnDoCalc" class="btn btn-primary" type="button">
-                                            <i class="fas fa-play"></i> Berechnen
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
-                    <!-- Dateien & Notizen -->
-                    <div class="tab-pane fade" id="files" role="tabpanel">
-                        <div class="alert alert-warning">
-                            Datei-Upload ist noch nicht angebunden. UI ist bereit; Backend-Endpoint erforderlich.
-                        </div>
-
-                        <div class="form-group">
-                            <label>Notiz</label>
-                            <textarea class="form-control" rows="3"
-                                      placeholder="Interne Notizen zur Firma..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Datei hochladen</label>
-                            <input type="file" class="form-control-file" />
-                        </div>
-
-                        <button class="btn btn-secondary" disabled>
-                            <i class="fas fa-upload"></i> Hochladen (demnächst)
-                        </button>
-                    </div>
-
-                    <!-- Einstellungen -->
-                    <div class="tab-pane fade" id="settings" role="tabpanel">
-                        <div class="alert alert-info">
-                            Firmenspezifische Einstellungen können hier konfiguriert werden.
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label>Standard-Lohnart</label>
-                                <select class="form-control" disabled>
-                                    <option>Monthly</option>
-                                    <option>Hourly</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group col-md-6">
-                                <label>Standard-Pensum (%)</label>
-                                <input type="number" class="form-control" value="100" disabled />
-                            </div>
-                        </div>
-
-                        <button class="btn btn-secondary" disabled>
-                            <i class="fas fa-save"></i> Speichern (demnächst)
-                        </button>
-                    </div>
-
-                </div>
             </div>
         </div>
 
     </div>
 </section>
-
 @section Scripts {
     <script>
         // Razor tarafında JS'e context aktarma
-        window.COMPANY_ID = @Model.Id;
+        window.COMPANY_ID   = @Model.Id;
         window.API_BASE_URL = "@(ViewData["ApiBaseUrl"] ?? "")";
         console.log('[loehne] (cshtml) COMPANY_ID =', window.COMPANY_ID);
         console.log('[loehne] (cshtml) API_BASE_URL =', window.API_BASE_URL);
@@ -356,6 +263,7 @@
         });
     </script>
 
-    <script src="~/js/lohnverlauf-detail.js"></script>
+    <!-- ❗ Burada SADECE dış script referansı olsun -->
     <script src="~/js/loehne-tab.js"></script>
 }
+

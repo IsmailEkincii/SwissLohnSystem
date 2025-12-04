@@ -96,5 +96,23 @@ namespace SwissLohnSystem.API.Models
 
         // --- Kommentar ---
         public string? Comment { get; set; }
+
+        // ===============================
+        //  SNAPSHOT DER AN-ABZÜGE
+        // ===============================
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployeeAhvIvEo { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployeeAlv { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployeeNbu { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployeeBvg { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployeeQst { get; set; }
     }
 }
