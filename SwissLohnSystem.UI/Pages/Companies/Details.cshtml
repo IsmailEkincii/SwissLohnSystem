@@ -192,24 +192,42 @@
                                         <tr>
                                             <th>Mitarbeiter</th>
                                             <th>Monat</th>
-                                            <th>Brutto</th>
-                                            <th>Abzüge (AN)</th> <!-- 🔥 eklendi -->
-                                            <th>Netto</th>
+                                            <th class="text-right">Brutto</th>
+                                            <th class="text-right">Abzüge (AN)</th>
+                                            <th class="text-right">Netto</th>
                                             <th>Status</th>
                                             <th>Aktionen</th>
                                         </tr>
                                     </thead>
-                                    <tbody><!-- rows via JS --></tbody>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted p-3">
+                                                Löhne werden geladen…
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Dateien & Notizen -->
+                    <div class="tab-pane fade" id="files" role="tabpanel">
+                        <p class="text-muted">(Später: Dateien & Notizen Modul)</p>
+                    </div>
+
+                    <!-- Einstellungen -->
+                    <div class="tab-pane fade" id="settings" role="tabpanel">
+                        <p class="text-muted">(Später: firmenspezifische Einstellungen)</p>
+                    </div>
+
+                </div>
             </div>
         </div>
 
     </div>
 </section>
+
 @section Scripts {
     <script>
         // Razor tarafında JS'e context aktarma
@@ -248,7 +266,7 @@
         })();
     </script>
 
-    <!-- 🔥 Toast mesajları (Create/Edit sonrası) -->
+    <!-- Toast mesajları (Create/Edit sonrası) -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             @if (TempData["ToastSuccess"] is string toastSuccess && !string.IsNullOrWhiteSpace(toastSuccess))
@@ -263,7 +281,5 @@
         });
     </script>
 
-    <!-- ❗ Burada SADECE dış script referansı olsun -->
     <script src="~/js/loehne-tab.js"></script>
 }
-

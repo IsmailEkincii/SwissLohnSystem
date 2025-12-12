@@ -5,8 +5,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SwissLohnSystem.UI.DTOs.Employees;
+using SwissLohnSystem.UI.DTOs.Payroll;
 using SwissLohnSystem.UI.Services;
+using SwissLohnSystem.UI.Services.Lookups;
 
 namespace SwissLohnSystem.UI.Pages.Employees
 {
@@ -25,6 +28,10 @@ namespace SwissLohnSystem.UI.Pages.Employees
         public EmployeeEditDto Input { get; set; } = new();
 
         [TempData] public string? Toast { get; set; }
+
+        // QST dropdown’larý
+        public List<SelectListItem> PermitTypes { get; private set; } = new();
+        public List<SelectListItem> QstTariffCodes { get; private set; } = new();
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
@@ -65,7 +72,7 @@ namespace SwissLohnSystem.UI.Pages.Employees
                 Krankenkasse = emp.Krankenkasse,
                 BVGPlan = emp.BVGPlan,
 
-                // ?? Arbeitszeit & Lohnparameter
+                // Arbeitszeit & Lohnparameter
                 WeeklyHours = emp.WeeklyHours,
                 PensumPercent = emp.PensumPercent,
                 HolidayRate = emp.HolidayRate,
@@ -75,7 +82,7 @@ namespace SwissLohnSystem.UI.Pages.Employees
                 ThirteenthEligible = emp.ThirteenthEligible,
                 ThirteenthProrated = emp.ThirteenthProrated,
 
-                // ?? Sozialversicherungs-Flags
+                // Sozialversicherungs-Flags
                 ApplyAHV = emp.ApplyAHV,
                 ApplyALV = emp.ApplyALV,
                 ApplyNBU = emp.ApplyNBU,
@@ -84,24 +91,32 @@ namespace SwissLohnSystem.UI.Pages.Employees
                 ApplyFAK = emp.ApplyFAK,
                 ApplyQST = emp.ApplyQST,
 
-                // ?? Steuer / Kanton
+                // Steuer / Kanton
                 PermitType = emp.PermitType,
                 ChurchMember = emp.ChurchMember,
                 Canton = emp.Canton,
                 WithholdingTaxCode = emp.WithholdingTaxCode,
 
-                // ?? Adresse & Kontakt
+                // Adresse & Kontakt
                 Address = emp.Address,
                 Zip = emp.Zip,
                 City = emp.City,
                 Phone = emp.Phone
             };
 
+            // Dropdown kaynaklarý
+            PermitTypes = QstUiLookups.GetPermitTypes();
+            await LoadQstTariffsAsync(Input.Canton);
+
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
+            // ModelState hatasýnda dropdown’lar kaybolmasýn
+            PermitTypes = QstUiLookups.GetPermitTypes();
+            await LoadQstTariffsAsync(Input.Canton);
+
             if (!ModelState.IsValid)
                 return Page();
 
@@ -141,6 +156,25 @@ namespace SwissLohnSystem.UI.Pages.Employees
 
             if (string.IsNullOrWhiteSpace(Input.PermitType))
                 Input.PermitType = "B";
+
+            // QST seçildiyse Bewilligung + Tarif zorunlu
+            if (Input.ApplyQST)
+            {
+                if (string.IsNullOrWhiteSpace(Input.PermitType))
+                {
+                    ModelState.AddModelError(nameof(Input.PermitType),
+                        "Bitte eine Bewilligung auswählen.");
+                }
+
+                if (string.IsNullOrWhiteSpace(Input.WithholdingTaxCode))
+                {
+                    ModelState.AddModelError(nameof(Input.WithholdingTaxCode),
+                        "Bitte einen Quellensteuer-Tarif auswählen.");
+                }
+
+                if (!ModelState.IsValid)
+                    return Page();
+            }
 
             // API'ye gidecek DTO (API EmployeeUpdateDto ile bire bir)
             var body = new EmployeeUpdateDto
@@ -211,7 +245,7 @@ namespace SwissLohnSystem.UI.Pages.Employees
             return RedirectToPage("/Companies/Details", new { id = Input.CompanyId });
         }
 
-        // Ek validasyonlar (SalaryType/Brutto/Hourly/EndDate)
+        // Ek validasyonlar (SalaryType/Brutto/Hourly/EndDate + QST)
         public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
         {
             if (Input.SalaryType == "Hourly")
@@ -239,6 +273,36 @@ namespace SwissLohnSystem.UI.Pages.Employees
                     "Enddatum darf nicht vor dem Startdatum liegen.",
                     new[] { nameof(Input.EndDate) });
             }
+        }
+
+        // QST lookup helper
+        private async Task LoadQstTariffsAsync(string? canton)
+        {
+            var c = string.IsNullOrWhiteSpace(canton)
+                ? "ZH"
+                : canton.Trim().ToUpperInvariant();
+
+            var (ok, data, msg) =
+                await _api.GetAsync<List<QstTariffLookupDto>>($"/api/Lookups/qst-tariffs?canton={c}");
+
+            var list = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "", Text = "-- bitte wählen --" }
+            };
+
+            if (ok && data is not null)
+            {
+                foreach (var t in data)
+                {
+                    list.Add(new SelectListItem
+                    {
+                        Value = t.Code,
+                        Text = $"{t.Code} – {t.Description}"
+                    });
+                }
+            }
+
+            QstTariffCodes = list;
         }
     }
 }

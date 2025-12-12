@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SwissLohnSystem.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a7bd1c00fc9dfe116309c836851a9c98084b2ee")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f552f667d51646d68860777a0f654bba43a710f")]
 [assembly: System.Reflection.AssemblyProductAttribute("SwissLohnSystem.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SwissLohnSystem.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

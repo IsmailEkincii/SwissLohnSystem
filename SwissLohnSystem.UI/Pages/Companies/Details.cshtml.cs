@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SwissLohnSystem.UI.DTOs.Companies;
 using SwissLohnSystem.UI.DTOs.Employees;
@@ -18,6 +19,7 @@ namespace SwissLohnSystem.UI.Pages.Companies
             _api = api;
         }
 
+        [BindProperty(SupportsGet = true)]
         public int Id { get; set; }
 
         // View'da kullandığımız ViewModel
@@ -26,7 +28,7 @@ namespace SwissLohnSystem.UI.Pages.Companies
         // API base adresi (appsettings / ApiClient'tan gelir)
         public string ApiBaseUrl => _api.BaseUrl?.TrimEnd('/') ?? string.Empty;
 
-        public async Task OnGetAsync(int id)
+        public async Task<IActionResult> OnGetAsync(int id)
         {
             Id = id;
 
@@ -37,12 +39,11 @@ namespace SwissLohnSystem.UI.Pages.Companies
             var (okCompany, company, companyMsg) =
                 await _api.GetAsync<CompanyDto>($"/api/Company/{id}");
 
-            // Firma bulunamazsa
             if (!okCompany || company is null)
             {
-                ViewData["Error"] = companyMsg ?? "Firma konnte nicht geladen werden.";
-                Vm = new CompanyDetailsDto();
-                return;
+                // İstersen burada Companies/Index'e geri de yönlendirebiliriz
+                TempData["ToastError"] = companyMsg ?? "Firma konnte nicht geladen werden.";
+                return RedirectToPage("/Companies/Index");
             }
 
             // Mitarbeiter listesi
@@ -55,6 +56,8 @@ namespace SwissLohnSystem.UI.Pages.Companies
 
             // UI ViewModel’e map et
             Vm = ApiToUiMapper.BuildDetails(company, employeeList);
+
+            return Page();
         }
     }
 }

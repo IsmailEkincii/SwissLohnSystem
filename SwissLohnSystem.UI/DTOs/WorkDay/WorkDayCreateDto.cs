@@ -3,7 +3,7 @@
 namespace SwissLohnSystem.UI.DTOs.WorkDay
 {
     public record WorkDayCreateDto(
-        int EmployeeId,
+         int EmployeeId,
         DateTime Date,
         string DayType,
         decimal HoursWorked,

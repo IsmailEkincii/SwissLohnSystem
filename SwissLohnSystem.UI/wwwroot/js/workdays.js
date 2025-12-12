@@ -55,6 +55,62 @@ document.addEventListener("DOMContentLoaded", function () {
         return dateStr;
     }
 
+    // ✅ UI (0/1/2/3) -> API ("Work"/"Sick"/"Vacation"/"Unpaid")
+    function toDayTypeString(v) {
+        const n = parseInt(v, 10);
+        switch (n) {
+            case 0: return "Work";
+            case 1: return "Sick";
+            case 2: return "Vacation";
+            case 3: return "Unpaid";
+            default: return "Work";
+        }
+    }
+
+    // ✅ API ("Work" vs) or number -> UI select value ("0/1/2/3")
+    function toDayTypeSelectValue(v) {
+        if (v === null || v === undefined) return "0";
+
+        // If API returns number
+        if (typeof v === "number") return String(v);
+
+        const s = String(v).trim().toLowerCase();
+
+        // If API returns string types
+        switch (s) {
+            case "work":
+            case "arbeit":
+            case "arbeitstag":
+                return "0";
+            case "sick":
+            case "krank":
+            case "krankheit":
+                return "1";
+            case "vacation":
+            case "ferien":
+            case "holiday":
+                return "2";
+            case "unpaid":
+            case "unbezahlt":
+                return "3";
+            default:
+                // If API accidentally stored "0"/"1" as string, still handle it
+                if (s === "0" || s === "1" || s === "2" || s === "3") return s;
+                return "0";
+        }
+    }
+
+    function dayTypeLabelFromApi(v) {
+        const sel = toDayTypeSelectValue(v);
+        switch (sel) {
+            case "0": return "Arbeitstag";
+            case "1": return "Krankheit";
+            case "2": return "Ferien";
+            case "3": return "Unbezahlt";
+            default: return "";
+        }
+    }
+
     async function loadWorkDays() {
         const url = `${API_BASE}/api/WorkDay/Employee/${EMPLOYEE_ID}`;
         console.log("[workdays] GET", url);
@@ -88,20 +144,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 const tr = document.createElement("tr");
                 const dateOnly = w.date ? w.date.split("T")[0] : "";
 
-                // DayType etiketi (isteğe bağlı, sadece gösterim için)
-                let dayTypeLabel = "";
-                switch (w.dayType) {
-                    case 0: dayTypeLabel = "Arbeitstag"; break;
-                    case 1: dayTypeLabel = "Krankheit"; break;
-                    case 2: dayTypeLabel = "Ferien"; break;
-                    case 3: dayTypeLabel = "Unbezahlt"; break;
-                    default: dayTypeLabel = ""; break;
-                }
+                const dayTypeLabel = dayTypeLabelFromApi(w.dayType);
 
                 tr.innerHTML = `
                     <td>${dateOnly}</td>
-                    <td>${w.hoursWorked.toFixed(2)}</td>
-                    <td>${w.overtimeHours.toFixed(2)}</td>
+                    <td>${Number(w.hoursWorked || 0).toFixed(2)}</td>
+                    <td>${Number(w.overtimeHours || 0).toFixed(2)}</td>
                     <td class="text-right">
                         <span class="badge badge-light mr-1">${dayTypeLabel}</span>
                         <button class="btn btn-xs btn-outline-secondary btn-wd-edit" data-id="${w.id}">
@@ -136,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
         hoursInput.value = "8";
         otInput.value = "0";
 
-        // 🔥 Varsayılan: Arbeitstag (0)
+        // Varsayılan: Arbeitstag
         if (dayTypeSelect) {
             dayTypeSelect.value = "0";
         }
@@ -151,16 +199,12 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("[workdays] openEditModal", workDay);
         idInput.value = workDay.id;
         dateInput.value = workDay.date ? workDay.date.split("T")[0] : "";
-        hoursInput.value = workDay.hoursWorked.toString().replace('.', ',');
-        otInput.value = workDay.overtimeHours.toString().replace('.', ',');
+        hoursInput.value = String(workDay.hoursWorked ?? 0).replace('.', ',');
+        otInput.value = String(workDay.overtimeHours ?? 0).replace('.', ',');
 
-        // 🔥 Var olan dayType’ı dropdown’a set et
+        // ✅ API string/number ne dönerse dönsün select’e uyarlıyoruz
         if (dayTypeSelect) {
-            if (workDay.dayType !== null && workDay.dayType !== undefined) {
-                dayTypeSelect.value = String(workDay.dayType);
-            } else {
-                dayTypeSelect.value = "0"; // fallback
-            }
+            dayTypeSelect.value = toDayTypeSelectValue(workDay.dayType);
         }
 
         modalTitle.textContent = "Arbeitszeit bearbeiten";
@@ -193,10 +237,10 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // 🔥 DayType değeri (0=Arbeitstag, 1=Krank, 2=Ferien, 3=Unbezahlt)
-        let dayType = 0;
+        // UI select -> number -> API string
+        let dayTypeNum = 0;
         if (dayTypeSelect && dayTypeSelect.value !== "") {
-            dayType = parseInt(dayTypeSelect.value, 10);
+            dayTypeNum = parseInt(dayTypeSelect.value, 10);
         }
 
         const body = {
@@ -204,7 +248,8 @@ document.addEventListener("DOMContentLoaded", function () {
             date: dateVal,
             hoursWorked: hours,
             overtimeHours: overtime,
-            dayType: dayType
+            // ✅ FIX: API string bekliyor
+            dayType: toDayTypeString(dayTypeNum)
         };
 
         let url, method;
@@ -218,6 +263,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         console.log("[workdays] SAVE", method, url, body);
+        console.log("[workdays] SAVE JSON", JSON.stringify(body));
+
 
         try {
             const res = await fetch(url, {
@@ -272,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // 🔘 Events
+    // Events
     btnNew.addEventListener("click", function () {
         console.log("[workdays] btnWdNew clicked");
         openNewModal();

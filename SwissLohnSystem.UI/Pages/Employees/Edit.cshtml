@@ -173,6 +173,44 @@
                         </div>
                     </div>
 
+                    <!-- Quellensteuer / Steuer-Settings -->
+                    <hr />
+                    <h5>Quellensteuer (QST)</h5>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <div class="form-check mt-4">
+                                <input asp-for="Input.ApplyQST" class="form-check-input" />
+                                <label asp-for="Input.ApplyQST" class="form-check-label">Quellensteuer anwenden</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.PermitType">Bewilligung</label>
+                            <select asp-for="Input.PermitType"
+                                    class="form-control"
+                                    asp-items="Model.PermitTypes">
+                            </select>
+                            <span asp-validation-for="Input.PermitType" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label asp-for="Input.WithholdingTaxCode">QST-Code (z.B. A0, C0)</label>
+                            <select asp-for="Input.WithholdingTaxCode"
+                                    class="form-control"
+                                    asp-items="Model.QstTariffCodes">
+                            </select>
+                            <span asp-validation-for="Input.WithholdingTaxCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <div class="form-check mt-4">
+                                <input asp-for="Input.ChurchMember" class="form-check-input" />
+                                <label asp-for="Input.ChurchMember" class="form-check-label">Kirchensteuerpflichtig</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Adresse & Kontakt -->
                     <hr />
                     <h5>Adresse &amp; Kontakt</h5>
@@ -181,33 +219,33 @@
                         <div class="form-group col-md-3">
                             <label asp-for="Input.Canton">Kanton</label>
                             <select asp-for="Input.Canton" class="form-control">
-                                <option value="">-- bitte wählen --</option>
-                                <option value="ZH">ZH</option>
-                                <option value="BE">BE</option>
-                                <option value="LU">LU</option>
-                                <option value="UR">UR</option>
-                                <option value="SZ">SZ</option>
-                                <option value="OW">OW</option>
-                                <option value="NW">NW</option>
-                                <option value="GL">GL</option>
-                                <option value="ZG">ZG</option>
-                                <option value="FR">FR</option>
-                                <option value="SO">SO</option>
-                                <option value="BS">BS</option>
-                                <option value="BL">BL</option>
-                                <option value="SH">SH</option>
-                                <option value="AR">AR</option>
-                                <option value="AI">AI</option>
-                                <option value="SG">SG</option>
-                                <option value="GR">GR</option>
-                                <option value="AG">AG</option>
-                                <option value="TG">TG</option>
-                                <option value="TI">TI</option>
-                                <option value="VD">VD</option>
-                                <option value="VS">VS</option>
-                                <option value="NE">NE</option>
-                                <option value="GE">GE</option>
-                                <option value="JU">JU</option>
+                                <option value="">--</option>
+                                <option value="AG">Aargau (AG)</option>
+                                <option value="AI">Appenzell Innerrhoden (AI)</option>
+                                <option value="AR">Appenzell Ausserrhoden (AR)</option>
+                                <option value="BE">Bern (BE)</option>
+                                <option value="BL">Basel-Landschaft (BL)</option>
+                                <option value="BS">Basel-Stadt (BS)</option>
+                                <option value="FR">Freiburg / Fribourg (FR)</option>
+                                <option value="GE">Genève / Genf (GE)</option>
+                                <option value="GL">Glarus (GL)</option>
+                                <option value="GR">Graubünden / Grisons (GR)</option>
+                                <option value="JU">Jura (JU)</option>
+                                <option value="LU">Luzern (LU)</option>
+                                <option value="NE">Neuchâtel (NE)</option>
+                                <option value="NW">Nidwalden (NW)</option>
+                                <option value="OW">Obwalden (OW)</option>
+                                <option value="SG">St. Gallen (SG)</option>
+                                <option value="SH">Schaffhausen (SH)</option>
+                                <option value="SZ">Schwyz (SZ)</option>
+                                <option value="SO">Solothurn (SO)</option>
+                                <option value="TG">Thurgau (TG)</option>
+                                <option value="TI">Ticino / Tessin (TI)</option>
+                                <option value="UR">Uri (UR)</option>
+                                <option value="VD">Vaud / Waadt (VD)</option>
+                                <option value="VS">Valais / Wallis (VS)</option>
+                                <option value="ZG">Zug (ZG)</option>
+                                <option value="ZH">Zürich (ZH)</option>
                             </select>
                             <span asp-validation-for="Input.Canton" class="text-danger"></span>
                         </div>

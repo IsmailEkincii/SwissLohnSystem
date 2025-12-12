@@ -56,31 +56,32 @@ namespace SwissLohnSystem.UI.Services.Mapping
         };
 
         // =========================
-        // Lohn – Liste satırı
+        // Lohn – Firma aylık liste satırı (CompanyMonthlyLohnDto)
         // =========================
-        public static LohnMonthlyRowDto ToMonthlyRow(this LohnDto l, string? employeeName = null) =>
-            new LohnMonthlyRowDto
+        public static CompanyMonthlyLohnDto ToCompanyMonthlyRow(
+            this LohnDto l,
+            string? employeeName = null)
+            => new CompanyMonthlyLohnDto
             {
                 Id = l.Id,
                 EmployeeId = l.EmployeeId,
+                EmployeeName = employeeName ?? $"#{l.EmployeeId}",
                 Month = l.Month,
                 Year = l.Year,
                 BruttoSalary = l.BruttoSalary,
                 NetSalary = l.NetSalary,
                 TotalDeductions = l.TotalDeductions,
-                OvertimePay = l.OvertimePay,
-                HolidayAllowance = l.HolidayAllowance,
-                IsFinal = l.IsFinal,
-                EmployeeName = employeeName ?? ""
+                IsFinal = l.IsFinal
             };
 
-        public static IEnumerable<LohnMonthlyRowDto> ToMonthlyRows(
+        public static IEnumerable<CompanyMonthlyLohnDto> ToCompanyMonthlyRows(
             this IEnumerable<LohnDto> loehne,
             IEnumerable<EmployeeDto> employees)
         {
             var nameById = employees.ToDictionary(
                 e => e.Id,
-                e => $"{e.FirstName} {e.LastName}".Trim());
+                e => $"{e.FirstName} {e.LastName}".Trim()
+            );
 
             foreach (var l in loehne)
             {
@@ -88,7 +89,7 @@ namespace SwissLohnSystem.UI.Services.Mapping
                     ? n
                     : $"#{l.EmployeeId}";
 
-                yield return l.ToMonthlyRow(employeeName);
+                yield return l.ToCompanyMonthlyRow(employeeName);
             }
         }
 

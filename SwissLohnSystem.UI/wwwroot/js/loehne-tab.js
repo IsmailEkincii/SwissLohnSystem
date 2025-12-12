@@ -1,6 +1,7 @@
-﻿console.log("[loehne-tab] script loaded");
-
+﻿// wwwroot/js/loehne-tab.js
 (function () {
+    console.log("[loehne-tab] script loaded");
+
     const API_BASE_URL = (window.API_BASE_URL || "").replace(/\/+$/, "");
     const COMPANY_ID = window.COMPANY_ID || 0;
 
@@ -42,6 +43,13 @@
         return n.toFixed(2) + " CHF";
     }
 
+    function formatStatus(isFinal) {
+        if (isFinal) {
+            return '<span class="badge badge-success">Final</span>';
+        }
+        return '<span class="badge badge-warning">Entwurf</span>';
+    }
+
     // =========================
     // Lohn liste (tablo)
     // =========================
@@ -61,8 +69,8 @@
 
         tblBody.innerHTML = `
             <tr>
-                <td colspan="6" class="text-center text-muted p-3">
-                    Lade Löhne...
+                <td colspan="7" class="text-center text-muted p-3">
+                    Löhne werden geladen...
                 </td>
             </tr>`;
 
@@ -72,7 +80,7 @@
                 console.error("[loehne-tab] monthly http error", res.status);
                 tblBody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="text-center text-danger p-3">
+                        <td colspan="7" class="text-center text-danger p-3">
                             Fehler beim Laden der Löhne.
                         </td>
                     </tr>`;
@@ -85,45 +93,62 @@
             if (!payload.success || !payload.data || payload.data.length === 0) {
                 tblBody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="text-center text-muted p-3">
+                        <td colspan="7" class="text-center text-muted p-3">
                             Keine Löhne für diesen Monat vorhanden.
                         </td>
                     </tr>`;
                 return;
             }
 
+            const rows = payload.data; // CompanyMonthlyLohnDto listesi
             tblBody.innerHTML = "";
-            payload.data.forEach(row => {
+
+            rows.forEach(row => {
                 const tr = document.createElement("tr");
                 const periodLabel = `${String(row.month).padStart(2, "0")}.${row.year}`;
+                const statusHtml = formatStatus(!!row.isFinal);
+                const empName = row.employeeName || ("#" + row.employeeId);
 
                 tr.innerHTML = `
-                    <td>${row.employeeName || ("#" + row.employeeId)}</td>
+                    <td>${empName}</td>
                     <td>${periodLabel}</td>
-                    <td>${formatMoney(row.bruttoSalary)}</td>
-                    <td>${formatMoney(row.netSalary)}</td>
+                    <td class="text-right">${formatMoney(row.bruttoSalary)}</td>
+                    <td class="text-right">${formatMoney(row.totalDeductions)}</td>
+                    <td class="text-right">${formatMoney(row.netSalary)}</td>
+                    <td>${statusHtml}</td>
                     <td>
-                        <span class="badge badge-${row.isFinal ? "success" : "warning"}">
-                            ${row.isFinal ? "Final" : "Entwurf"}
-                        </span>
-                    </td>
-                    <td>
-                        <a class="btn btn-xs btn-outline-secondary"
+                        <a class="btn btn-xs btn-outline-primary mr-1"
                            href="/Lohn/Details/${row.id}">
-                            <i class="fas fa-file-alt"></i> Details
+                            <i class="fas fa-search"></i> Details
                         </a>
+                        <button type="button"
+                                class="btn btn-xs btn-outline-secondary btn-lohn-pdf"
+                                data-id="${row.id}">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
                     </td>
                 `;
 
                 tblBody.appendChild(tr);
             });
 
+            // PDF butonları: Detay sayfasını yeni sekmede aç (orada print/PDF var)
+            const pdfButtons = tblBody.querySelectorAll(".btn-lohn-pdf");
+            pdfButtons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const id = this.getAttribute("data-id");
+                    if (!id) return;
+                    const url = "/Lohn/Details/" + id;
+                    window.open(url, "_blank");
+                });
+            });
+
         } catch (err) {
             console.error("[loehne-tab] monthly exception", err);
             tblBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center text-danger p-3">
-                        Fehler beim Laden der Löhne.
+                    <td colspan="7" class="text-center text-danger p-3">
+                        Fehler beim Laden der Löhne (Netzwerkfehler).
                     </td>
                 </tr>`;
         }

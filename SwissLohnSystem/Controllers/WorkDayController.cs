@@ -46,10 +46,14 @@ namespace SwissLohnSystem.API.Controllers
 
             return ApiResponse<WorkDayDto>.Ok(w.ToDto(), "Arbeitszeit erfolgreich geladen.");
         }
+
         // POST: api/WorkDay
         [HttpPost]
         public async Task<ActionResult<ApiResponse<WorkDayDto>>> PostWorkDay([FromBody] WorkDayCreateDto dto)
         {
+            // ✅ Runtime kanıt: hangi DTO tipi gerçekten kullanılıyor?
+            Console.WriteLine($"[WorkDayController] DTO Type = {dto?.GetType().FullName ?? "NULL"}");
+
             if (!ModelState.IsValid)
             {
                 var errors = string.Join(" | ",
@@ -84,6 +88,7 @@ namespace SwissLohnSystem.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = entity.Id },
                 ApiResponse<WorkDayDto>.Ok(entity.ToDto(), "Arbeitszeit erfolgreich hinzugefügt."));
         }
+
         // PUT: api/WorkDay/5
         [HttpPut("{id:int}")]
         public async Task<ActionResult<ApiResponse<string>>> PutWorkDay(int id, [FromBody] WorkDayUpdateDto dto)

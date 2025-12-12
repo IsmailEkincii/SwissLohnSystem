@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SwissLohnSystem.UI.DTOs.Companies;
 using SwissLohnSystem.UI.DTOs.Employees;
 using SwissLohnSystem.UI.DTOs.Lohn;
+using SwissLohnSystem.UI.DTOs.Payroll;
 using SwissLohnSystem.UI.Services;
+using SwissLohnSystem.UI.Services.Lookups;
 
 namespace SwissLohnSystem.UI.Pages.Lohn
 {
@@ -38,10 +40,9 @@ namespace SwissLohnSystem.UI.Pages.Lohn
         // ================================
         public async Task<IActionResult> OnGetAsync(int employeeId, string? period)
         {
-            // 🔥 JS tarafı için API base URL'yi ViewData'ya veriyoruz
+            // JS tarafı için API base URL'yi ViewData'ya veriyoruz
             ViewData["ApiBaseUrl"] = _api.BaseUrl?.TrimEnd('/');
 
-            // Querystring'ten gelen id'yi property'ye yaz
             EmployeeId = employeeId;
 
             if (employeeId <= 0)
@@ -57,7 +58,6 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             if (!okEmp || emp is null)
             {
                 Error = empMsg ?? "Mitarbeiterdaten konnten nicht geladen werden.";
-                // Employee null kalacak, cshtml'deki uyarı tetiklenir
                 return Page();
             }
 
@@ -70,9 +70,6 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             {
                 Company = comp;
             }
-
-            // 3) Dropdownları doldur
-            LoadLookups();
 
             // 4) Period (varsayılan bu ayın 1’i)
             DateTime periodDate;
@@ -91,9 +88,17 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             Input.GrossMonthly = emp.BruttoSalary;
             Input.WeeklyHours = emp.WeeklyHours;
 
-            Input.Canton = string.IsNullOrWhiteSpace(emp.Canton) ? "ZH" : emp.Canton;
-            Input.PermitType = string.IsNullOrWhiteSpace(emp.PermitType) ? "B" : emp.PermitType;
-            Input.WithholdingTaxCode = emp.WithholdingTaxCode;
+            Input.Canton = string.IsNullOrWhiteSpace(emp.Canton)
+                ? "ZH"
+                : emp.Canton.Trim().ToUpperInvariant();
+
+            Input.PermitType = string.IsNullOrWhiteSpace(emp.PermitType)
+                ? "B"
+                : emp.PermitType.Trim().ToUpperInvariant();
+
+            Input.WithholdingTaxCode = string.IsNullOrWhiteSpace(emp.WithholdingTaxCode)
+                ? null
+                : emp.WithholdingTaxCode.Trim().ToUpperInvariant();
 
             Input.ApplyAHV = emp.ApplyAHV;
             Input.ApplyALV = emp.ApplyALV;
@@ -104,7 +109,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             Input.ApplyQST = emp.ApplyQST;
             Input.ChurchMember = emp.ChurchMember;
 
-            // Gün / izin alanları (şimdilik sadece UI için)
+            // Gün / izin alanları
             Input.WorkedDays = null;
             Input.SickDays = null;
             Input.UnpaidDays = null;
@@ -114,6 +119,9 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             Input.ExtraAllowance = 0;
             Input.UnpaidDeduction = 0;
             Input.OtherDeduction = 0;
+
+            // 3) Dropdownları doldur (employee Kanton'una göre)
+            await LoadLookupsAsync(Input.Canton);
 
             return Page();
         }
@@ -126,7 +134,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             // JS için yine BaseUrl
             ViewData["ApiBaseUrl"] = _api.BaseUrl?.TrimEnd('/');
 
-            // 🔥 Employee & Company'yi POST'ta da yeniden yükleyelim
+            // Employee & Company'yi POST'ta da yeniden yükleyelim
             if (Input.EmployeeId > 0)
             {
                 var (okEmp, emp, empMsg) =
@@ -143,24 +151,57 @@ namespace SwissLohnSystem.UI.Pages.Lohn
                 }
                 else
                 {
-                    Error = empMsg ?? "Mitarbeiterdaten konnten nicht geladen werden.";
+                    Error = empMsg ?? "Mitarbeiterdaten konden nicht geladen werden.";
                 }
             }
 
-            LoadLookups();
+            // ---- Normalizasyon ----
+            Input.Canton = string.IsNullOrWhiteSpace(Input.Canton)
+                ? "ZH"
+                : Input.Canton.Trim().ToUpperInvariant();
+
+            if (string.IsNullOrWhiteSpace(Input.PermitType))
+                Input.PermitType = "B";
+            else
+                Input.PermitType = Input.PermitType.Trim().ToUpperInvariant();
+
+            if (!string.IsNullOrWhiteSpace(Input.WithholdingTaxCode))
+                Input.WithholdingTaxCode = Input.WithholdingTaxCode.Trim().ToUpperInvariant();
+
+            // Dropdownları (normalize sonrası) doldur
+            await LoadLookupsAsync(Input.Canton);
+
+            // ---- QST basit validasyon ----
+            if (Input.ApplyQST)
+            {
+                if (string.IsNullOrWhiteSpace(Input.WithholdingTaxCode))
+                {
+                    ModelState.AddModelError(nameof(Input.WithholdingTaxCode),
+                        "Bei Quellensteuer ist ein QST-Code erforderlich (z.B. A0).");
+                }
+
+                if (string.IsNullOrWhiteSpace(Input.PermitType))
+                {
+                    ModelState.AddModelError(nameof(Input.PermitType),
+                        "Bei Quellensteuer ist eine Bewilligung erforderlich.");
+                }
+            }
 
             if (!ModelState.IsValid)
                 return Page();
 
+            // 🔥 DateTime -> DateOnly dönüşümü
             var dto = new PayrollRequestDto
             {
                 EmployeeId = Input.EmployeeId,
-                Period = Input.Period,
+                Period = DateOnly.FromDateTime(Input.Period),
+
                 GrossMonthly = Input.GrossMonthly,
                 Bonus = Input.Bonus,
                 ExtraAllowance = Input.ExtraAllowance,
                 UnpaidDeduction = Input.UnpaidDeduction,
                 OtherDeduction = Input.OtherDeduction,
+
                 ApplyAHV = Input.ApplyAHV,
                 ApplyALV = Input.ApplyALV,
                 ApplyBVG = Input.ApplyBVG,
@@ -168,12 +209,13 @@ namespace SwissLohnSystem.UI.Pages.Lohn
                 ApplyBU = Input.ApplyBU,
                 ApplyFAK = Input.ApplyFAK,
                 ApplyQST = Input.ApplyQST,
+
                 WeeklyHours = Input.WeeklyHours,
                 Canton = Input.Canton,
                 WithholdingTaxCode = Input.WithholdingTaxCode,
                 PermitType = Input.PermitType,
                 ChurchMember = Input.ChurchMember,
-                // 🔥 YENİ: gün bilgileri API’ye gitsin
+
                 WorkedDays = Input.WorkedDays,
                 SickDays = Input.SickDays,
                 UnpaidDays = Input.UnpaidDays,
@@ -194,36 +236,43 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             return RedirectToPage("/Lohn/Details", new { id = lohn.Id });
         }
 
-
         // ================================
-        // Dropdown doldurma
+        // Lookup helper
         // ================================
-        private void LoadLookups()
+        private async Task LoadLookupsAsync(string? canton)
         {
-            PermitTypes = new List<SelectListItem>
-{
-    new() { Value = "B", Text = "B – Aufenthaltsbewilligung" },
-    new() { Value = "C", Text = "C – Niederlassungsbewilligung" },
-    new() { Value = "L", Text = "L – Kurzaufenthaltsbewilligung" },
-    new() { Value = "G", Text = "G – Grenzgängerbewilligung" },
-    new() { Value = "F", Text = "F – Vorläufig aufgenommen" },
-    new() { Value = "N", Text = "N – Asylsuchende" }
-};
+            // Bewilligunglar hala statik (UI lookups)
+            PermitTypes = QstUiLookups.GetPermitTypes();
 
+            var c = string.IsNullOrWhiteSpace(canton)
+                ? "ZH"
+                : canton.Trim().ToUpperInvariant();
 
-            QstTariffCodes = new List<SelectListItem>
+            var (ok, data, msg) =
+                await _api.GetAsync<List<QstTariffLookupDto>>($"/api/Lookups/qst-tariffs?canton={c}");
+
+            var list = new List<SelectListItem>
             {
-                new("",  "-- Bitte wählen --"),
-                new("A0", "A0 – ledig, 1 Einkommen, keine Kinder"),
-                new("A1", "A1 – ledig, 1 Einkommen, 1 Kind"),
-                new("B0", "B0 – verheiratet, 2 Einkommen"),
-                new("C0", "C0 – verheiratet, 1 Einkommen"),
-                new("H",  "H – Alleinerziehende")
+                new SelectListItem { Value = "", Text = "-- bitte wählen --" }
             };
+
+            if (ok && data is not null)
+            {
+                foreach (var t in data)
+                {
+                    list.Add(new SelectListItem
+                    {
+                        Value = t.Code,
+                        Text = $"{t.Code} – {t.Description}"
+                    });
+                }
+            }
+
+            QstTariffCodes = list;
         }
 
         // ================================
-        // Form ViewModel
+        // Form ViewModel (aynı kaldı)
         // ================================
         public class InputModel
         {
@@ -242,7 +291,6 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             public decimal UnpaidDeduction { get; set; }
             public decimal OtherDeduction { get; set; }
 
-            // Gün bazlı alanlar (şimdilik sadece UI, API kullanmıyor)
             [Range(0, 31)]
             public decimal? WorkedDays { get; set; }
 
@@ -252,7 +300,6 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             [Range(0, 31)]
             public decimal? UnpaidDays { get; set; }
 
-            // Flags
             public bool ApplyAHV { get; set; }
             public bool ApplyALV { get; set; }
             public bool ApplyBVG { get; set; }
@@ -273,7 +320,6 @@ namespace SwissLohnSystem.UI.Pages.Lohn
             public string PermitType { get; set; } = "B";
 
             public bool ChurchMember { get; set; }
-
         }
     }
 }

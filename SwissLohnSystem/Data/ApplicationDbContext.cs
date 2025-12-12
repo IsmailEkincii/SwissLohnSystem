@@ -31,33 +31,46 @@ namespace SwissLohnSystem.API.Data
                 .HasForeignKey(e => e.CompanyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // QstTariff config (opsiyonel, ama tabloyla uyumlu)
+            // QstTariff config
             modelBuilder.Entity<QstTariff>(entity =>
             {
                 entity.ToTable("QstTariffs");
 
-                entity.Property(e => e.Canton)
-                    .HasMaxLength(4)
-                    .IsRequired();
+                entity.HasKey(x => x.Id);
 
-                entity.Property(e => e.Code)
-                    .HasMaxLength(4)
-                    .IsRequired();
+                entity.Property(x => x.Canton)
+                      .IsRequired()
+                      .HasMaxLength(2);
 
-                entity.Property(e => e.PermitType)
-                    .HasMaxLength(4)
-                    .IsRequired();
+                entity.Property(x => x.Code)
+                      .IsRequired()
+                      .HasMaxLength(10);
 
-                entity.Property(e => e.IncomeFrom)
-                    .HasColumnType("decimal(18,2)");
+                entity.Property(x => x.PermitType)
+                      .IsRequired()
+                      .HasMaxLength(5);
 
-                entity.Property(e => e.IncomeTo)
-                    .HasColumnType("decimal(18,2)");
+                entity.Property(x => x.ChurchMember)
+                      .IsRequired();
 
-                entity.Property(e => e.Rate)
-                    .HasColumnType("decimal(18,4)");
+                entity.Property(x => x.IncomeFrom)
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.IncomeTo)
+                      .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Rate)
+                      .HasColumnType("decimal(18,4)");
+
+                entity.Property(x => x.Remark)
+                      .HasMaxLength(200);
+
+                // Sorgu için mantıklı index’ler
+                entity.HasIndex(x => new { x.Canton, x.Code, x.PermitType, x.ChurchMember });
+                entity.HasIndex(x => new { x.Canton, x.Code, x.PermitType, x.IncomeFrom, x.IncomeTo });
             });
         }
+
 
     }
 }

@@ -17,9 +17,7 @@
                     @if (Model.Company is not null)
                     {
                         <li class="breadcrumb-item">
-                            <a href="~/Companies/Details/@Model.Company.Id">
-                                @Model.Company.Name
-                            </a>
+                            <a href="~/Companies/Details/@Model.Company.Id">@Model.Company.Name</a>
                         </li>
                     }
                     <li class="breadcrumb-item active">Lohn abrechnen</li>
@@ -32,17 +30,13 @@
 <section class="content">
     <div class="container-fluid">
 
-        @* HATA MESAJI *@
         @if (!string.IsNullOrWhiteSpace(Model.Error))
         {
             <div class="alert alert-danger">@Model.Error</div>
         }
         else if (Model.Employee is null)
         {
-            @* Sadece Employee hiç gelmediyse göster *@
-            <div class="alert alert-warning">
-                Mitarbeiterdaten konnten nicht geladen werden.
-            </div>
+            <div class="alert alert-warning">Mitarbeiterdaten konnten nicht geladen werden.</div>
         }
         else
         {
@@ -50,7 +44,6 @@
             var co = Model.Company;
 
             <div class="row">
-                <!-- Mitarbeiter / Firma Info -->
                 <div class="col-md-4">
                     <div class="card card-outline card-primary">
                         <div class="card-header">
@@ -62,21 +55,10 @@
                                 <dd class="col-7">@e.FirstName @e.LastName</dd>
 
                                 <dt class="col-5">Firma</dt>
-                                <dd class="col-7">
-                                    @if (co is not null)
-                                    {
-                                        @co.Name
-                                    }
-                                    else
-                                    {
-                                        @:—
-                                    }
-                                </dd>
+                                <dd class="col-7">@((co is not null) ? co.Name : "—")</dd>
 
                                 <dt class="col-5">Gehaltsart</dt>
-                                <dd class="col-7">
-                                    @(e.SalaryType == "Hourly" ? "Stundenlohn" : "Monatslohn")
-                                </dd>
+                                <dd class="col-7">@(e.SalaryType == "Hourly" ? "Stundenlohn" : "Monatslohn")</dd>
 
                                 <dt class="col-5">Bruttolohn</dt>
                                 <dd class="col-7">@e.BruttoSalary.ToString("N2") CHF</dd>
@@ -91,7 +73,6 @@
                     </div>
                 </div>
 
-                <!-- FORM -->
                 <div class="col-md-8">
                     <div class="card card-outline card-success">
                         <div class="card-header">
@@ -105,202 +86,145 @@
 
                                 <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
-                                <!-- Periode & Grundlohn -->
-                                <h5>Periode & Grundlohn</h5>
+                                <h5>Periode &amp; Grundlohn</h5>
+
+                                <div class="alert alert-info">
+                                    <strong>Arbeitszeiten im Monat:</strong>
+                                    <span id="wdSummary">wird geladen…</span>
+                                </div>
+
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
                                         <label asp-for="Input.Period">Abrechnungsmonat</label>
-                                        <input asp-for="Input.Period"
-                                               type="date"
-                                               class="form-control" />
-                                        <span class="form-text text-muted">
-                                            Wählen Sie ein Datum im gewünschten Monat (z.B. 01.MM.JJJJ).
-                                        </span>
+                                        <input asp-for="Input.Period" type="date" class="form-control" />
                                         <span asp-validation-for="Input.Period" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label asp-for="Input.GrossMonthly">Bruttolohn (Monat)</label>
-                                        <input asp-for="Input.GrossMonthly"
-                                               type="number"
-                                               step="0.01"
-                                               class="form-control" />
+                                        <input asp-for="Input.GrossMonthly" type="number" step="0.01" class="form-control" />
                                         <span asp-validation-for="Input.GrossMonthly" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label asp-for="Input.WeeklyHours">Wochenstunden</label>
-                                        <input asp-for="Input.WeeklyHours"
-                                               type="number"
-                                               min="1"
-                                               max="60"
-                                               step="0.5"
-                                               class="form-control" />
+                                        <input asp-for="Input.WeeklyHours" type="number" min="1" max="60" step="0.5" class="form-control" />
                                         <span asp-validation-for="Input.WeeklyHours" class="text-danger"></span>
                                     </div>
                                 </div>
 
-                                <!-- Tage (Arbeit / Krank / Unbezahlt) -->
                                 <hr />
-                                <h5>Arbeitstage & Abwesenheiten (optional)</h5>
+                                <h5>Arbeitstage &amp; Abwesenheiten (optional)</h5>
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
                                         <label asp-for="Input.WorkedDays">Gearbeitete Tage</label>
-                                        <input asp-for="Input.WorkedDays"
-                                               type="number"
-                                               min="0"
-                                               max="31"
-                                               step="0.5"
-                                               class="form-control" />
+                                        <input asp-for="Input.WorkedDays" type="number" min="0" max="31" step="0.5" class="form-control" />
                                         <span asp-validation-for="Input.WorkedDays" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label asp-for="Input.SickDays">Krankheitstage</label>
-                                        <input asp-for="Input.SickDays"
-                                               type="number"
-                                               min="0"
-                                               max="31"
-                                               step="0.5"
-                                               class="form-control" />
+                                        <input asp-for="Input.SickDays" type="number" min="0" max="31" step="0.5" class="form-control" />
                                         <span asp-validation-for="Input.SickDays" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label asp-for="Input.UnpaidDays">Unbezahlte Tage</label>
-                                        <input asp-for="Input.UnpaidDays"
-                                               type="number"
-                                               min="0"
-                                               max="31"
-                                               step="0.5"
-                                               class="form-control" />
+                                        <input asp-for="Input.UnpaidDays" type="number" min="0" max="31" step="0.5" class="form-control" />
                                         <span asp-validation-for="Input.UnpaidDays" class="text-danger"></span>
                                     </div>
                                 </div>
 
-                                <!-- Zulagen & Abzüge -->
                                 <hr />
-                                <h5>Zulagen & Abzüge</h5>
+                                <h5>Zulagen &amp; Abzüge</h5>
                                 <div class="form-row">
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.Bonus">Bonus</label>
-                                        <input asp-for="Input.Bonus"
-                                               type="number"
-                                               step="0.01"
-                                               class="form-control" />
-                                        <span asp-validation-for="Input.Bonus" class="text-danger"></span>
+                                        <input asp-for="Input.Bonus" type="number" step="0.01" class="form-control" />
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.ExtraAllowance">Weitere Zulagen</label>
-                                        <input asp-for="Input.ExtraAllowance"
-                                               type="number"
-                                               step="0.01"
-                                               class="form-control" />
-                                        <span asp-validation-for="Input.ExtraAllowance" class="text-danger"></span>
+                                        <input asp-for="Input.ExtraAllowance" type="number" step="0.01" class="form-control" />
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.UnpaidDeduction">Unbezahlte Abzüge</label>
-                                        <input asp-for="Input.UnpaidDeduction"
-                                               type="number"
-                                               step="0.01"
-                                               class="form-control" />
-                                        <span asp-validation-for="Input.UnpaidDeduction" class="text-danger"></span>
+                                        <input asp-for="Input.UnpaidDeduction" type="number" step="0.01" class="form-control" />
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.OtherDeduction">Sonstige Abzüge</label>
-                                        <input asp-for="Input.OtherDeduction"
-                                               type="number"
-                                               step="0.01"
-                                               class="form-control" />
-                                        <span asp-validation-for="Input.OtherDeduction" class="text-danger"></span>
+                                        <input asp-for="Input.OtherDeduction" type="number" step="0.01" class="form-control" />
                                     </div>
                                 </div>
 
-                                <!-- Sozialversicherungen -->
                                 <hr />
                                 <h5>Sozialversicherungen (AN/AG Beiträge anwenden)</h5>
                                 <div class="form-row">
                                     <div class="form-group col-md-2">
                                         <div class="form-check">
-                                            <input asp-for="Input.ApplyAHV" class="form-check-input" />
-                                            <label asp-for="Input.ApplyAHV" class="form-check-label">AHV/IV/EO</label>
+                                            <input class="form-check-input" type="checkbox" name="Input.ApplyAHV" value="true" @(Model.Input.ApplyAHV ? "checked" : "") />
+                                            <label class="form-check-label">AHV/IV/EO</label>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-2">
                                         <div class="form-check">
-                                            <input asp-for="Input.ApplyALV" class="form-check-input" />
-                                            <label asp-for="Input.ApplyALV" class="form-check-label">ALV</label>
+                                            <input class="form-check-input" type="checkbox" name="Input.ApplyALV" value="true" @(Model.Input.ApplyALV ? "checked" : "") />
+                                            <label class="form-check-label">ALV</label>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-2">
                                         <div class="form-check">
-                                            <input asp-for="Input.ApplyBVG" class="form-check-input" />
-                                            <label asp-for="Input.ApplyBVG" class="form-check-label">BVG</label>
+                                            <input class="form-check-input" type="checkbox" name="Input.ApplyBVG" value="true" @(Model.Input.ApplyBVG ? "checked" : "") />
+                                            <label class="form-check-label">BVG</label>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-2">
                                         <div class="form-check">
-                                            <input asp-for="Input.ApplyNBU" class="form-check-input" />
-                                            <label asp-for="Input.ApplyNBU" class="form-check-label">NBU</label>
+                                            <input class="form-check-input" type="checkbox" name="Input.ApplyNBU" value="true" @(Model.Input.ApplyNBU ? "checked" : "") />
+                                            <label class="form-check-label">NBU</label>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-2">
                                         <div class="form-check">
-                                            <input asp-for="Input.ApplyBU" class="form-check-input" />
-                                            <label asp-for="Input.ApplyBU" class="form-check-label">BU</label>
+                                            <input class="form-check-input" type="checkbox" name="Input.ApplyBU" value="true" @(Model.Input.ApplyBU ? "checked" : "") />
+                                            <label class="form-check-label">BU</label>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-2">
                                         <div class="form-check">
-                                            <input asp-for="Input.ApplyFAK" class="form-check-input" />
-                                            <label asp-for="Input.ApplyFAK" class="form-check-label">FAK</label>
+                                            <input class="form-check-input" type="checkbox" name="Input.ApplyFAK" value="true" @(Model.Input.ApplyFAK ? "checked" : "") />
+                                            <label class="form-check-label">FAK</label>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Quellensteuer -->
                                 <hr />
-                                <h5>Quellensteuer & Kanton</h5>
+                                <h5>Quellensteuer &amp; Kanton</h5>
                                 <div class="form-row">
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.PermitType">Bewilligung</label>
-                                        <select asp-for="Input.PermitType"
-                                                class="form-control"
-                                                asp-items="Model.PermitTypes">
-                                        </select>
+                                        <select asp-for="Input.PermitType" class="form-control" asp-items="Model.PermitTypes"></select>
                                         <span asp-validation-for="Input.PermitType" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.Canton">Kanton</label>
-                                        <input asp-for="Input.Canton"
-                                               class="form-control"
-                                               maxlength="2" />
+                                        <input asp-for="Input.Canton" class="form-control" maxlength="2" />
                                         <span asp-validation-for="Input.Canton" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.WithholdingTaxCode">Quellensteuer-Tarif</label>
-                                        <select asp-for="Input.WithholdingTaxCode"
-                                                class="form-control"
-                                                asp-items="Model.QstTariffCodes"
-                                                id="QstTarifSelect">
-                                        </select>
+                                        <select asp-for="Input.WithholdingTaxCode" class="form-control" asp-items="Model.QstTariffCodes" id="QstTarifSelect"></select>
                                         <span asp-validation-for="Input.WithholdingTaxCode" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-3">
                                         <div class="form-check mt-4">
-                                            <input asp-for="Input.ApplyQST"
-                                                   class="form-check-input"
-                                                   id="ApplyQstCheckbox" />
-                                            <label asp-for="Input.ApplyQST" class="form-check-label">Quellensteuer anwenden</label>
+                                            <input class="form-check-input" type="checkbox" id="ApplyQstCheckbox" name="Input.ApplyQST" value="true" @(Model.Input.ApplyQST ? "checked" : "") />
+                                            <label class="form-check-label" for="ApplyQstCheckbox">Quellensteuer anwenden</label>
                                         </div>
                                         <div class="form-check mt-1">
-                                            <input asp-for="Input.ChurchMember" class="form-check-input" />
-                                            <label asp-for="Input.ChurchMember" class="form-check-label">Kirchensteuerpflichtig</label>
+                                            <input class="form-check-input" type="checkbox" name="Input.ChurchMember" value="true" @(Model.Input.ChurchMember ? "checked" : "") />
+                                            <label class="form-check-label">Kirchensteuerpflichtig</label>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="mt-3 d-flex gap-2">
-                                    <a class="btn btn-outline-secondary"
-                                       href="~/Employees/Details/@Model.Employee.Id#loehne">
-                                        Abbrechen
-                                    </a>
+                                    <a class="btn btn-outline-secondary" href="~/Employees/Details/@Model.Employee.Id#loehne">Abbrechen</a>
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-calculator"></i> Berechnen &amp; speichern
                                     </button>
@@ -308,14 +232,15 @@
                             </form>
                         </div>
                     </div>
-                </div> <!-- col-md-8 -->
-            </div> <!-- row -->
+                </div>
+            </div>
         }
     </div>
 </section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         (function () {
             const qstCheckbox = document.getElementById('ApplyQstCheckbox');
@@ -327,8 +252,30 @@
             }
 
             document.addEventListener('DOMContentLoaded', toggleQstSelect);
-            if (qstCheckbox) {
-                qstCheckbox.addEventListener('change', toggleQstSelect);
+            if (qstCheckbox) qstCheckbox.addEventListener('change', toggleQstSelect);
+        })();
+    </script>
+
+    <script>
+        (async function () {
+            const wdSummary = document.getElementById("wdSummary");
+            const periodInput = document.getElementById("Input_Period");
+            if (!wdSummary || !periodInput) return;
+
+            const empId = @Model.Employee.Id;
+            const period = periodInput.value;
+            if (!period) { wdSummary.innerText = "—"; return; }
+
+            const d = new Date(period);
+            const url = `/api/WorkDay/summary?employeeId=${empId}&year=${d.getFullYear()}&month=${d.getMonth()+1}`;
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) { wdSummary.innerText = "—"; return; }
+                const data = await res.json();
+                wdSummary.innerText = `${data.totalHours} h, Überstunden: ${data.totalOvertimeHours} h`;
+            } catch {
+                wdSummary.innerText = "—";
             }
         })();
     </script>

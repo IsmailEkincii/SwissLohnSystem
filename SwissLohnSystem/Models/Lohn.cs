@@ -114,5 +114,38 @@ namespace SwissLohnSystem.API.Models
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal EmployeeQst { get; set; }
+
+        // ===============================
+        //  SNAPSHOT DER AG-BEITRÄGE (YENİ)
+        // ===============================
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployerAhvIvEo { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployerAlv { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployerBu { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployerBvg { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployerFak { get; set; }
+        // ===============================
+        //  BVG PLAN SNAPSHOT (NEW)
+        // ===============================
+        [MaxLength(50)]
+        public string? BvgPlanName { get; set; } // opsiyonel (Plan adı)
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal? BvgCoordinationDeductionAnnual { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal? BvgEmployeeRate { get; set; } // normalize edilmiş 0..1
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal? BvgEmployerRate { get; set; } // normalize edilmiş 0..1
+
     }
 }

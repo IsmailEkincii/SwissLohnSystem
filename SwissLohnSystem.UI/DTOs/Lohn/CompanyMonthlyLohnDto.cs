@@ -1,0 +1,21 @@
+﻿namespace SwissLohnSystem.UI.DTOs.Lohn
+{
+    /// <summary>
+    /// Firma → Mitarbeiter → Löhne tablosu için sadeleştirilmiş DTO.
+    /// UI tablosu ile bire bir uyumludur.
+    /// </summary>
+    public class CompanyMonthlyLohnDto
+    {
+        public int Id { get; set; }                // Lohn Id
+        public int EmployeeId { get; set; }
+        public string EmployeeName { get; set; } = "";
+        public int Month { get; set; }
+        public int Year { get; set; }
+
+        public decimal BruttoSalary { get; set; }
+        public decimal TotalDeductions { get; set; }
+        public decimal NetSalary { get; set; }
+
+        public bool IsFinal { get; set; }
+    }
+}

@@ -46,11 +46,23 @@ namespace SwissLohnSystem.API.DTOs.Lohn
 
         public string? Comment { get; set; }
 
-        // --- Arbeitnehmer-Abzüge Snapshot ---
+        // --- Arbeitnehmer-Abzüge Snapshot (AN) ---
         public decimal EmployeeAhvIvEo { get; set; }
         public decimal EmployeeAlv { get; set; }
         public decimal EmployeeNbu { get; set; }
         public decimal EmployeeBvg { get; set; }
         public decimal EmployeeQst { get; set; }
+
+        // --- Arbeitgeber-Beiträge Snapshot (AG) – YENİ ---
+        public decimal EmployerAhvIvEo { get; set; }
+        public decimal EmployerAlv { get; set; }
+        public decimal EmployerBu { get; set; }
+        public decimal EmployerBvg { get; set; }
+        public decimal EmployerFak { get; set; }
+        public string? BvgPlanName { get; set; }
+        public decimal? BvgCoordinationDeductionAnnual { get; set; }
+        public decimal? BvgEmployeeRate { get; set; }
+        public decimal? BvgEmployerRate { get; set; }
+
     }
 }

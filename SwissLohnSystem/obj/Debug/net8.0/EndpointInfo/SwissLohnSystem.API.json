@@ -1,0 +1,3289 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "SwissLohnSystem API",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/Admin": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Admin.AdminCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Admin.AdminCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Admin.AdminCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Admin/{id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Admin.AdminUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Admin.AdminUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Admin.AdminUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Company": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Company"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Companies.CompanyCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Companies.CompanyCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Companies.CompanyCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Company/{id}": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Company"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Companies.CompanyUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Companies.CompanyUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Companies.CompanyUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Company"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Company/{id}/Employees": {
+      "get": {
+        "tags": [
+          "Company"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Employee/{id}": {
+      "get": {
+        "tags": [
+          "Employee"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Employee"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Employees.EmployeeUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Employees.EmployeeUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Employees.EmployeeUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Employee"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Employee": {
+      "post": {
+        "tags": [
+          "Employee"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Employees.EmployeeCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Employees.EmployeeCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Employees.EmployeeCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lohn/calc": {
+      "post": {
+        "tags": [
+          "Lohn"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Payroll.PayrollResponseDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Payroll.PayrollResponseDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Payroll.PayrollResponseDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lohn/calc-and-save": {
+      "post": {
+        "tags": [
+          "Lohn"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lohn": {
+      "get": {
+        "tags": [
+          "Lohn"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lohn/{id}": {
+      "get": {
+        "tags": [
+          "Lohn"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lohn/finalize": {
+      "post": {
+        "tags": [
+          "Lohn"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Lohn.LohnCalculateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Lohn.LohnCalculateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Lohn.LohnCalculateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lohn/by-employee/{employeeId}": {
+      "get": {
+        "tags": [
+          "Lohn"
+        ],
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lohn/by-company/{companyId}": {
+      "get": {
+        "tags": [
+          "Lohn"
+        ],
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lohn/by-company/{companyId}/monthly": {
+      "get": {
+        "tags": [
+          "Lohn"
+        ],
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.List`1[[SwissLohnSystem.API.DTOs.Lohn.CompanyMonthlyLohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.List`1[[SwissLohnSystem.API.DTOs.Lohn.CompanyMonthlyLohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.List`1[[SwissLohnSystem.API.DTOs.Lohn.CompanyMonthlyLohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Lookups/qst-tariffs": {
+      "get": {
+        "tags": [
+          "Lookups"
+        ],
+        "parameters": [
+          {
+            "name": "canton",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "permit",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "church",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Settings": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "parameters": [
+          {
+            "name": "prefix",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Settings/{name}": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Setting.SettingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Settings/qst-tariffs": {
+      "get": {
+        "tags": [
+          "Settings"
+        ],
+        "parameters": [
+          {
+            "name": "canton",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "permit",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "church",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Settings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Settings"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Qst.QstTariffDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Settings/qst-tariffs/import": {
+      "post": {
+        "tags": [
+          "Settings"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "File": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Settings/qst-tariffs/{id}": {
+      "delete": {
+        "tags": [
+          "Settings"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/WeatherForecast": {
+      "get": {
+        "tags": [
+          "WeatherForecast"
+        ],
+        "operationId": "GetWeatherForecast",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.WeatherForecast"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.WeatherForecast"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SwissLohnSystem.API.WeatherForecast"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WorkDay/Employee/{employeeId}": {
+      "get": {
+        "tags": [
+          "WorkDay"
+        ],
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WorkDay/{id}": {
+      "get": {
+        "tags": [
+          "WorkDay"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "WorkDay"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDayUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDayUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDayUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WorkDay"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WorkDay": {
+      "post": {
+        "tags": [
+          "WorkDay"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDayCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDayCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDayCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/WorkDay/summary": {
+      "get": {
+        "tags": [
+          "WorkDay"
+        ],
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDaySummaryDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDaySummaryDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDaySummaryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SwissLohnSystem.API.DTOs.Admin.AdminCreateDto": {
+        "required": [
+          "passwordHash",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "passwordHash": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Admin.AdminDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Admin.AdminUpdateDto": {
+        "required": [
+          "id",
+          "passwordHash",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "passwordHash": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Companies.CompanyCreateDto": {
+        "required": [
+          "canton",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "canton": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Companies.CompanyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Companies.CompanyUpdateDto": {
+        "required": [
+          "canton",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "canton": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "taxNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Employees.EmployeeCreateDto": {
+        "required": [
+          "companyId",
+          "firstName",
+          "lastName",
+          "salaryType",
+          "startDate"
+        ],
+        "type": "object",
+        "properties": {
+          "companyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "maxLength": 150,
+            "minLength": 0,
+            "type": "string"
+          },
+          "lastName": {
+            "maxLength": 150,
+            "minLength": 0,
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "maritalStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "childCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "salaryType": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "hourlyRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthlyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bruttoSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pensumPercent": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "overtimeRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayEligible": {
+            "type": "boolean"
+          },
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Employees.EmployeeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "companyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "maritalStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "childCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "salaryType": {
+            "type": "string",
+            "nullable": true
+          },
+          "hourlyRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthlyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bruttoSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pensumPercent": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "overtimeRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayEligible": {
+            "type": "boolean"
+          },
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Employees.EmployeeUpdateDto": {
+        "required": [
+          "companyId",
+          "firstName",
+          "id",
+          "lastName",
+          "salaryType",
+          "startDate"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "companyId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "firstName": {
+            "maxLength": 150,
+            "minLength": 0,
+            "type": "string"
+          },
+          "lastName": {
+            "maxLength": 150,
+            "minLength": 0,
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "maritalStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "childCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "salaryType": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "hourlyRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthlyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bruttoSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pensumPercent": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "overtimeRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayEligible": {
+            "type": "boolean"
+          },
+          "thirteenthEligible": {
+            "type": "boolean"
+          },
+          "thirteenthProrated": {
+            "type": "boolean"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "ahvNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "krankenkasse": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Lohn.CompanyMonthlyLohnDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employeeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bruttoSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "netSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalDeductions": {
+            "type": "number",
+            "format": "double"
+          },
+          "isFinal": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Lohn.LohnCalculateDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Lohn.LohnDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bruttoSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalDeductions": {
+            "type": "number",
+            "format": "double"
+          },
+          "netSalary": {
+            "type": "number",
+            "format": "double"
+          },
+          "childAllowance": {
+            "type": "number",
+            "format": "double"
+          },
+          "holidayAllowance": {
+            "type": "number",
+            "format": "double"
+          },
+          "overtimePay": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthlyHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "monthlyOvertimeHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "bonus": {
+            "type": "number",
+            "format": "double"
+          },
+          "extraAllowance": {
+            "type": "number",
+            "format": "double"
+          },
+          "unpaidDeduction": {
+            "type": "number",
+            "format": "double"
+          },
+          "otherDeduction": {
+            "type": "number",
+            "format": "double"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isFinal": {
+            "type": "boolean"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "holidayRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "holidayEligible": {
+            "type": "boolean"
+          },
+          "comment": {
+            "type": "string",
+            "nullable": true
+          },
+          "employeeAhvIvEo": {
+            "type": "number",
+            "format": "double"
+          },
+          "employeeAlv": {
+            "type": "number",
+            "format": "double"
+          },
+          "employeeNbu": {
+            "type": "number",
+            "format": "double"
+          },
+          "employeeBvg": {
+            "type": "number",
+            "format": "double"
+          },
+          "employeeQst": {
+            "type": "number",
+            "format": "double"
+          },
+          "employerAhvIvEo": {
+            "type": "number",
+            "format": "double"
+          },
+          "employerAlv": {
+            "type": "number",
+            "format": "double"
+          },
+          "employerBu": {
+            "type": "number",
+            "format": "double"
+          },
+          "employerBvg": {
+            "type": "number",
+            "format": "double"
+          },
+          "employerFak": {
+            "type": "number",
+            "format": "double"
+          },
+          "bvgPlanName": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgCoordinationDeductionAnnual": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "bvgEmployeeRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "bvgEmployerRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Payroll.BvgPlanDto": {
+        "type": "object",
+        "properties": {
+          "employeeRateOverride": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "employerRateOverride": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "coordinationDeductionAnnualOverride": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Payroll.MoneyBreakdownDto": {
+        "type": "object",
+        "properties": {
+          "ahV_IV_EO": {
+            "type": "number",
+            "format": "double"
+          },
+          "alv": {
+            "type": "number",
+            "format": "double"
+          },
+          "uvG_NBU": {
+            "type": "number",
+            "format": "double"
+          },
+          "bvg": {
+            "type": "number",
+            "format": "double"
+          },
+          "withholdingTax": {
+            "type": "number",
+            "format": "double"
+          },
+          "other": {
+            "type": "number",
+            "format": "double"
+          },
+          "total": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Payroll.PayrollItemDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          },
+          "basis": {
+            "type": "string",
+            "nullable": true
+          },
+          "rate": {
+            "type": "number",
+            "format": "double"
+          },
+          "side": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "period": {
+            "type": "string",
+            "format": "date"
+          },
+          "grossMonthly": {
+            "type": "number",
+            "format": "double"
+          },
+          "bonus": {
+            "type": "number",
+            "format": "double"
+          },
+          "extraAllowance": {
+            "type": "number",
+            "format": "double"
+          },
+          "unpaidDeduction": {
+            "type": "number",
+            "format": "double"
+          },
+          "otherDeduction": {
+            "type": "number",
+            "format": "double"
+          },
+          "applyAHV": {
+            "type": "boolean"
+          },
+          "applyALV": {
+            "type": "boolean"
+          },
+          "applyBVG": {
+            "type": "boolean"
+          },
+          "applyNBU": {
+            "type": "boolean"
+          },
+          "applyBU": {
+            "type": "boolean"
+          },
+          "applyFAK": {
+            "type": "boolean"
+          },
+          "applyQST": {
+            "type": "boolean"
+          },
+          "weeklyHours": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "withholdingTaxCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "bvgPlan": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.BvgPlanDto"
+          },
+          "workedDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "sickDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "unpaidDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Payroll.PayrollResponseDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "nullable": true
+          },
+          "employee": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.MoneyBreakdownDto"
+          },
+          "employer": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.MoneyBreakdownDto"
+          },
+          "netToPay": {
+            "type": "number",
+            "format": "double"
+          },
+          "employerTotalCost": {
+            "type": "number",
+            "format": "double"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.PayrollItemDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Qst.QstTariffDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "canton": {
+            "type": "string",
+            "nullable": true
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "permitType": {
+            "type": "string",
+            "nullable": true
+          },
+          "churchMember": {
+            "type": "boolean"
+          },
+          "incomeFrom": {
+            "type": "number",
+            "format": "double"
+          },
+          "incomeTo": {
+            "type": "number",
+            "format": "double"
+          },
+          "rate": {
+            "type": "number",
+            "format": "double"
+          },
+          "remark": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.Setting.SettingDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "value": {
+            "type": "number",
+            "format": "double"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.WorkDay.WorkDayCreateDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dayType": {
+            "type": "string",
+            "nullable": true
+          },
+          "hoursWorked": {
+            "type": "number",
+            "format": "double"
+          },
+          "overtimeHours": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dayType": {
+            "type": "string",
+            "nullable": true
+          },
+          "hoursWorked": {
+            "type": "number",
+            "format": "double"
+          },
+          "overtimeHours": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.WorkDay.WorkDaySummaryDto": {
+        "type": "object",
+        "properties": {
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalOvertimeHours": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.DTOs.WorkDay.WorkDayUpdateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dayType": {
+            "type": "string",
+            "nullable": true
+          },
+          "hoursWorked": {
+            "type": "number",
+            "format": "double"
+          },
+          "overtimeHours": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Admin.AdminDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Companies.CompanyDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Employees.EmployeeDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Lohn.LohnDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.Payroll.PayrollResponseDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Payroll.PayrollResponseDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Admin.AdminDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Admin.AdminDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Companies.CompanyDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Companies.CompanyDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Employees.EmployeeDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Employees.EmployeeDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Lohn.LohnDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.IEnumerable`1[[SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.WorkDay.WorkDayDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[System.Collections.Generic.List`1[[SwissLohnSystem.API.DTOs.Lohn.CompanyMonthlyLohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SwissLohnSystem.API.DTOs.Lohn.CompanyMonthlyLohnDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.Responses.ApiResponse`1[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "data": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SwissLohnSystem.API.WeatherForecast": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "temperatureC": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "temperatureF": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

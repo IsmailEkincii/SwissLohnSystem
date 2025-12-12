@@ -5,8 +5,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SwissLohnSystem.UI.DTOs.Employees;
+using SwissLohnSystem.UI.DTOs.Payroll;
 using SwissLohnSystem.UI.Services;
+using SwissLohnSystem.UI.Services.Lookups;
 
 namespace SwissLohnSystem.UI.Pages.Companies.Employees
 {
@@ -26,7 +29,14 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
 
         [TempData] public string? Toast { get; set; }
 
-        public void OnGet(int companyId)
+        // QST / Bewilligung dropdown’ları
+        public List<SelectListItem> PermitTypes { get; private set; } = new();
+        public List<SelectListItem> QstTariffCodes { get; private set; } = new();
+
+        // ==============================
+        // GET
+        // ==============================
+        public async Task OnGetAsync(int companyId)
         {
             CompanyId = companyId;
 
@@ -63,10 +73,21 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
                 ThirteenthEligible = false,
                 ThirteenthProrated = false
             };
+
+            // Dropdown kaynakları
+            PermitTypes = QstUiLookups.GetPermitTypes();
+            await LoadQstTariffsAsync(Input.Canton);
         }
 
+        // ==============================
+        // POST
+        // ==============================
         public async Task<IActionResult> OnPostAsync()
         {
+            // Dropdown’lar ModelState hatasında kaybolmasın
+            PermitTypes = QstUiLookups.GetPermitTypes();
+            await LoadQstTariffsAsync(Input.Canton);
+
             if (!ModelState.IsValid)
                 return Page();
 
@@ -109,6 +130,25 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
             if (string.IsNullOrWhiteSpace(Input.PermitType))
                 Input.PermitType = "B";
 
+            // QST seçildiyse Bewilligung + Tarif zorunlu
+            if (Input.ApplyQST)
+            {
+                if (string.IsNullOrWhiteSpace(Input.PermitType))
+                {
+                    ModelState.AddModelError(nameof(Input.PermitType),
+                        "Bitte eine Bewilligung auswählen.");
+                }
+
+                if (string.IsNullOrWhiteSpace(Input.WithholdingTaxCode))
+                {
+                    ModelState.AddModelError(nameof(Input.WithholdingTaxCode),
+                        "Bitte einen Quellensteuer-Tarif auswählen.");
+                }
+
+                if (!ModelState.IsValid)
+                    return Page();
+            }
+
             var (success, createdEmployee, message) =
                 await _api.PostAsync<EmployeeDto>("/api/Employee", Input);
 
@@ -146,6 +186,38 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
                     "Enddatum darf nicht vor dem Startdatum liegen.",
                     new[] { nameof(Input.EndDate) });
             }
+        }
+
+        // ==============================
+        // QST tariflerini API'den yükleyen helper
+        // ==============================
+        private async Task LoadQstTariffsAsync(string? canton)
+        {
+            var c = string.IsNullOrWhiteSpace(canton)
+                ? "ZH"
+                : canton.Trim().ToUpperInvariant();
+
+            var (ok, data, msg) =
+                await _api.GetAsync<List<QstTariffLookupDto>>($"/api/Lookups/qst-tariffs?canton={c}");
+
+            var list = new List<SelectListItem>
+            {
+                new SelectListItem { Value = "", Text = "-- bitte wählen --" }
+            };
+
+            if (ok && data is not null)
+            {
+                foreach (var t in data)
+                {
+                    list.Add(new SelectListItem
+                    {
+                        Value = t.Code,
+                        Text = $"{t.Code} – {t.Description}"
+                    });
+                }
+            }
+
+            QstTariffCodes = list;
         }
     }
 }

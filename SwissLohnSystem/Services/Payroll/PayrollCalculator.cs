@@ -86,6 +86,9 @@ namespace SwissLohnSystem.API.Services.Payroll
             decimal qst = 0m;
             decimal qstRate = 0m;
 
+            // 🔔 QST için ayrı bir item hazırlayacağız (bulunsun veya bulunmasın)
+            PayrollItemDto? qstItem = null;
+
             if (req.ApplyQST &&
                 !string.IsNullOrWhiteSpace(req.Canton) &&
                 !string.IsNullOrWhiteSpace(req.WithholdingTaxCode) &&
@@ -103,6 +106,32 @@ namespace SwissLohnSystem.API.Services.Payroll
                 {
                     qstRate = tariff.Rate;
                     qst = RoundStep(gross * qstRate, cfg.WithholdingRoundingStep);
+
+                    qstItem = new PayrollItemDto
+                    {
+                        Code = "QST",
+                        Title = $"Quellensteuer {tariff.Code}",
+                        Type = "deduction",
+                        Amount = qst,
+                        Basis = "Brutto",
+                        Rate = qstRate,
+                        Side = "employee"
+                    };
+                }
+                else
+                {
+                    // ❗ QST uygulanmak isteniyor ama tarif bulunamadı – uyarı kalemi
+                    qstItem = new PayrollItemDto
+                    {
+                        Code = "QST-MISS",
+                        Title = "Quellensteuer-Tarif nicht gefunden",
+                        Type = "info",
+                        Amount = 0m,
+                        Basis = "Brutto",
+                        Rate = 0m,
+                        Side = "employee"
+                    };
+                    // qst = 0 kalıyor, Employee.WithholdingTax da 0 olacak
                 }
             }
 
@@ -114,111 +143,115 @@ namespace SwissLohnSystem.API.Services.Payroll
             }
 
             // -------- Kalem listesi --------
-            var items = new List<PayrollItemDto>
-            {
-                new()
-                {
-                    Code = "AHV",
-                    Title = "AHV/IV/EO (Arbeitnehmer)",
-                    Type = "deduction",
-                    Amount = ahvEmp,
-                    Basis = "Brutto",
-                    Rate = cfg.AhvEmployee,
-                    Side = "employee"
-                },
-                new()
-                {
-                    Code = "ALV",
-                    Title = "ALV (Arbeitnehmer)",
-                    Type = "deduction",
-                    Amount = alvEmp,
-                    Basis = "Brutto bis Cap",
-                    Rate = cfg.AlvRateTotal * cfg.AlvEmployeeShare,
-                    Side = "employee"
-                },
-                new()
-                {
-                    Code = "NBU",
-                    Title = "Nichtberufsunfall (AN)",
-                    Type = "deduction",
-                    Amount = nbuEmp,
-                    Basis = "Brutto",
-                    Rate = cfg.UvgNbuEmployeeRate,
-                    Side = "employee"
-                },
-                new()
-                {
-                    Code = "BVG",
-                    Title = "BVG (Arbeitnehmer)",
-                    Type = "deduction",
-                    Amount = bvgEmp,
-                    Basis = "Koord. Lohn",
-                    // override varsa onu, yoksa global oranı göster
-                    Rate = effectiveBvgEmpRate != 0m ? effectiveBvgEmpRate : cfg.BvgEmployeeRate,
-                    Side = "employee"
-                },
-                new()
-                {
-                    Code = "QST",
-                    Title = "Quellensteuer",
-                    Type = "deduction",
-                    Amount = qst,
-                    Basis = "Tarif",
-                    Rate = qstRate,
-                    Side = "employee"
-                },
+            var items = new List<PayrollItemDto>();
 
-                new()
-                {
-                    Code = "AHV_ER",
-                    Title = "AHV/IV/EO (Arbeitgeber)",
-                    Type = "contribution",
-                    Amount = ahvEr,
-                    Basis = "Brutto",
-                    Rate = cfg.AhvEmployer,
-                    Side = "employer"
-                },
-                new()
-                {
-                    Code = "ALV_ER",
-                    Title = "ALV (Arbeitgeber)",
-                    Type = "contribution",
-                    Amount = alvEr,
-                    Basis = "Brutto bis Cap",
-                    Rate = cfg.AlvRateTotal * cfg.AlvEmployerShare,
-                    Side = "employer"
-                },
-                new()
-                {
-                    Code = "BU",
-                    Title = "Berufsunfall (AG)",
-                    Type = "contribution",
-                    Amount = buEr,
-                    Basis = "Brutto",
-                    Rate = cfg.UvgBuEmployerRate,
-                    Side = "employer"
-                },
-                new()
-                {
-                    Code = "BVG_ER",
-                    Title = "BVG (Arbeitgeber)",
-                    Type = "contribution",
-                    Amount = bvgEr,
-                    Basis = "Koord. Lohn",
-                    Rate = effectiveBvgErRate != 0m ? effectiveBvgErRate : cfg.BvgEmployerRate,
-                    Side = "employer"
-                },
-                new()
-                {
-                    Code = "FAK",
-                    Title = "Familienausgleichskasse",
-                    Type = "contribution",
-                    Amount = fakEr,
-                    Basis = "Brutto",
-                    Rate = cfg.FakEmployerRate,
-                    Side = "employer"
-                }
-            };
+            // AN tarafı (çalışan)
+            items.Add(new PayrollItemDto
+            {
+                Code = "AHV",
+                Title = "AHV/IV/EO (Arbeitnehmer)",
+                Type = "deduction",
+                Amount = ahvEmp,
+                Basis = "Brutto",
+                Rate = cfg.AhvEmployee,
+                Side = "employee"
+            });
+
+            items.Add(new PayrollItemDto
+            {
+                Code = "ALV",
+                Title = "ALV (Arbeitnehmer)",
+                Type = "deduction",
+                Amount = alvEmp,
+                Basis = "Brutto bis Cap",
+                Rate = cfg.AlvRateTotal * cfg.AlvEmployeeShare,
+                Side = "employee"
+            });
+
+            items.Add(new PayrollItemDto
+            {
+                Code = "NBU",
+                Title = "Nichtberufsunfall (AN)",
+                Type = "deduction",
+                Amount = nbuEmp,
+                Basis = "Brutto",
+                Rate = cfg.UvgNbuEmployeeRate,
+                Side = "employee"
+            });
+
+            items.Add(new PayrollItemDto
+            {
+                Code = "BVG",
+                Title = "BVG (Arbeitnehmer)",
+                Type = "deduction",
+                Amount = bvgEmp,
+                Basis = "Koord. Lohn",
+                // override varsa onu, yoksa global oranı göster
+                Rate = effectiveBvgEmpRate != 0m ? effectiveBvgEmpRate : cfg.BvgEmployeeRate,
+                Side = "employee"
+            });
+
+            // 🔥 QST kalemi: bulunduysa gerçek deduction, bulunamadıysa info satırı
+            if (qstItem is not null)
+            {
+                items.Add(qstItem);
+            }
+
+            // AG tarafı (işveren)
+            items.Add(new PayrollItemDto
+            {
+                Code = "AHV_ER",
+                Title = "AHV/IV/EO (Arbeitgeber)",
+                Type = "contribution",
+                Amount = ahvEr,
+                Basis = "Brutto",
+                Rate = cfg.AhvEmployer,
+                Side = "employer"
+            });
+
+            items.Add(new PayrollItemDto
+            {
+                Code = "ALV_ER",
+                Title = "ALV (Arbeitgeber)",
+                Type = "contribution",
+                Amount = alvEr,
+                Basis = "Brutto bis Cap",
+                Rate = cfg.AlvRateTotal * cfg.AlvEmployerShare,
+                Side = "employer"
+            });
+
+            items.Add(new PayrollItemDto
+            {
+                Code = "BU",
+                Title = "Berufsunfall (AG)",
+                Type = "contribution",
+                Amount = buEr,
+                Basis = "Brutto",
+                Rate = cfg.UvgBuEmployerRate,
+                Side = "employer"
+            });
+
+            items.Add(new PayrollItemDto
+            {
+                Code = "BVG_ER",
+                Title = "BVG (Arbeitgeber)",
+                Type = "contribution",
+                Amount = bvgEr,
+                Basis = "Koord. Lohn",
+                Rate = effectiveBvgErRate != 0m ? effectiveBvgErRate : cfg.BvgEmployerRate,
+                Side = "employer"
+            });
+
+            items.Add(new PayrollItemDto
+            {
+                Code = "FAK",
+                Title = "Familienausgleichskasse",
+                Type = "contribution",
+                Amount = fakEr,
+                Basis = "Brutto",
+                Rate = cfg.FakEmployerRate,
+                Side = "employer"
+            });
 
             // -------- Toplamlar --------
             var empDeductions = items
@@ -243,17 +276,17 @@ namespace SwissLohnSystem.API.Services.Payroll
                     ALV = alvEmp,
                     UVG_NBU = nbuEmp,
                     BVG = bvgEmp,
-                    WithholdingTax = qst,
+                    WithholdingTax = qst,  // ❗ Burada hâlâ gerçek QST tutarı (yoksa 0)
                     Other = 0m
                 },
                 Employer = new MoneyBreakdownDto
                 {
                     AHV_IV_EO = ahvEr,
                     ALV = alvEr,
-                    UVG_NBU = 0m,
+                    UVG_NBU = buEr,           // 🔥 BU (Berufsunfall) artık buraya geliyor
                     BVG = bvgEr,
                     WithholdingTax = 0m,
-                    Other = fakEr
+                    Other = fakEr             // FAK = Other
                 },
                 Items = items
             };

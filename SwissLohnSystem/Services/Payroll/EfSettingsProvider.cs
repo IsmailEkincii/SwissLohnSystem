@@ -50,7 +50,7 @@ namespace SwissLohnSystem.API.Services.Payroll
             };
         }
 
-        // 💡 Yeni: QST tarifini DB’den bul
+        // QST tarifini DB’den bul
         public QstTariff? GetQstTariff(
             string canton,
             string? code,
@@ -65,6 +65,9 @@ namespace SwissLohnSystem.API.Services.Payroll
             code = code.ToUpperInvariant();
             permitType = permitType.ToUpperInvariant();
 
+            // ✅ Kritik fix:
+            // Aynı grupta birden fazla band varsa, "grossMonthly" için en yakın alt bandı seçmek için
+            // IncomeFrom'u DESC sıralıyoruz.
             return _db.QstTariffs
                 .AsNoTracking()
                 .Where(t =>
@@ -74,7 +77,8 @@ namespace SwissLohnSystem.API.Services.Payroll
                     t.ChurchMember == churchMember &&
                     t.IncomeFrom <= grossMonthly &&
                     t.IncomeTo >= grossMonthly)
-                .OrderBy(t => t.IncomeFrom)
+                .OrderByDescending(t => t.IncomeFrom)
+                .ThenBy(t => t.IncomeTo)
                 .FirstOrDefault();
         }
     }

@@ -267,6 +267,19 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<decimal>("BruttoSalary")
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<decimal?>("BvgCoordinationDeductionAnnual")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal?>("BvgEmployeeRate")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal?>("BvgEmployerRate")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("BvgPlanName")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Canton")
                         .HasMaxLength(5)
                         .HasColumnType("nvarchar(5)");
@@ -299,6 +312,21 @@ namespace SwissLohnSystem.API.Migrations
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("EmployeeQst")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployerAhvIvEo")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployerAlv")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployerBu")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployerBvg")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployerFak")
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("ExtraAllowance")
@@ -368,16 +396,16 @@ namespace SwissLohnSystem.API.Migrations
 
                     b.Property<string>("Canton")
                         .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
 
                     b.Property<bool>("ChurchMember")
                         .HasColumnType("bit");
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<decimal>("IncomeFrom")
                         .HasColumnType("decimal(18,2)");
@@ -387,16 +415,21 @@ namespace SwissLohnSystem.API.Migrations
 
                     b.Property<string>("PermitType")
                         .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("nvarchar(4)");
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<decimal>("Rate")
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("Remark")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Canton", "Code", "PermitType", "ChurchMember");
+
+                    b.HasIndex("Canton", "Code", "PermitType", "IncomeFrom", "IncomeTo");
 
                     b.ToTable("QstTariffs", (string)null);
                 });

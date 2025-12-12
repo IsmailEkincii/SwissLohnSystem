@@ -3,6 +3,8 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using System.Net.Http.Headers;
 
 namespace SwissLohnSystem.UI.Services
 {
@@ -16,7 +18,6 @@ namespace SwissLohnSystem.UI.Services
         {
             _http = http;
 
-            // appsettings.json:  "Api": { "BaseUrl": "https://localhost:7090" }
             BaseUrl = config["Api:BaseUrl"]?.TrimEnd('/') ?? string.Empty;
 
             if (!string.IsNullOrWhiteSpace(BaseUrl))
@@ -49,35 +50,93 @@ namespace SwissLohnSystem.UI.Services
             return await ParseEnvelope<T>(resMsg);
         }
 
+        /// <summary>
+        /// CSV import gibi multipart/form-data upload işlemleri için.
+        /// </summary>
+        public async Task<(bool ok, T? data, string? message)> PostMultipartAsync<T>(
+            string url,
+            IFormFile file,
+            string formFieldName = "File") where T : class
+        {
+            if (file is null || file.Length == 0)
+                return (false, null, "Datei ist leer oder fehlt.");
+
+            using var form = new MultipartFormDataContent();
+
+            await using var stream = file.OpenReadStream();
+            var fileContent = new StreamContent(stream);
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType ?? "text/csv");
+
+            form.Add(fileContent, formFieldName, file.FileName);
+
+            var resMsg = await _http.PostAsync(url, form);
+            return await ParseEnvelope<T>(resMsg);
+        }
+
         private static async Task<(bool ok, T? data, string? message)> ParseEnvelope<T>(HttpResponseMessage resMsg) where T : class
         {
-            ApiEnvelope<T>? env = null;
             string? raw = null;
 
             try
             {
-                // Önce JSON dene
-                env = await resMsg.Content.ReadFromJsonAsync<ApiEnvelope<T>>();
+                raw = await resMsg.Content.ReadAsStringAsync();
             }
             catch
             {
-                // JSON değilse düz metni al
-                try { raw = await resMsg.Content.ReadAsStringAsync(); } catch { /* ignore */ }
             }
 
-            var success = resMsg.IsSuccessStatusCode && env?.Success == true;
-            if (success) return (true, env!.Data, env.Message);
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                var ok = resMsg.IsSuccessStatusCode;
+                return (ok, null, resMsg.ReasonPhrase);
+            }
 
-            // Hata mesajı üret
-            var msg =
-                env?.Message
-                ?? raw
-                ?? $"{(int)resMsg.StatusCode} {resMsg.ReasonPhrase}";
+            var trimmed = raw.TrimStart();
 
-            return (false, env?.Data, msg);
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            if (trimmed.StartsWith("["))
+            {
+                try
+                {
+                    var direct = JsonSerializer.Deserialize<T>(raw, jsonOptions);
+                    return (resMsg.IsSuccessStatusCode, direct, resMsg.IsSuccessStatusCode ? null : resMsg.ReasonPhrase);
+                }
+                catch (Exception ex)
+                {
+                    return (false, null, $"JSON parse error (array): {ex.Message}");
+                }
+            }
+
+            try
+            {
+                var env = JsonSerializer.Deserialize<ApiEnvelope<T>>(raw, jsonOptions);
+
+                if (env is not null)
+                {
+                    var success = resMsg.IsSuccessStatusCode && env.Success;
+                    var msg = env.Message ?? resMsg.ReasonPhrase;
+                    return (success, env.Data, msg);
+                }
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                var direct = JsonSerializer.Deserialize<T>(raw, jsonOptions);
+                return (resMsg.IsSuccessStatusCode, direct, resMsg.IsSuccessStatusCode ? null : resMsg.ReasonPhrase);
+            }
+            catch (Exception ex)
+            {
+                return (false, null, $"JSON parse error: {ex.Message}");
+            }
         }
 
-        // API'nin standardı
         private sealed class ApiEnvelope<T>
         {
             public bool Success { get; set; }

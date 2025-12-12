@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models; // ?? eklendi
+ï»¿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using SwissLohnSystem.API.Data;
 using SwissLohnSystem.API.Services.Payroll;
 
@@ -15,13 +15,18 @@ var connStr =
     builder.Configuration.GetConnectionString("Default") ??
     throw new InvalidOperationException("Connection string not found.");
 
-// Controllers + JSON (DateOnly/TimeOnly)
+// Controllers + JSON (DateOnly/TimeOnly + Enum as string)
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
     {
+        o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+
+        // âœ… enums: "Work" gibi string deÄŸerleri kabul etsin
         o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-        o.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());  // ?? eklendi
-        o.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());  // ?? eklendi
+
+        // DateOnly/TimeOnly
+        o.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
+        o.JsonSerializerOptions.Converters.Add(new TimeOnlyJsonConverter());
     });
 
 // DbContext
@@ -38,23 +43,26 @@ builder.Services.AddCors(opt =>
     );
 });
 
-// Swagger + DateOnly/TimeOnly eþlemeleri
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "SwissLohnSystem API", Version = "v1" });
-    // ?? Swagger þema üretimi için gerekli map’ler
-    c.MapType<DateOnly>(() => new OpenApiSchema { Type = "string", Format = "date" });
-    c.MapType<TimeOnly>(() => new OpenApiSchema { Type = "string", Format = "time" });
 
-    // Çakýþan route varsa (ayný method+path), en azýndan build etsin:
-    // c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); // gerekirse aç
+    // DateOnly/TimeOnly ÅŸema eÅŸlemeleri
+    c.MapType<DateOnly>(() => new Microsoft.OpenApi.Models.OpenApiSchema { Type = "string", Format = "date" });
+    c.MapType<TimeOnly>(() => new Microsoft.OpenApi.Models.OpenApiSchema { Type = "string", Format = "time" });
+
+    // Swagger sigortalarÄ±
+    c.CustomSchemaIds(t => t.FullName);
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
