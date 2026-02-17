@@ -1,587 +1,271 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SwissLohnSystem.API.Data;
+using SwissLohnSystem.API.DTOs.Payroll;
 using SwissLohnSystem.API.DTOs.Qst;
 using SwissLohnSystem.API.DTOs.Setting;
+using SwissLohnSystem.API.Mappings;
 using SwissLohnSystem.API.Models;
-using System.Globalization;
-using System.Text;
+using SwissLohnSystem.API.Responses;
 
-[Route("api/[controller]")]
-[ApiController]
-public class SettingsController : ControllerBase
+namespace SwissLohnSystem.API.Controllers
 {
-    private static readonly string[] AllowedPrefixes = { "AHV.", "ALV.", "UVG.", "BVG.", "FAK.", "Rounding.", "QST." };
-
-    private readonly ApplicationDbContext _db;
-    public SettingsController(ApplicationDbContext db) => _db = db;
-
-    // ======================
-    // SETTINGS
-    // ======================
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<SettingDto>>> GetAll(
-        [FromQuery] string? prefix = null,
-        CancellationToken ct = default)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SettingsController : ControllerBase
     {
-        var q = _db.Settings.AsNoTracking();
-        if (!string.IsNullOrWhiteSpace(prefix))
+        private readonly ApplicationDbContext _db;
+        public SettingsController(ApplicationDbContext db) => _db = db;
+
+        // =========================
+        // SETTINGS (company-scoped)
+        // =========================
+        [HttpGet]
+        public async Task<ActionResult<ApiResponse<List<SettingDto>>>> Get([FromQuery] int companyId)
         {
-            var p = prefix.Trim();
-            q = q.Where(s => s.Name.StartsWith(p));
+            if (companyId <= 0) return BadRequest(ApiResponse<List<SettingDto>>.Fail("companyId required."));
+
+            var list = await _db.Settings.AsNoTracking()
+                .Where(x => x.CompanyId == companyId)
+                .OrderBy(x => x.Name)
+                .Select(x => x.ToDto())
+                .ToListAsync();
+
+            return Ok(ApiResponse<List<SettingDto>>.Ok(list));
         }
 
-        var data = await q
-            .OrderBy(s => s.Name)
-            .Select(s => new SettingDto
+        [HttpPut]
+        public async Task<ActionResult<ApiResponse<object>>> UpsertBulk([FromQuery] int companyId, [FromBody] List<SettingUpsertDto> items)
+        {
+            if (companyId <= 0) return BadRequest(ApiResponse<object>.Fail("companyId required."));
+            items ??= new();
+
+            foreach (var it in items)
             {
-                Id = s.Id,
-                Name = s.Name,
-                Value = s.Value,
-                Description = s.Description
-            })
-            .ToListAsync(ct);
-
-        return Ok(data);
-    }
-
-    [HttpGet("{name}")]
-    public async Task<ActionResult<SettingDto>> GetOne(string name, CancellationToken ct = default)
-    {
-        var key = name.Trim();
-        var s = await _db.Settings.AsNoTracking().FirstOrDefaultAsync(x => x.Name == key, ct);
-        if (s is null) return NotFound();
-
-        return Ok(new SettingDto
-        {
-            Id = s.Id,
-            Name = s.Name,
-            Value = s.Value,
-            Description = s.Description
-        });
-    }
-
-    [HttpPut("{name}")]
-    public async Task<IActionResult> UpsertOne(
-        string name,
-        [FromBody] SettingDto dto,
-        CancellationToken ct = default)
-    {
-        if (dto is null) return BadRequest("Body required.");
-
-        var key = (dto.Name ?? "").Trim();
-        if (!string.Equals(name.Trim(), key, StringComparison.OrdinalIgnoreCase))
-            return BadRequest("Name mismatch.");
-        if (!IsValidKey(key)) return BadRequest("Invalid key.");
-        if (!IsValidValue(key, dto.Value)) return BadRequest("Invalid value.");
-
-        var s = await _db.Settings.FirstOrDefaultAsync(x => x.Name == key, ct);
-        if (s is null)
-        {
-            _db.Settings.Add(new Setting
-            {
-                Name = key,
-                Value = dto.Value,
-                Description = Clean(dto.Description)
-            });
-        }
-        else
-        {
-            s.Value = dto.Value;
-            s.Description = Clean(dto.Description);
-        }
-
-        await _db.SaveChangesAsync(ct);
-        return NoContent();
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> BulkUpsert(
-        [FromBody] IEnumerable<SettingDto> dtos,
-        CancellationToken ct = default)
-    {
-        if (dtos is null) return BadRequest("Body required.");
-
-        var list = dtos
-            .Where(d => d is not null && !string.IsNullOrWhiteSpace(d.Name))
-            .Select(d => new SettingDto
-            {
-                Name = d.Name!.Trim(),
-                Value = d.Value,
-                Description = Clean(d.Description)
-            })
-            .ToList();
-
-        if (list.Count == 0) return BadRequest("No items.");
-
-        foreach (var d in list)
-        {
-            if (!IsValidKey(d.Name)) return BadRequest($"Invalid key: {d.Name}");
-            if (!IsValidValue(d.Name, d.Value)) return BadRequest($"Invalid value for {d.Name}");
-        }
-
-        var names = list.Select(d => d.Name).Distinct().ToList();
-        var existing = await _db.Settings.Where(s => names.Contains(s.Name)).ToListAsync(ct);
-        var map = existing.ToDictionary(s => s.Name, StringComparer.OrdinalIgnoreCase);
-
-        foreach (var d in list)
-        {
-            if (map.TryGetValue(d.Name, out var s))
-            {
-                s.Value = d.Value;
-                s.Description = d.Description;
+                if (string.IsNullOrWhiteSpace(it.Name))
+                    return BadRequest(ApiResponse<object>.Fail("Setting name required."));
             }
-            else
+
+            var existing = await _db.Settings
+                .Where(x => x.CompanyId == companyId)
+                .ToDictionaryAsync(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var dto in items)
             {
-                _db.Settings.Add(new Setting
+                var key = dto.Name.Trim();
+                if (existing.TryGetValue(key, out var ent))
                 {
-                    Name = d.Name,
-                    Value = d.Value,
-                    Description = d.Description
-                });
-            }
-        }
-
-        await _db.SaveChangesAsync(ct);
-        return NoContent();
-    }
-
-    // ============================
-    // QST Tariffs
-    // ============================
-
-    [HttpGet("qst-tariffs")]
-    public async Task<ActionResult<IEnumerable<QstTariffDto>>> GetQstTariffs(
-        [FromQuery] string? canton = null,
-        [FromQuery] string? code = null,
-        [FromQuery] string? permit = null,
-        [FromQuery] bool? church = null,
-        CancellationToken ct = default)
-    {
-        var q = _db.QstTariffs.AsNoTracking();
-
-        if (!string.IsNullOrWhiteSpace(canton))
-        {
-            var c = canton.Trim().ToUpperInvariant();
-            q = q.Where(t => t.Canton == c);
-        }
-
-        if (!string.IsNullOrWhiteSpace(code))
-        {
-            var c = code.Trim().ToUpperInvariant();
-            q = q.Where(t => t.Code == c);
-        }
-
-        if (!string.IsNullOrWhiteSpace(permit))
-        {
-            var p = permit.Trim().ToUpperInvariant();
-            q = q.Where(t => t.PermitType == p);
-        }
-
-        if (church.HasValue)
-        {
-            q = q.Where(t => t.ChurchMember == church.Value);
-        }
-
-        var list = await q
-            .OrderBy(t => t.Canton)
-            .ThenBy(t => t.Code)
-            .ThenBy(t => t.PermitType)
-            .ThenBy(t => t.ChurchMember)
-            .ThenBy(t => t.IncomeFrom)
-            .Select(t => new QstTariffDto
-            {
-                Id = t.Id,
-                Canton = t.Canton,
-                Code = t.Code,
-                PermitType = t.PermitType,
-                ChurchMember = t.ChurchMember,
-                IncomeFrom = t.IncomeFrom,
-                IncomeTo = t.IncomeTo,
-                Rate = t.Rate,
-                Remark = t.Remark
-            })
-            .ToListAsync(ct);
-
-        return Ok(list);
-    }
-
-    [HttpPost("qst-tariffs")]
-    public async Task<IActionResult> UpsertQstTariff(
-        [FromBody] QstTariffDto dto,
-        CancellationToken ct = default)
-    {
-        if (dto is null)
-            return BadRequest("Body required.");
-
-        dto.Canton = (dto.Canton ?? "").Trim().ToUpperInvariant();
-        dto.Code = (dto.Code ?? "").Trim().ToUpperInvariant();
-        dto.PermitType = (dto.PermitType ?? "").Trim().ToUpperInvariant();
-        dto.Remark = string.IsNullOrWhiteSpace(dto.Remark) ? null : dto.Remark.Trim();
-
-        if (string.IsNullOrWhiteSpace(dto.Canton)
-            || string.IsNullOrWhiteSpace(dto.Code)
-            || string.IsNullOrWhiteSpace(dto.PermitType))
-        {
-            return BadRequest("Canton, Code und PermitType sind erforderlich.");
-        }
-
-        if (dto.IncomeFrom < 0 || dto.IncomeTo < dto.IncomeFrom)
-            return BadRequest("Ungültiger Einkommensbereich (IncomeFrom/IncomeTo).");
-
-        if (dto.Rate < 0)
-            return BadRequest("Rate darf nicht negativ sein.");
-
-        QstTariff entity;
-
-        if (dto.Id > 0)
-        {
-            entity = await _db.QstTariffs.FirstOrDefaultAsync(t => t.Id == dto.Id, ct);
-            if (entity is null)
-                return NotFound($"QST-Tarif mit Id={dto.Id} wurde nicht gefunden.");
-        }
-        else
-        {
-            entity = new QstTariff();
-            _db.QstTariffs.Add(entity);
-        }
-
-        entity.Canton = dto.Canton;
-        entity.Code = dto.Code;
-        entity.PermitType = dto.PermitType;
-        entity.ChurchMember = dto.ChurchMember;
-        entity.IncomeFrom = dto.IncomeFrom;
-        entity.IncomeTo = dto.IncomeTo;
-        entity.Rate = dto.Rate;
-        entity.Remark = dto.Remark;
-
-        await _db.SaveChangesAsync(ct);
-
-        dto.Id = entity.Id;
-        return Ok(dto);
-    }
-
-    [HttpPut("qst-tariffs")]
-    public async Task<IActionResult> BulkUpsertQstTariffs(
-        [FromBody] IEnumerable<QstTariffDto> dtos,
-        CancellationToken ct = default)
-    {
-        if (dtos is null)
-            return BadRequest("Body required.");
-
-        var list = dtos
-            .Where(d => d is not null)
-            .Select(d =>
-            {
-                d.Canton = (d.Canton ?? "").Trim().ToUpperInvariant();
-                d.Code = (d.Code ?? "").Trim().ToUpperInvariant();
-                d.PermitType = (d.PermitType ?? "").Trim().ToUpperInvariant();
-                d.Remark = string.IsNullOrWhiteSpace(d.Remark) ? null : d.Remark.Trim();
-                return d;
-            })
-            .Where(d =>
-                !string.IsNullOrWhiteSpace(d.Canton) &&
-                !string.IsNullOrWhiteSpace(d.Code) &&
-                !string.IsNullOrWhiteSpace(d.PermitType))
-            .ToList();
-
-        if (list.Count == 0)
-            return BadRequest("No items.");
-
-        foreach (var d in list)
-        {
-            if (d.IncomeFrom < 0 || d.IncomeTo < d.IncomeFrom)
-                return BadRequest($"Ungültiger Einkommensbereich für {d.Canton} {d.Code}.");
-
-            if (d.Rate < 0)
-                return BadRequest($"Rate darf nicht negativ sein ({d.Canton} {d.Code}).");
-        }
-
-        var ids = list.Where(d => d.Id > 0).Select(d => d.Id).ToList();
-        var existing = await _db.QstTariffs
-            .Where(t => ids.Contains(t.Id))
-            .ToListAsync(ct);
-
-        var mapById = existing.ToDictionary(t => t.Id);
-
-        foreach (var d in list)
-        {
-            if (d.Id > 0 && mapById.TryGetValue(d.Id, out var e))
-            {
-                e.Canton = d.Canton;
-                e.Code = d.Code;
-                e.PermitType = d.PermitType;
-                e.ChurchMember = d.ChurchMember;
-                e.IncomeFrom = d.IncomeFrom;
-                e.IncomeTo = d.IncomeTo;
-                e.Rate = d.Rate;
-                e.Remark = d.Remark;
-            }
-            else
-            {
-                var newEntity = new QstTariff
-                {
-                    Canton = d.Canton!,
-                    Code = d.Code!,
-                    PermitType = d.PermitType!,
-                    ChurchMember = d.ChurchMember,
-                    IncomeFrom = d.IncomeFrom,
-                    IncomeTo = d.IncomeTo,
-                    Rate = d.Rate,
-                    Remark = d.Remark
-                };
-                _db.QstTariffs.Add(newEntity);
-            }
-        }
-
-        await _db.SaveChangesAsync(ct);
-        return NoContent();
-    }
-
-    // ✅ Swagger ile uyumlu multipart/form-data model
-    public sealed class QstTariffImportForm
-    {
-        public IFormFile? File { get; set; }
-    }
-
-    // POST /api/Settings/qst-tariffs/import
-    [HttpPost("qst-tariffs/import")]
-    [Consumes("multipart/form-data")]
-    [RequestSizeLimit(50_000_000)]
-    public async Task<IActionResult> ImportQstTariffsCsv(
-        [FromForm] QstTariffImportForm form,
-        CancellationToken ct = default)
-    {
-        var file = form?.File;
-
-        if (file is null || file.Length == 0)
-            return BadRequest("CSV file required.");
-
-        string csv;
-        using (var sr = new StreamReader(file.OpenReadStream(), Encoding.UTF8, detectEncodingFromByteOrderMarks: true))
-            csv = await sr.ReadToEndAsync(ct);
-
-        var lines = csv
-            .Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => x.Trim())
-            .Where(x => x.Length > 0)
-            .ToList();
-
-        if (lines.Count == 0)
-            return BadRequest("CSV is empty.");
-
-        var sample = lines[0];
-        var delim = sample.Contains(';') ? ';' : ',';
-
-        bool IsHeader(string ln)
-        {
-            var l = ln.ToLowerInvariant();
-            return l.Contains("canton") || l.Contains("permit") || l.Contains("income") || l.Contains("church") || l.Contains("rate");
-        }
-
-        int start = IsHeader(lines[0]) ? 1 : 0;
-        if (start >= lines.Count)
-            return BadRequest("CSV has only header.");
-
-        var parsed = new List<QstTariffDto>();
-        for (int i = start; i < lines.Count; i++)
-        {
-            var ln = lines[i];
-            var cols = SplitCsvLine(ln, delim);
-
-            if (cols.Count < 7)
-                return BadRequest($"Invalid CSV row at line {i + 1}: expected >= 7 columns.");
-
-            var dto = new QstTariffDto();
-
-            dto.Canton = (cols[0] ?? "").Trim().ToUpperInvariant();
-            dto.Code = (cols[1] ?? "").Trim().ToUpperInvariant();
-            dto.PermitType = (cols[2] ?? "").Trim().ToUpperInvariant();
-
-            if (string.IsNullOrWhiteSpace(dto.Canton) ||
-                string.IsNullOrWhiteSpace(dto.Code) ||
-                string.IsNullOrWhiteSpace(dto.PermitType))
-            {
-                return BadRequest($"Invalid CSV row at line {i + 1}: Canton/Code/PermitType required.");
-            }
-
-            dto.ChurchMember = ParseBool(cols[3]);
-
-            dto.IncomeFrom = ParseDecimal(cols[4], $"IncomeFrom (line {i + 1})");
-            dto.IncomeTo = ParseDecimal(cols[5], $"IncomeTo (line {i + 1})");
-            if (dto.IncomeFrom < 0 || dto.IncomeTo < dto.IncomeFrom)
-                return BadRequest($"Invalid income range at line {i + 1}.");
-
-            dto.Rate = ParseDecimal(cols[6], $"Rate (line {i + 1})");
-            dto.Rate = NormalizeRate(dto.Rate);
-            if (dto.Rate < 0)
-                return BadRequest($"Rate darf nicht negativ sein (line {i + 1}).");
-
-            dto.Remark = cols.Count >= 8 ? Clean(cols[7]) : null;
-
-            parsed.Add(dto);
-        }
-
-        if (parsed.Count == 0)
-            return BadRequest("No valid rows.");
-
-        var groups = parsed
-            .GroupBy(x => new { x.Canton, x.Code, x.PermitType, x.ChurchMember })
-            .ToList();
-
-        await using var tx = await _db.Database.BeginTransactionAsync(ct);
-
-        foreach (var g in groups)
-        {
-            var toDelete = await _db.QstTariffs
-                .Where(t =>
-                    t.Canton == g.Key.Canton &&
-                    t.Code == g.Key.Code &&
-                    t.PermitType == g.Key.PermitType &&
-                    t.ChurchMember == g.Key.ChurchMember)
-                .ToListAsync(ct);
-
-            if (toDelete.Count > 0)
-                _db.QstTariffs.RemoveRange(toDelete);
-
-            foreach (var d in g.OrderBy(x => x.IncomeFrom))
-            {
-                _db.QstTariffs.Add(new QstTariff
-                {
-                    Canton = d.Canton!,
-                    Code = d.Code!,
-                    PermitType = d.PermitType!,
-                    ChurchMember = d.ChurchMember,
-                    IncomeFrom = d.IncomeFrom,
-                    IncomeTo = d.IncomeTo,
-                    Rate = d.Rate,
-                    Remark = d.Remark
-                });
-            }
-        }
-
-        await _db.SaveChangesAsync(ct);
-        await tx.CommitAsync(ct);
-
-        return Ok(new
-        {
-            imported = parsed.Count,
-            groups = groups.Count
-        });
-    }
-
-    [HttpDelete("qst-tariffs/{id:int}")]
-    public async Task<IActionResult> DeleteQstTariff(int id, CancellationToken ct = default)
-    {
-        var entity = await _db.QstTariffs.FirstOrDefaultAsync(t => t.Id == id, ct);
-        if (entity is null)
-            return NotFound();
-
-        _db.QstTariffs.Remove(entity);
-        await _db.SaveChangesAsync(ct);
-        return NoContent();
-    }
-
-    // --- helpers ---
-    private static string? Clean(string? s) =>
-        string.IsNullOrWhiteSpace(s) ? null : s.Trim();
-
-    private static bool IsValidKey(string key) =>
-        AllowedPrefixes.Any(p => key.StartsWith(p, StringComparison.Ordinal));
-
-    private static bool IsValidValue(string key, decimal value)
-    {
-        if (key.StartsWith("Rounding.", StringComparison.Ordinal))
-            return value == 0.01m || value == 0.05m;
-
-        if (key is "ALV.CapAnnual"
-            or "BVG.EntryThresholdAnnual"
-            or "BVG.CoordinationDedAnnual"
-            or "BVG.UpperLimitAnnual")
-            return value >= 0;
-
-        return value >= 0;
-    }
-
-    private static decimal NormalizeRate(decimal r)
-    {
-        if (r < 0m) return r;
-        if (r > 1m) r = r / 100m;
-        return r;
-    }
-
-    private static bool ParseBool(string? s)
-    {
-        if (string.IsNullOrWhiteSpace(s)) return false;
-        var v = s.Trim().ToLowerInvariant();
-
-        return v switch
-        {
-            "1" => true,
-            "true" => true,
-            "yes" => true,
-            "y" => true,
-            "ja" => true,
-            "t" => true,
-            _ => false
-        };
-    }
-
-    private static decimal ParseDecimal(string? s, string fieldName)
-    {
-        if (string.IsNullOrWhiteSpace(s))
-            throw new InvalidOperationException($"{fieldName} is empty.");
-
-        var raw = s.Trim();
-
-        if (decimal.TryParse(raw, NumberStyles.Number, CultureInfo.InvariantCulture, out var a))
-            return a;
-
-        if (decimal.TryParse(raw, NumberStyles.Number, CultureInfo.GetCultureInfo("de-CH"), out var b))
-            return b;
-
-        raw = raw.Replace(',', '.');
-        if (decimal.TryParse(raw, NumberStyles.Number, CultureInfo.InvariantCulture, out var c))
-            return c;
-
-        throw new InvalidOperationException($"{fieldName} invalid decimal: '{s}'.");
-    }
-
-    private static List<string?> SplitCsvLine(string line, char delim)
-    {
-        var res = new List<string?>();
-        var sb = new StringBuilder();
-        bool inQuotes = false;
-
-        for (int i = 0; i < line.Length; i++)
-        {
-            var ch = line[i];
-
-            if (ch == '"')
-            {
-                if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
-                {
-                    sb.Append('"');
-                    i++;
-                    continue;
+                    ent.ApplyUpsert(dto);
                 }
-
-                inQuotes = !inQuotes;
-                continue;
+                else
+                {
+                    var n = new Setting { CompanyId = companyId, Name = key };
+                    n.ApplyUpsert(dto);
+                    _db.Settings.Add(n);
+                }
             }
 
-            if (!inQuotes && ch == delim)
-            {
-                res.Add(sb.ToString());
-                sb.Clear();
-                continue;
-            }
-
-            sb.Append(ch);
+            await _db.SaveChangesAsync();
+            return Ok(ApiResponse<object>.Ok(new { updated = items.Count }, "Settings saved."));
         }
 
-        res.Add(sb.ToString());
-        return res;
+        // =========================
+        // QST TARIFFS (company-scoped)
+        // =========================
+        [HttpGet("qst-tariffs")]
+        public async Task<ActionResult<ApiResponse<List<QstTariffDto>>>> GetQst([FromQuery] int companyId)
+        {
+            if (companyId <= 0) return BadRequest(ApiResponse<List<QstTariffDto>>.Fail("companyId required."));
+
+            var list = await _db.QstTariffs.AsNoTracking()
+                .Where(x => x.CompanyId == companyId)
+                .OrderBy(x => x.Canton).ThenBy(x => x.Code).ThenBy(x => x.PermitType).ThenBy(x => x.ChurchMember).ThenBy(x => x.IncomeFrom)
+                .Select(x => new QstTariffDto
+                {
+                    Id = x.Id,
+                    CompanyId = x.CompanyId,
+                    Canton = x.Canton,
+                    Code = x.Code,
+                    PermitType = x.PermitType,
+                    ChurchMember = x.ChurchMember,
+                    IncomeFrom = x.IncomeFrom,
+                    IncomeTo = x.IncomeTo,
+                    Rate = x.Rate,
+                    Remark = x.Remark
+                })
+                .ToListAsync();
+
+            return Ok(ApiResponse<List<QstTariffDto>>.Ok(list));
+        }
+
+        [HttpPost("qst-tariffs")]
+        public async Task<ActionResult<ApiResponse<QstTariffDto>>> CreateQst([FromQuery] int companyId, [FromBody] QstTariffDto dto)
+        {
+            if (companyId <= 0) return BadRequest(ApiResponse<QstTariffDto>.Fail("companyId required."));
+
+            dto.Canton = (dto.Canton ?? "ZH").Trim().ToUpperInvariant();
+            dto.Code = dto.Code.Trim().ToUpperInvariant();
+            dto.PermitType = (dto.PermitType ?? "B").Trim().ToUpperInvariant();
+
+            if (dto.IncomeFrom < 0 || dto.IncomeTo < dto.IncomeFrom)
+                return BadRequest(ApiResponse<QstTariffDto>.Fail("Invalid income range."));
+
+            if (dto.Rate < 0)
+                return BadRequest(ApiResponse<QstTariffDto>.Fail("Rate must be >= 0."));
+
+
+            var ent = new QstTariff
+            {
+                CompanyId = companyId,
+                Canton = dto.Canton,
+                Code = dto.Code,
+                PermitType = dto.PermitType,
+                ChurchMember = dto.ChurchMember,
+                IncomeFrom = dto.IncomeFrom,
+                IncomeTo = dto.IncomeTo,
+                Rate = dto.Rate,
+                Remark = string.IsNullOrWhiteSpace(dto.Remark) ? null : dto.Remark.Trim()
+            };
+
+            _db.QstTariffs.Add(ent);
+            await _db.SaveChangesAsync();
+
+            dto.Id = ent.Id;
+            dto.CompanyId = companyId;
+
+            return Ok(ApiResponse<QstTariffDto>.Ok(dto, "QST created."));
+        }
+
+        [HttpPut("qst-tariffs")]
+        public async Task<ActionResult<ApiResponse<object>>> SaveQst([FromQuery] int companyId, [FromBody] List<QstTariffDto> items)
+        {
+            if (companyId <= 0) return BadRequest(ApiResponse<object>.Fail("companyId required."));
+            items ??= new();
+
+            var ids = items.Where(x => x.Id > 0).Select(x => x.Id).Distinct().ToList();
+            var existing = await _db.QstTariffs.Where(x => x.CompanyId == companyId && ids.Contains(x.Id)).ToListAsync();
+            var map = existing.ToDictionary(x => x.Id);
+
+            foreach (var dto in items)
+            {
+                if (dto.Id <= 0) continue;
+                if (!map.TryGetValue(dto.Id, out var ent)) continue;
+
+                ent.Canton = (dto.Canton ?? "ZH").Trim().ToUpperInvariant();
+                ent.Code = dto.Code.Trim().ToUpperInvariant();
+                ent.PermitType = (dto.PermitType ?? "B").Trim().ToUpperInvariant();
+                ent.ChurchMember = dto.ChurchMember;
+                ent.IncomeFrom = dto.IncomeFrom;
+                ent.IncomeTo = dto.IncomeTo;
+                ent.Rate = dto.Rate;
+                ent.Remark = string.IsNullOrWhiteSpace(dto.Remark) ? null : dto.Remark.Trim();
+            }
+
+            await _db.SaveChangesAsync();
+            return Ok(ApiResponse<object>.Ok(new { updated = existing.Count }, "QST saved."));
+        }
+
+        [HttpDelete("qst-tariffs/{id:int}")]
+        public async Task<ActionResult<ApiResponse<object>>> DeleteQst(int id, [FromQuery] int companyId)
+        {
+            if (companyId <= 0) return BadRequest(ApiResponse<object>.Fail("companyId required."));
+
+            var ent = await _db.QstTariffs.FirstOrDefaultAsync(x => x.Id == id && x.CompanyId == companyId);
+            if (ent is null) return NotFound(ApiResponse<object>.Fail("Not found."));
+
+            _db.QstTariffs.Remove(ent);
+            await _db.SaveChangesAsync();
+            return Ok(ApiResponse<object>.Ok(new { deleted = id }, "Deleted."));
+        }
+
+        // =========================
+        // BVG PLANS (company-scoped)
+        // =========================
+        [HttpGet("bvg-plans")]
+        public async Task<ActionResult<ApiResponse<List<BvgPlanListItemDto>>>> GetBvgPlans([FromQuery] int companyId)
+        {
+            if (companyId <= 0) return BadRequest(ApiResponse<List<BvgPlanListItemDto>>.Fail("companyId required."));
+
+            var list = await _db.BvgPlans.AsNoTracking()
+                .Where(x => x.CompanyId == companyId)
+                .OrderByDescending(x => x.Year).ThenBy(x => x.PlanCode)
+                .Select(x => new BvgPlanListItemDto { Code = x.PlanCode, Year = x.Year, Name = x.PlanBaseCode })
+                .ToListAsync();
+
+            return Ok(ApiResponse<List<BvgPlanListItemDto>>.Ok(list));
+        }
+
+        [HttpGet("bvg-plans/{planCode}")]
+        public async Task<ActionResult<ApiResponse<BvgPlanDetailDto>>> GetBvgPlan([FromRoute] string planCode, [FromQuery] int companyId)
+        {
+            if (companyId <= 0) return BadRequest(ApiResponse<BvgPlanDetailDto>.Fail("companyId required."));
+
+            planCode = planCode.Trim().ToUpperInvariant();
+
+            var p = await _db.BvgPlans.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CompanyId == companyId && x.PlanCode == planCode);
+
+            if (p is null) return NotFound(ApiResponse<BvgPlanDetailDto>.Fail("BVG plan not found."));
+
+            var dto = new BvgPlanDetailDto
+            {
+                CompanyId = p.CompanyId,
+                PlanCode = p.PlanCode,
+                PlanBaseCode = p.PlanBaseCode,
+                Year = p.Year,
+                CoordinationDedAnnual = p.CoordinationDedAnnual,
+                EntryThresholdAnnual = p.EntryThresholdAnnual,
+                UpperLimitAnnual = p.UpperLimitAnnual,
+                Rate25_34_Employee = p.Rate25_34_Employee,
+                Rate25_34_Employer = p.Rate25_34_Employer,
+                Rate35_44_Employee = p.Rate35_44_Employee,
+                Rate35_44_Employer = p.Rate35_44_Employer,
+                Rate45_54_Employee = p.Rate45_54_Employee,
+                Rate45_54_Employer = p.Rate45_54_Employer,
+                Rate55_65_Employee = p.Rate55_65_Employee,
+                Rate55_65_Employer = p.Rate55_65_Employer
+            };
+
+            return Ok(ApiResponse<BvgPlanDetailDto>.Ok(dto));
+        }
+
+        [HttpPost("bvg-plans")]
+        public async Task<ActionResult<ApiResponse<object>>> CreateOrUpdateBvg([FromQuery] int companyId, [FromBody] CreateOrUpdateBvgPlanDto dto)
+        {
+            if (companyId <= 0) return BadRequest(ApiResponse<object>.Fail("companyId required."));
+
+            var baseCode = (dto.PlanBaseCode ?? "").Trim().ToUpperInvariant();
+            if (string.IsNullOrWhiteSpace(baseCode)) return BadRequest(ApiResponse<object>.Fail("PlanBaseCode required."));
+            if (dto.Year < 2000 || dto.Year > 2100) return BadRequest(ApiResponse<object>.Fail("Invalid year."));
+
+            var planCode = $"{baseCode}_{dto.Year}".ToUpperInvariant();
+
+            var ent = await _db.BvgPlans.FirstOrDefaultAsync(x => x.CompanyId == companyId && x.PlanCode == planCode);
+            if (ent is null)
+            {
+                ent = new BvgPlan { CompanyId = companyId, PlanCode = planCode, PlanBaseCode = baseCode, Year = dto.Year };
+                _db.BvgPlans.Add(ent);
+            }
+
+            ent.PlanBaseCode = baseCode;
+            ent.Year = dto.Year;
+            ent.CoordinationDedAnnual = dto.CoordinationDedAnnual;
+            ent.EntryThresholdAnnual = dto.EntryThresholdAnnual;
+            ent.UpperLimitAnnual = dto.UpperLimitAnnual;
+
+            ent.Rate25_34_Employee = dto.Rate25_34_Employee;
+            ent.Rate25_34_Employer = dto.Rate25_34_Employer;
+            ent.Rate35_44_Employee = dto.Rate35_44_Employee;
+            ent.Rate35_44_Employer = dto.Rate35_44_Employer;
+            ent.Rate45_54_Employee = dto.Rate45_54_Employee;
+            ent.Rate45_54_Employer = dto.Rate45_54_Employer;
+            ent.Rate55_65_Employee = dto.Rate55_65_Employee;
+            ent.Rate55_65_Employer = dto.Rate55_65_Employer;
+
+            ent.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+            return Ok(ApiResponse<object>.Ok(new { planCode }, "BVG saved."));
+        }
     }
 }

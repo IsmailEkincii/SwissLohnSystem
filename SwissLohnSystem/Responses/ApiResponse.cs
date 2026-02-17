@@ -6,10 +6,8 @@
         public string? Message { get; set; }
         public T? Data { get; set; }
 
-        public static ApiResponse<T> Ok(T data, string? message = null)
-            => new() { Success = true, Message = message, Data = data };
 
-        public static ApiResponse<T> Fail(string message)
-            => new() { Success = false, Message = message, Data = default };
+        public static ApiResponse<T> Ok(T? data, string? msg = null) => new() { Success = true, Data = data, Message = msg };
+        public static ApiResponse<T> Fail(string msg) => new() { Success = false, Message = msg };
     }
 }

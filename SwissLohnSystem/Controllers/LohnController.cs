@@ -1,656 +1,183 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Fluent;
 using SwissLohnSystem.API.Data;
+using SwissLohnSystem.API.Documents;
 using SwissLohnSystem.API.DTOs.Lohn;
 using SwissLohnSystem.API.DTOs.Payroll;
 using SwissLohnSystem.API.Mappings;
-using SwissLohnSystem.API.Models;
 using SwissLohnSystem.API.Responses;
-using SwissLohnSystem.API.Services.Payroll;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using SwissLohnSystem.API.Services.Lohn;
 
 namespace SwissLohnSystem.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class LohnController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IPayrollCalculator _calculator;
+        private readonly ILohnService _lohnService;
+        private readonly ApplicationDbContext _db;
 
-        public LohnController(ApplicationDbContext context, IPayrollCalculator calculator)
+        public LohnController(ILohnService lohnService, ApplicationDbContext db)
         {
-            _context = context;
-            _calculator = calculator;
+            _lohnService = lohnService;
+            _db = db;
         }
 
         // =====================================================
-        // POST: api/Lohn/calc
-        // - Sadece hesaplama, DB'ye yazmaz
+        // POST: api/lohn/calculate
         // =====================================================
-        [HttpPost("calc")]
-        public async Task<ActionResult<ApiResponse<PayrollResponseDto>>> Calculate([FromBody] PayrollRequestDto request)
+        [HttpPost("calculate")]
+        public async Task<ActionResult<ApiResponse<LohnDto>>> Calculate(
+            [FromBody] PayrollRequestDto request,
+            CancellationToken ct)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ApiResponse<PayrollResponseDto>.Fail("Ungültige Eingabedaten."));
-
-            var employee = await _context.Employees
-                .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Id == request.EmployeeId);
-
-            if (employee is null)
-                return NotFound(ApiResponse<PayrollResponseDto>.Fail("Mitarbeiter wurde nicht gefunden."));
-
-            var year = request.Period.Year;
-            var month = request.Period.Month;
-            var monthStart = new DateTime(year, month, 1);
-            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
-
-            var employmentStart = employee.StartDate.Date;
-            var employmentEnd = (employee.EndDate ?? DateTime.MaxValue).Date;
-
-            // Mitarbeiter in diesem Monat aktiv?
-            if (!employee.Active ||
-                employmentEnd < monthStart ||
-                employmentStart > monthEnd)
+            try
             {
-                return BadRequest(ApiResponse<PayrollResponseDto>.Fail(
-                    "Mitarbeiter ist in diesem Monat nicht aktiv."
-                ));
+                var dto = await _lohnService.CalculateAsync(request, ct);
+
+                return Ok(new ApiResponse<LohnDto>
+                {
+                    Success = true,
+                    Data = dto,
+                    Message = null
+                });
             }
-
-            // ---- Default parametreleri Employee'den doldur ----
-            if (string.IsNullOrWhiteSpace(request.Canton))
-                request.Canton = string.IsNullOrWhiteSpace(employee.Canton) ? "ZH" : employee.Canton;
-
-            request.ApplyAHV = employee.ApplyAHV;
-            request.ApplyALV = employee.ApplyALV;
-            request.ApplyBVG = employee.ApplyBVG;
-            request.ApplyNBU = employee.ApplyNBU;
-            request.ApplyBU = employee.ApplyBU;
-            request.ApplyFAK = employee.ApplyFAK;
-            request.ApplyQST = employee.ApplyQST;
-
-            request.WeeklyHours = employee.WeeklyHours;
-
-            request.PermitType ??= employee.PermitType;
-            request.ChurchMember = employee.ChurchMember;
-            if (string.IsNullOrWhiteSpace(request.WithholdingTaxCode))
-                request.WithholdingTaxCode = employee.WithholdingTaxCode;
-
-            // ---- Bruttolohn-Basis + Stundenberechnung ----
-            decimal monthlyHours = 0m;
-            decimal monthlyOvertimeHours = 0m;
-            decimal overtimePay = 0m;
-            decimal holidayAllowance = 0m; // Şimdilik otomatik hesaplamıyoruz
-            decimal baseGross;
-
-            // ✅ FIX: SalaryType case-insensitive
-            if (string.Equals(employee.SalaryType, "Monthly", StringComparison.OrdinalIgnoreCase))
+            catch (Exception ex)
             {
-                var monthDays = (monthEnd - monthStart).Days + 1;
-
-                var effectiveStart = employmentStart < monthStart ? monthStart : employmentStart;
-                var effectiveEnd = employmentEnd > monthEnd ? monthEnd : employmentEnd;
-
-                var activeDays = (effectiveEnd - effectiveStart).Days + 1;
-                if (activeDays < 0) activeDays = 0;
-
-                decimal factor;
-
-                // Eğer kullanıcı Worked/Sick/Unpaid alanlarından en az birini girdiyse,
-                // gün bazlı mantığı kullanalım. Hiçbiri yoksa eski pro-rata davranışı korunsun.
-                var hasDayInputs =
-                    request.WorkedDays.HasValue ||
-                    request.SickDays.HasValue ||
-                    request.UnpaidDays.HasValue;
-
-                if (!hasDayInputs)
+                return BadRequest(new ApiResponse<LohnDto>
                 {
-                    // Eski davranış: sadece Start/End tarihine göre pro-rata
-                    factor = monthDays == 0 ? 0m : (decimal)activeDays / monthDays;
-                }
-                else
-                {
-                    var worked = request.WorkedDays ?? 0m;
-                    var sick = request.SickDays ?? 0m;
-                    var unpaid = request.UnpaidDays ?? 0m;
-
-                    if (worked < 0m) worked = 0m;
-                    if (sick < 0m) sick = 0m;
-                    if (unpaid < 0m) unpaid = 0m;
-
-                    var activeDec = (decimal)activeDays;
-
-                    var totalEntered = worked + sick + unpaid;
-                    if (totalEntered > activeDec)
-                    {
-                        var overflow = totalEntered - activeDec;
-                        unpaid = unpaid - overflow;
-                        if (unpaid < 0m) unpaid = 0m;
-
-                        totalEntered = worked + sick + unpaid;
-                    }
-
-                    var paidDays = worked + sick;
-                    if (paidDays > activeDec)
-                        paidDays = activeDec;
-
-                    factor = monthDays == 0 ? 0m : paidDays / monthDays;
-                }
-
-                var baseMonthly = employee.BruttoSalary;
-                var proratedBase = Math.Round(baseMonthly * factor, 2);
-
-                baseGross = proratedBase;
-                monthlyHours = employee.MonthlyHours * factor;
-                monthlyOvertimeHours = 0m;
+                    Success = false,
+                    Data = default,
+                    Message = ex.Message
+                });
             }
-            else // "Hourly"
-            {
-                var workDays = await _context.WorkDays
-                    .AsNoTracking()
-                    .Where(w => w.EmployeeId == employee.Id &&
-                                w.Date.Year == year &&
-                                w.Date.Month == month)
-                    .ToListAsync();
-
-                if (workDays.Count == 0)
-                {
-                    return BadRequest(ApiResponse<PayrollResponseDto>.Fail(
-                        "Keine Arbeitszeit-Daten für diesen stundenbasierten Mitarbeiter in diesem Monat gefunden."
-                    ));
-                }
-
-                monthlyHours = workDays.Sum(w => w.HoursWorked);
-                monthlyOvertimeHours = workDays.Sum(w => w.OvertimeHours);
-
-                var normalPay = employee.HourlyRate * monthlyHours;
-                overtimePay = employee.HourlyRate * monthlyOvertimeHours;
-
-                baseGross = normalPay + overtimePay;
-            }
-
-            // Bonus / Zulagen / Abzüge (request’ten)
-            var bonus = request.Bonus;
-            var extra = request.ExtraAllowance;
-            var unpaidDed = request.UnpaidDeduction;
-            var otherDed = request.OtherDeduction;
-
-            var adjustments = bonus + extra - unpaidDed - otherDed;
-
-            request.GrossMonthly = baseGross + adjustments;
-
-            var result = _calculator.Calculate(request);
-            return Ok(ApiResponse<PayrollResponseDto>.Ok(result, "Berechnung erfolgreich."));
         }
 
         // =====================================================
-        // POST: api/Lohn/calc-and-save
-        // - Hesapla + Lohn tablosuna ENTWURF olarak upsert et
-        // - UI: Companies/Details -> Löhne tabı (loehne-tab.js)
+        // POST: api/lohn/{id}/finalize
         // =====================================================
-        [HttpPost("calc-and-save")]
-        public async Task<ActionResult<ApiResponse<LohnDto>>> CalculateAndSave([FromBody] PayrollRequestDto request)
+        [HttpPost("{id:int}/finalize")]
+        public async Task<ActionResult<ApiResponse<string>>> Finalize(int id, CancellationToken ct)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ApiResponse<LohnDto>.Fail("Ungültige Eingabedaten."));
-
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(e => e.Id == request.EmployeeId);
-
-            if (employee is null)
-                return NotFound(ApiResponse<LohnDto>.Fail("Mitarbeiter wurde nicht gefunden."));
-
-            var year = request.Period.Year;
-            var month = request.Period.Month;
-            var monthStart = new DateTime(year, month, 1);
-            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
-
-            var employmentStart = employee.StartDate.Date;
-            var employmentEnd = (employee.EndDate ?? DateTime.MaxValue).Date;
-
-            if (!employee.Active ||
-                employmentEnd < monthStart ||
-                employmentStart > monthEnd)
+            try
             {
-                return BadRequest(ApiResponse<LohnDto>.Fail(
-                    "Mitarbeiter ist in diesem Monat nicht aktiv."
-                ));
+                await _lohnService.FinalizeAsync(id, ct);
+                return Ok(new ApiResponse<string> { Success = true, Data = "OK", Message = "Lohn finalized." });
             }
-
-            // ---- Helper: Swagger’ın "string" placeholder’ını da boş kabul et ----
-            static bool IsEmpty(string? s)
-                => string.IsNullOrWhiteSpace(s) ||
-                   s.Trim().Equals("string", StringComparison.OrdinalIgnoreCase);
-
-            // ---- Default parametreleri Employee'den doldur ----
-            if (IsEmpty(request.Canton))
-                request.Canton = string.IsNullOrWhiteSpace(employee.Canton) ? "ZH" : employee.Canton;
-
-            if (request.WeeklyHours <= 0)
-                request.WeeklyHours = employee.WeeklyHours;
-
-            if (IsEmpty(request.PermitType))
-                request.PermitType = employee.PermitType;
-
-            // UI'dan true geldiyse koru, yoksa Employee'deki ChurchMember'ı kullan
-            request.ChurchMember = request.ChurchMember || employee.ChurchMember;
-
-            if (IsEmpty(request.WithholdingTaxCode))
-                request.WithholdingTaxCode = employee.WithholdingTaxCode;
-
-            // ---- Bruttolohn-Basis + Stundenberechnung ----
-            decimal monthlyHours = 0m;
-            decimal monthlyOvertimeHours = 0m;
-            decimal overtimePayForLohn = 0m;
-            decimal holidayAllowance = 0m;    // Şimdilik hesaplamıyoruz
-            decimal childAllowance = 0m;      // TODO: später Kindergeld-Logik
-            decimal baseGross;
-
-            // ✅ FIX: SalaryType case-insensitive
-            if (string.Equals(employee.SalaryType, "Monthly", StringComparison.OrdinalIgnoreCase))
+            catch (Exception ex)
             {
-                var monthDays = (monthEnd - monthStart).Days + 1;
-
-                var effectiveStart = employmentStart < monthStart ? monthStart : employmentStart;
-                var effectiveEnd = employmentEnd > monthEnd ? monthEnd : employmentEnd;
-
-                var activeDays = (effectiveEnd - effectiveStart).Days + 1;
-                if (activeDays < 0) activeDays = 0;
-
-                decimal factor;
-
-                var hasDayInputs =
-                    request.WorkedDays.HasValue ||
-                    request.SickDays.HasValue ||
-                    request.UnpaidDays.HasValue;
-
-                if (!hasDayInputs)
-                {
-                    factor = monthDays == 0 ? 0m : (decimal)activeDays / monthDays;
-                }
-                else
-                {
-                    var worked = request.WorkedDays ?? 0m;
-                    var sick = request.SickDays ?? 0m;
-                    var unpaid = request.UnpaidDays ?? 0m;
-
-                    if (worked < 0m) worked = 0m;
-                    if (sick < 0m) sick = 0m;
-                    if (unpaid < 0m) unpaid = 0m;
-
-                    var activeDec = (decimal)activeDays;
-
-                    var totalEntered = worked + sick + unpaid;
-                    if (totalEntered > activeDec)
-                    {
-                        var overflow = totalEntered - activeDec;
-                        unpaid = unpaid - overflow;
-                        if (unpaid < 0m) unpaid = 0m;
-
-                        totalEntered = worked + sick + unpaid;
-                    }
-
-                    var paidDays = worked + sick;
-                    if (paidDays > activeDec)
-                        paidDays = activeDec;
-
-                    factor = monthDays == 0 ? 0m : paidDays / monthDays;
-                }
-
-                var baseMonthly = employee.BruttoSalary;
-                var proratedBase = Math.Round(baseMonthly * factor, 2);
-
-                baseGross = proratedBase;
-                monthlyHours = employee.MonthlyHours * factor;
-                monthlyOvertimeHours = 0m;
+                return BadRequest(new ApiResponse<string> { Success = false, Data = null, Message = ex.Message });
             }
-            else // "Hourly"
-            {
-                var workDays = await _context.WorkDays
-                    .AsNoTracking()
-                    .Where(w => w.EmployeeId == employee.Id &&
-                                w.Date.Year == year &&
-                                w.Date.Month == month)
-                    .ToListAsync();
-
-                if (workDays.Count == 0)
-                {
-                    return BadRequest(ApiResponse<LohnDto>.Fail(
-                        "Keine Arbeitszeit-Daten für diesen stundenbasierten Mitarbeiter in diesem Monat gefunden."
-                    ));
-                }
-
-                monthlyHours = workDays.Sum(w => w.HoursWorked);
-                monthlyOvertimeHours = workDays.Sum(w => w.OvertimeHours);
-
-                var normalPay = employee.HourlyRate * monthlyHours;
-                overtimePayForLohn = employee.HourlyRate * monthlyOvertimeHours;
-
-                baseGross = normalPay + overtimePayForLohn;
-            }
-
-            var bonus = request.Bonus;
-            var extra = request.ExtraAllowance;
-            var unpaidDed = request.UnpaidDeduction;
-            var otherDed = request.OtherDeduction;
-
-            var adjustments = bonus + extra - unpaidDed - otherDed;
-
-            request.GrossMonthly = baseGross + adjustments;
-
-            var result = _calculator.Calculate(request);
-
-            var gross = request.GrossMonthly;
-            var net = result.NetToPay;
-
-            var empDeductions = result.Items
-                .Where(i => i.Side == "employee" && i.Type == "deduction")
-                .Sum(i => i.Amount);
-
-            var emp = result.Employee;
-            var er = result.Employer;
-
-            var existing = await _context.Lohns
-                .FirstOrDefaultAsync(l =>
-                    l.EmployeeId == employee.Id &&
-                    l.Year == year &&
-                    l.Month == month);
-
-            Lohn lohn;
-
-            if (existing is not null)
-            {
-                existing.BruttoSalary = gross;
-                existing.NetSalary = net;
-                existing.TotalDeductions = empDeductions;
-
-                existing.MonthlyHours = monthlyHours;
-                existing.MonthlyOvertimeHours = monthlyOvertimeHours;
-
-                existing.OvertimePay = overtimePayForLohn;
-                existing.HolidayAllowance = holidayAllowance;
-                existing.ChildAllowance = childAllowance;
-
-                existing.Bonus = bonus;
-                existing.ExtraAllowance = extra;
-                existing.UnpaidDeduction = unpaidDed;
-                existing.OtherDeduction = otherDed;
-
-                existing.EmployeeAhvIvEo = emp.AHV_IV_EO;
-                existing.EmployeeAlv = emp.ALV;
-                existing.EmployeeNbu = emp.UVG_NBU;
-                existing.EmployeeBvg = emp.BVG;
-                existing.EmployeeQst = emp.WithholdingTax;
-
-                existing.EmployerAhvIvEo = er.AHV_IV_EO;
-                existing.EmployerAlv = er.ALV;
-                existing.EmployerBu = er.UVG_NBU;
-                existing.EmployerBvg = er.BVG;
-                existing.EmployerFak = er.Other;
-
-                existing.ApplyAHV = request.ApplyAHV;
-                existing.ApplyALV = request.ApplyALV;
-                existing.ApplyBVG = request.ApplyBVG;
-                existing.ApplyNBU = request.ApplyNBU;
-                existing.ApplyBU = request.ApplyBU;
-                existing.ApplyFAK = request.ApplyFAK;
-                existing.ApplyQST = request.ApplyQST;
-
-                existing.PermitType = request.PermitType;
-                existing.Canton = request.Canton;
-                existing.ChurchMember = request.ChurchMember;
-                existing.WithholdingTaxCode = request.WithholdingTaxCode;
-
-                existing.Comment = result.Period;
-
-                lohn = existing;
-            }
-            else
-            {
-                lohn = new Lohn
-                {
-                    EmployeeId = employee.Id,
-                    Month = month,
-                    Year = year,
-                    BruttoSalary = gross,
-                    NetSalary = net,
-                    TotalDeductions = empDeductions,
-                    OvertimePay = overtimePayForLohn,
-                    HolidayAllowance = holidayAllowance,
-                    ChildAllowance = childAllowance,
-                    MonthlyHours = monthlyHours,
-                    MonthlyOvertimeHours = monthlyOvertimeHours,
-                    Bonus = bonus,
-                    ExtraAllowance = extra,
-                    UnpaidDeduction = unpaidDed,
-                    OtherDeduction = otherDed,
-                    CreatedAt = DateTime.Now,
-                    IsFinal = false,
-
-                    EmployeeAhvIvEo = emp.AHV_IV_EO,
-                    EmployeeAlv = emp.ALV,
-                    EmployeeNbu = emp.UVG_NBU,
-                    EmployeeBvg = emp.BVG,
-                    EmployeeQst = emp.WithholdingTax,
-
-                    EmployerAhvIvEo = er.AHV_IV_EO,
-                    EmployerAlv = er.ALV,
-                    EmployerBu = er.UVG_NBU,
-                    EmployerBvg = er.BVG,
-                    EmployerFak = er.Other,
-
-                    ApplyAHV = request.ApplyAHV,
-                    ApplyALV = request.ApplyALV,
-                    ApplyBVG = request.ApplyBVG,
-                    ApplyNBU = request.ApplyNBU,
-                    ApplyBU = request.ApplyBU,
-                    ApplyFAK = request.ApplyFAK,
-                    ApplyQST = request.ApplyQST,
-
-                    PermitType = request.PermitType,
-                    Canton = request.Canton,
-                    ChurchMember = request.ChurchMember,
-                    WithholdingTaxCode = request.WithholdingTaxCode,
-
-                    Comment = result.Period
-                };
-
-                _context.Lohns.Add(lohn);
-            }
-
-            await _context.SaveChangesAsync();
-
-            return ApiResponse<LohnDto>.Ok(lohn.ToDto(), "Lohnabrechnung wurde berechnet und als Entwurf gespeichert.");
         }
 
-        // =============================
-        // GET: api/Lohn
-        // =============================
-        [HttpGet]
-        public async Task<ActionResult<ApiResponse<IEnumerable<LohnDto>>>> GetLohns()
-        {
-            var lohns = await _context.Lohns
-                .AsNoTracking()
-                .OrderByDescending(l => l.CreatedAt)
-                .Select(l => l.ToDto())
-                .ToListAsync();
-
-            return ApiResponse<IEnumerable<LohnDto>>.Ok(lohns, "Alle Lohnabrechnungen wurden erfolgreich geladen.");
-        }
-
-        // =============================
-        // GET: api/Lohn/{id}
-        // =============================
+        // =====================================================
+        // GET: api/lohn/{id}
+        // Details JSON for UI
+        // =====================================================
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<ApiResponse<LohnDto>>> GetLohn(int id)
+        public async Task<ActionResult<ApiResponse<LohnDetailsDto>>> GetDetails(int id, CancellationToken ct)
         {
-            var lohn = await _context.Lohns
-                .AsNoTracking()
-                .FirstOrDefaultAsync(l => l.Id == id);
-
-            if (lohn is null)
-                return NotFound(ApiResponse<LohnDto>.Fail("Lohnabrechnung wurde nicht gefunden."));
-
-            return ApiResponse<LohnDto>.Ok(lohn.ToDto(), "Lohnabrechnung erfolgreich geladen.");
+            try
+            {
+                var dto = await _lohnService.GetDetailsAsync(id, ct);
+                return Ok(new ApiResponse<LohnDetailsDto> { Success = true, Data = dto, Message = null });
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new ApiResponse<LohnDetailsDto> { Success = false, Data = null, Message = ex.Message });
+            }
         }
 
-        // ======================================
-        // POST: api/Lohn/finalize
-        // ======================================
-        [HttpPost("finalize")]
-        public async Task<ActionResult<ApiResponse<LohnDto>>> FinalizePayroll([FromBody] LohnCalculateDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ApiResponse<LohnDto>.Fail("Ungültige Eingabedaten."));
-
-            var lohn = await _context.Lohns
-                .FirstOrDefaultAsync(l =>
-                    l.EmployeeId == dto.EmployeeId &&
-                    l.Month == dto.Month &&
-                    l.Year == dto.Year);
-
-            if (lohn is null)
-                return NotFound(ApiResponse<LohnDto>.Fail("Lohnabrechnung wurde nicht gefunden."));
-
-            if (lohn.IsFinal)
-                return BadRequest(ApiResponse<LohnDto>.Fail("Diese Lohnabrechnung ist bereits final."));
-
-            lohn.IsFinal = true;
-            await _context.SaveChangesAsync();
-
-            return ApiResponse<LohnDto>.Ok(lohn.ToDto(), "Lohnabrerechnung wurde finalisiert.");
-        }
-
-        // =====================================
-        // GET: api/Lohn/by-employee/{employeeId}
-        // =====================================
-        [HttpGet("by-employee/{employeeId:int}")]
-        public async Task<ActionResult<ApiResponse<IEnumerable<LohnDto>>>> GetByEmployee(int employeeId)
-        {
-            var list = await _context.Lohns
-                .AsNoTracking()
-                .Where(l => l.EmployeeId == employeeId)
-                .OrderByDescending(l => l.Year)
-                .ThenByDescending(l => l.Month)
-                .Select(l => l.ToDto())
-                .ToListAsync();
-
-            return ApiResponse<IEnumerable<LohnDto>>.Ok(list, "Löhne erfolgreich geladen.");
-        }
-
-        // =========================================================
-        // GET: api/Lohn/by-company/{companyId}?period=YYYY-MM
-        // =========================================================
+        // =====================================================
+        // GET: api/lohn/by-company/{companyId}?year=2026&month=1
+        // Firma -> Löhne (monthly)
+        // =====================================================
         [HttpGet("by-company/{companyId:int}")]
-        public async Task<ActionResult<ApiResponse<IEnumerable<LohnDto>>>> GetByCompany(
-            int companyId,
-            [FromQuery] string? period = null)
+        public async Task<ActionResult<ApiResponse<List<CompanyMonthlyLohnDto>>>> GetByCompany(
+    int companyId,
+    [FromQuery] int year,
+    [FromQuery] int month,
+    CancellationToken ct)
         {
-            int? month = null, year = null;
-
-            if (IsValidPeriod(period))
-                (year, month) = ParsePeriod(period!);
-
-            var query = _context.Lohns
-                .AsNoTracking()
-                .Include(l => l.Employee)
-                .Where(l => l.Employee.CompanyId == companyId);
-
-            if (month.HasValue && year.HasValue)
+            try
             {
-                query = query.Where(l => l.Month == month.Value && l.Year == year.Value);
+                var rows = await _lohnService.GetCompanyMonthlyAsync(companyId, year, month, ct);
+                return Ok(new ApiResponse<List<CompanyMonthlyLohnDto>> { Success = true, Data = rows, Message = null });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<List<CompanyMonthlyLohnDto>> { Success = false, Data = null, Message = ex.Message });
+            }
+        }
+        // GET: api/lohn/lohnausweis/{employeeId}?year=2024
+        [HttpGet("lohnausweis/{employeeId:int}")]
+        public async Task<ActionResult<ApiResponse<LohnausweisDto>>> GetLohnausweis(
+            int employeeId,
+            [FromQuery] int year,
+            CancellationToken ct)
+        {
+            try
+            {
+                var dto = await _lohnService.GetLohnausweisAsync(employeeId, year, ct);
+                return Ok(new ApiResponse<LohnausweisDto> { Success = true, Data = dto, Message = null });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<LohnausweisDto> { Success = false, Data = null, Message = ex.Message });
+            }
+        }
+        // GET: api/lohn/lohnausweis/{employeeId}/pdf?year=2024
+        [HttpGet("lohnausweis/{employeeId:int}/pdf")]
+        public async Task<IActionResult> DownloadLohnausweisPdf(
+            int employeeId,
+            [FromQuery] int year,
+            CancellationToken ct)
+        {
+            LohnausweisDto dto;
+            try
+            {
+                dto = await _lohnService.GetLohnausweisAsync(employeeId, year, ct);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<string> { Success = false, Data = null, Message = ex.Message });
             }
 
-            var list = await query
-                .OrderByDescending(l => l.Year)
-                .ThenByDescending(l => l.Month)
-                .Select(l => l.ToDto())
-                .ToListAsync();
-
-            return ApiResponse<IEnumerable<LohnDto>>.Ok(list, "Löhne erfolgreich geladen.");
-        }
-
-        // =========================================================
-        // GET: api/Lohn/by-company/{companyId}/monthly?period=YYYY-MM
-        // =========================================================
-        [HttpGet("by-company/{companyId:int}/monthly")]
-        public async Task<ActionResult<ApiResponse<List<CompanyMonthlyLohnDto>>>> GetByCompanyMonthly(
-            int companyId,
-            [FromQuery] string? period = null,
-            CancellationToken ct = default)
-        {
-            int year;
-            int month;
-
-            if (IsValidPeriod(period))
+            // ✅ Kesin kural: incomplete ise PDF verme
+            if (!dto.IsComplete)
             {
-                (year, month) = ParsePeriod(period!);
-            }
-            else
-            {
-                var today = DateTime.Today;
-                year = today.Year;
-                month = today.Month;
+                var msg = $"Lohnausweis cannot be generated. MissingMonths=[{string.Join(",", dto.MissingMonths)}], NonFinalMonths=[{string.Join(",", dto.NonFinalMonths)}]";
+                return Conflict(new ApiResponse<string> { Success = false, Data = null, Message = msg });
             }
 
-            var loehne = await _context.Lohns
-                .AsNoTracking()
-                .Include(l => l.Employee)
-                .Where(l =>
-                    l.Employee.CompanyId == companyId &&
-                    l.Year == year &&
-                    l.Month == month)
-                .OrderBy(l => l.Employee.LastName)
-                .ThenBy(l => l.Employee.FirstName)
-                .ToListAsync(ct);
+            var document = new SwissLohnSystem.API.Documents.LohnausweisPdfDocument(dto);
+            var pdfBytes = document.GeneratePdf();
 
-            var list = loehne
-                .Select(x => new CompanyMonthlyLohnDto
-                {
-                    Id = x.Id,
-                    EmployeeId = x.EmployeeId,
-                    EmployeeName = x.Employee != null
-                        ? (x.Employee.FirstName + " " + x.Employee.LastName).Trim()
-                        : ("#" + x.EmployeeId),
-                    Year = x.Year,
-                    Month = x.Month,
-                    BruttoSalary = x.BruttoSalary,
-                    NetSalary = x.NetSalary,
-                    TotalDeductions = x.TotalDeductions,
-                    IsFinal = x.IsFinal
-                })
-                .ToList();
-
-            return ApiResponse<List<CompanyMonthlyLohnDto>>.Ok(
-                list,
-                "Löhne für den ausgewählten Monat wurden erfolgreich geladen."
-            );
+            return File(pdfBytes, "application/pdf", $"Lohnausweis_{dto.Year}_Emp{dto.EmployeeId}.pdf");
         }
 
-        // --------- helpers ---------
-        static decimal? NormalizeRate(decimal? r)
+        // =====================================================
+        // GET: api/lohn/{id}/pdf
+        // =====================================================
+        [HttpGet("{id:int}/pdf")]
+        public async Task<IActionResult> DownloadPdf(int id, CancellationToken ct)
         {
-            if (!r.HasValue) return null;
-            var v = r.Value;
-            if (v < 0m) return 0m;
-            return v > 1m ? v / 100m : v;
+            var lohn = await _db.Lohns.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
+            if (lohn is null)
+                return NotFound(new ApiResponse<string> { Success = false, Data = null, Message = "Lohn not found." });
+
+            if (!lohn.IsFinal)
+                return Conflict(new ApiResponse<string> { Success = false, Data = null, Message = "Lohn must be finalized before PDF export." });
+
+            // ✅ FIX: tam details + items
+            var details = await _lohnService.GetDetailsAsync(id, ct);
+
+            var document = new LohnSlipPdfDocument(details);
+            var pdfBytes = document.GeneratePdf();
+
+            return File(pdfBytes, "application/pdf", $"Lohn_{lohn.Year:D4}_{lohn.Month:D2}_Emp{lohn.EmployeeId}.pdf");
         }
 
-        private static bool IsValidPeriod(string? p) =>
-            !string.IsNullOrWhiteSpace(p) &&
-            p!.Length == 7 &&
-            p[4] == '-' &&
-            int.TryParse(p.AsSpan(0, 4), out _) &&
-            int.TryParse(p.AsSpan(5, 2), out var m) &&
-            m is >= 1 and <= 12;
-
-        private static (int year, int month) ParsePeriod(string p) =>
-            (int.Parse(p.AsSpan(0, 4)), int.Parse(p.AsSpan(5, 2)));
     }
 }

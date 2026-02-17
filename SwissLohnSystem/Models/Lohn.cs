@@ -11,18 +11,14 @@ namespace SwissLohnSystem.API.Models
 
         [ForeignKey(nameof(Employee))]
         public int EmployeeId { get; set; }
-
         public Employee Employee { get; set; } = null!;
 
-        /// <summary>Gehaltsmonat (1-12)</summary>
         public int Month { get; set; }
-
-        /// <summary>Gehaltsjahr (z.B. 2025)</summary>
         public int Year { get; set; }
 
         // --- Temel rakamlar ---
         [Column(TypeName = "decimal(18,4)")]
-        public decimal BruttoSalary { get; set; }
+        public decimal BruttoSalary { get; set; } // ✅ 13th dahil brüt
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal TotalDeductions { get; set; }
@@ -45,7 +41,7 @@ namespace SwissLohnSystem.API.Models
         [Column(TypeName = "decimal(18,4)")]
         public decimal MonthlyOvertimeHours { get; set; }
 
-        // --- Ek kalemler (her ay için) ---
+        // --- Ek kalemler ---
         [Column(TypeName = "decimal(18,4)")]
         public decimal Bonus { get; set; }
 
@@ -58,16 +54,44 @@ namespace SwissLohnSystem.API.Models
         [Column(TypeName = "decimal(18,4)")]
         public decimal OtherDeduction { get; set; }
 
+        // ✅ MA1 benzeri
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal PrivateBenefitAmount { get; set; } // brüte ek
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal ManualAdjustment { get; set; } // +/- brüt düzeltme
+
         public DateTime CreatedAt { get; set; }
-
-        /// <summary>Wenn true, Lohn ist final und kann nicht mehr überschrieben werden.</summary>
         public bool IsFinal { get; set; }
+        public DateTime? FinalizedAt { get; set; }
 
         // ===============================
-        //  SNAPSHOT PARAMETER PRO MONAT
+        // Excel snapshot
         // ===============================
 
-        // --- Sozialversicherungs-Flags ---
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal PauschalExpenses { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EffectiveExpenses { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal ShortTimeWorkDeduction { get; set; }
+
+        public bool Include13thSalary { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal ThirteenthSalaryAmount { get; set; }
+
+        public int CanteenDays { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal CanteenDailyRate { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal CanteenDeduction { get; set; }
+
+        // Flags snapshot
         public bool ApplyAHV { get; set; }
         public bool ApplyALV { get; set; }
         public bool ApplyBVG { get; set; }
@@ -75,36 +99,35 @@ namespace SwissLohnSystem.API.Models
         public bool ApplyBU { get; set; }
         public bool ApplyFAK { get; set; }
         public bool ApplyQST { get; set; }
+        public bool ApplyKTG { get; set; }
 
-        // --- Steuer / Bewilligung ---
+        [MaxLength(1)]
+        public string Gender { get; set; } = "M";
+
         [MaxLength(20)]
-        public string? PermitType { get; set; }   // z.B. B, C, L, G, F, N
+        public string? PermitType { get; set; }
 
         [MaxLength(5)]
-        public string? Canton { get; set; }       // z.B. ZH, AG, LU
+        public string? Canton { get; set; }
 
         public bool ChurchMember { get; set; }
 
         [MaxLength(50)]
         public string? WithholdingTaxCode { get; set; }
 
-        // --- Ferien-Parameter ---
-        [Column(TypeName = "decimal(18,4)")]
-        public decimal? HolidayRate { get; set; } // z.B. 0.0833, 0.1027
-
-        public bool HolidayEligible { get; set; }
-
-        // --- Kommentar ---
         public string? Comment { get; set; }
 
         // ===============================
-        //  SNAPSHOT DER AN-ABZÜGE
+        // Snapshot: Employee deductions (AN)
         // ===============================
         [Column(TypeName = "decimal(18,4)")]
         public decimal EmployeeAhvIvEo { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
-        public decimal EmployeeAlv { get; set; }
+        public decimal EmployeeAlv1 { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployeeAlv2 { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal EmployeeNbu { get; set; }
@@ -113,16 +136,22 @@ namespace SwissLohnSystem.API.Models
         public decimal EmployeeBvg { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployeeKtg { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
         public decimal EmployeeQst { get; set; }
 
         // ===============================
-        //  SNAPSHOT DER AG-BEITRÄGE (YENİ)
+        // Snapshot: Employer contributions (AG)
         // ===============================
         [Column(TypeName = "decimal(18,4)")]
         public decimal EmployerAhvIvEo { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
-        public decimal EmployerAlv { get; set; }
+        public decimal EmployerAlv1 { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployerAlv2 { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal EmployerBu { get; set; }
@@ -131,21 +160,16 @@ namespace SwissLohnSystem.API.Models
         public decimal EmployerBvg { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
+        public decimal EmployerKtg { get; set; }
+
+        [Column(TypeName = "decimal(18,4)")]
         public decimal EmployerFak { get; set; }
-        // ===============================
-        //  BVG PLAN SNAPSHOT (NEW)
-        // ===============================
-        [MaxLength(50)]
-        public string? BvgPlanName { get; set; } // opsiyonel (Plan adı)
 
+        // ✅ NEW: VK
         [Column(TypeName = "decimal(18,4)")]
-        public decimal? BvgCoordinationDeductionAnnual { get; set; }
+        public decimal EmployerVk { get; set; }
 
-        [Column(TypeName = "decimal(18,4)")]
-        public decimal? BvgEmployeeRate { get; set; } // normalize edilmiş 0..1
-
-        [Column(TypeName = "decimal(18,4)")]
-        public decimal? BvgEmployerRate { get; set; } // normalize edilmiş 0..1
-
+        [MaxLength(100)]
+        public string? BvgPlanCodeUsed { get; set; }
     }
 }

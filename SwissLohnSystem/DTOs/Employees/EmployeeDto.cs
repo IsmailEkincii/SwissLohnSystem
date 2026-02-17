@@ -16,6 +16,9 @@ namespace SwissLohnSystem.API.DTOs.Employees
         public string? MaritalStatus { get; set; }
         public int ChildCount { get; set; }
 
+        // ✅ NEW
+        public string Gender { get; set; } = "M";
+
         public string SalaryType { get; set; } = "Monthly";
         public decimal HourlyRate { get; set; }
         public int MonthlyHours { get; set; }
@@ -41,6 +44,9 @@ namespace SwissLohnSystem.API.DTOs.Employees
         public bool ApplyBVG { get; set; }
         public bool ApplyFAK { get; set; }
         public bool ApplyQST { get; set; }
+
+        // ✅ NEW
+        public bool ApplyKTG { get; set; }
 
         public string PermitType { get; set; } = "B";
         public bool ChurchMember { get; set; }

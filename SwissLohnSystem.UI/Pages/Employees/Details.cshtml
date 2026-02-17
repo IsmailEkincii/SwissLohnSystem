@@ -238,10 +238,10 @@
                                                         </a>
 
                                                         <!-- Modal + PDF (mevcut JS: btn-lohn-detail) -->
-                                                        <button type="button"
+                                                        @* <button type="button"
                                                                 class="btn btn-xs btn-outline-primary btn-lohn-detail">
                                                             <i class="fas fa-file-invoice"></i> PDF
-                                                        </button>
+                                                        </button> *@
                                                     </td>
                                                 </tr>
                                             }
@@ -300,92 +300,6 @@
         </div><!-- /.row -->
     </div>
 </section>
-
-<!-- 🔍 Lohn-Detail Modal -->
-<div class="modal fade" id="lohnDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    Lohn-Details&nbsp;<span id="ldmPeriod" class="text-muted"></span>
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-
-                <!-- Printable kısım -->
-                <div id="lohnDetailPrintable" class="p-3">
-                    <div class="row mb-4">
-                        <div class="col-sm-6 small">
-                            <strong>@Model.Company?.Name</strong><br />
-                            @Model.Company?.Address<br />
-                            @Model.Company?.Phone<br />
-                            @Model.Company?.Email<br />
-                            @Model.Company?.Canton
-                        </div>
-
-                        <div class="col-sm-6 small text-right">
-                            @DateTime.Today.ToString("dd.MM.yyyy")<br />
-                            <br />
-                            <strong>Mitarbeiter</strong><br />
-                            @Model.Employee?.FirstName @Model.Employee?.LastName<br />
-                            @Model.Employee?.Address<br />
-                            @Model.Employee?.Zip @Model.Employee?.City<br />
-                            <br />
-                            <strong>Personal-Nr.</strong> @Model.Employee?.Id<br />
-                            <strong>AHV-Nr.</strong> @Model.Employee?.AHVNumber
-                        </div>
-                    </div>
-
-                    <h5 class="mb-2">
-                        Lohnabrechnung&nbsp;<span id="ldmPeriodHeader" class="text-muted"></span>
-                    </h5>
-
-                    <!-- 🔥 Saat özetleri -->
-                    <div class="row mb-2">
-                        <div class="col-sm-6 small">
-                            <strong>Gesamtstunden im Monat:</strong>
-                            <span id="ldmMonthlyHours">—</span>
-                        </div>
-                        <div class="col-sm-6 small text-right">
-                            <strong>Überstunden im Monat:</strong>
-                            <span id="ldmMonthlyOvertime">—</span>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-sm table-bordered" id="ldmSlipTable">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th style="width:40%;">Legende</th>
-                                    <th style="width:10%;" class="text-right">%</th>
-                                    <th style="width:15%;" class="text-right">Menge</th>
-                                    <th style="width:15%;" class="text-right">Ansatz</th>
-                                    <th style="width:20%;" class="text-right">Betrag</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ldmSlipBody">
-                                <!-- JS dolduracak -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-footer">
-                <button id="btnLdmPrint" type="button" class="btn btn-outline-secondary">
-                    <i class="fas fa-print"></i> Drucken / PDF
-                </button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    Schließen
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- WorkDay Modal (WorkDays JS ile uyumlu) -->
 <div class="modal fade" id="workdayModal" tabindex="-1" role="dialog" aria-hidden="true">

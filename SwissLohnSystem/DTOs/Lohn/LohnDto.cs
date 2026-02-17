@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using SwissLohnSystem.API.DTOs.Payroll;
 
 namespace SwissLohnSystem.API.DTOs.Lohn
 {
@@ -12,6 +14,7 @@ namespace SwissLohnSystem.API.DTOs.Lohn
         public decimal BruttoSalary { get; set; }
         public decimal TotalDeductions { get; set; }
         public decimal NetSalary { get; set; }
+
         public decimal ChildAllowance { get; set; }
         public decimal HolidayAllowance { get; set; }
         public decimal OvertimePay { get; set; }
@@ -24,10 +27,26 @@ namespace SwissLohnSystem.API.DTOs.Lohn
         public decimal UnpaidDeduction { get; set; }
         public decimal OtherDeduction { get; set; }
 
+        public decimal PrivateBenefitAmount { get; set; }
+        public decimal ManualAdjustment { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public bool IsFinal { get; set; }
+        public DateTime? FinalizedAt { get; set; }
 
-        // --- Snapshot parametreler ---
+        // Excel fields
+        public decimal PauschalExpenses { get; set; }
+        public decimal EffectiveExpenses { get; set; }
+        public decimal ShortTimeWorkDeduction { get; set; }
+
+        public bool Include13thSalary { get; set; }
+        public decimal ThirteenthSalaryAmount { get; set; }
+
+        public int CanteenDays { get; set; }
+        public decimal CanteenDailyRate { get; set; }
+        public decimal CanteenDeduction { get; set; }
+
+        // Snapshot flags
         public bool ApplyAHV { get; set; }
         public bool ApplyALV { get; set; }
         public bool ApplyBVG { get; set; }
@@ -35,34 +54,38 @@ namespace SwissLohnSystem.API.DTOs.Lohn
         public bool ApplyBU { get; set; }
         public bool ApplyFAK { get; set; }
         public bool ApplyQST { get; set; }
+        public bool ApplyKTG { get; set; }
 
+        public string Gender { get; set; } = "M";
         public string? PermitType { get; set; }
         public string? Canton { get; set; }
         public bool ChurchMember { get; set; }
         public string? WithholdingTaxCode { get; set; }
 
-        public decimal? HolidayRate { get; set; }
-        public bool HolidayEligible { get; set; }
-
         public string? Comment { get; set; }
+        public string? BvgPlanCodeUsed { get; set; }
 
-        // --- Arbeitnehmer-Abzüge Snapshot (AN) ---
+        // AN snapshot
         public decimal EmployeeAhvIvEo { get; set; }
-        public decimal EmployeeAlv { get; set; }
+        public decimal EmployeeAlv1 { get; set; }
+        public decimal EmployeeAlv2 { get; set; }
         public decimal EmployeeNbu { get; set; }
         public decimal EmployeeBvg { get; set; }
+        public decimal EmployeeKtg { get; set; }
         public decimal EmployeeQst { get; set; }
 
-        // --- Arbeitgeber-Beiträge Snapshot (AG) – YENİ ---
+        // AG snapshot
         public decimal EmployerAhvIvEo { get; set; }
-        public decimal EmployerAlv { get; set; }
+        public decimal EmployerAlv1 { get; set; }
+        public decimal EmployerAlv2 { get; set; }
         public decimal EmployerBu { get; set; }
         public decimal EmployerBvg { get; set; }
+        public decimal EmployerKtg { get; set; }
         public decimal EmployerFak { get; set; }
-        public string? BvgPlanName { get; set; }
-        public decimal? BvgCoordinationDeductionAnnual { get; set; }
-        public decimal? BvgEmployeeRate { get; set; }
-        public decimal? BvgEmployerRate { get; set; }
 
+        // ✅ NEW
+        public decimal EmployerVk { get; set; }
+
+        public List<PayrollItemDto> Items { get; set; } = new();
     }
 }

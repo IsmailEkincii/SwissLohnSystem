@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using SwissLohnSystem.API.Data;
+using SwissLohnSystem.API.Services.Lohn;
 using SwissLohnSystem.API.Services.Payroll;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // DI
 builder.Services.AddScoped<ISettingsProvider, EfSettingsProvider>();
 builder.Services.AddScoped<IPayrollCalculator, PayrollCalculator>();
+builder.Services.AddScoped<ILohnService, LohnService>();
 
 // Connection string
 var connStr =
@@ -31,18 +33,6 @@ builder.Services.AddControllers()
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connStr));
-
-// CORS
-const string CorsPolicy = "AllowUI";
-builder.Services.AddCors(opt =>
-{
-    opt.AddPolicy(CorsPolicy, p => p
-        .WithOrigins("https://localhost:7296", "http://localhost:7296")
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-    );
-});
-
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -57,8 +47,29 @@ builder.Services.AddSwaggerGen(c =>
     c.CustomSchemaIds(t => t.FullName);
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
+// CORS
+const string CorsPolicy = "AllowUI";
+
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy(CorsPolicy, p => p
+        .WithOrigins(
+            "https://localhost:7296", "http://localhost:7296", // UI
+            "https://localhost:7090", "http://localhost:7090"  // Swagger (opsiyonel)
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+    );
+});
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+
+    await SwissLohnSystem.API.Data.Seed.SettingsSeeder.SeedAsync(db);
+}
 
 if (app.Environment.IsDevelopment())
 {

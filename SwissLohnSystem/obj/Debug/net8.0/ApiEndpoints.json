@@ -150,7 +150,7 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.CompanyController",
-    "Method": "PostCompany",
+    "Method": "CreateCompany",
     "RelativePath": "api/Company",
     "HttpMethod": "POST",
     "IsController": true,
@@ -202,7 +202,7 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.CompanyController",
-    "Method": "PutCompany",
+    "Method": "UpdateCompany",
     "RelativePath": "api/Company/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
@@ -260,7 +260,7 @@
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.CompanyController",
     "Method": "GetCompanyEmployees",
-    "RelativePath": "api/Company/{id}/Employees",
+    "RelativePath": "api/Company/{id}/employees",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -394,27 +394,7 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "GetLohns",
-    "RelativePath": "api/Lohn",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "GetLohn",
+    "Method": "GetDetails",
     "RelativePath": "api/Lohn/{id}",
     "HttpMethod": "GET",
     "IsController": true,
@@ -428,7 +408,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDetailsDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -437,6 +417,48 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
+    "Method": "Finalize",
+    "RelativePath": "api/Lohn/{id}/finalize",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
+    "Method": "DownloadPdf",
+    "RelativePath": "api/Lohn/{id}/pdf",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
@@ -452,39 +474,13 @@
         "IsRequired": true
       },
       {
-        "Name": "period",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "GetByCompanyMonthly",
-    "RelativePath": "api/Lohn/by-company/{companyId}/monthly",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "companyId",
+        "Name": "year",
         "Type": "System.Int32",
-        "IsRequired": true
+        "IsRequired": false
       },
       {
-        "Name": "period",
-        "Type": "System.String",
+        "Name": "month",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
@@ -502,8 +498,34 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "GetByEmployee",
-    "RelativePath": "api/Lohn/by-employee/{employeeId}",
+    "Method": "Calculate",
+    "RelativePath": "api/Lohn/calculate",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
+    "Method": "GetLohnausweis",
+    "RelativePath": "api/Lohn/lohnausweis/{employeeId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -512,11 +534,16 @@
         "Name": "employeeId",
         "Type": "System.Int32",
         "IsRequired": true
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnausweisDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -528,109 +555,109 @@
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "Calculate",
-    "RelativePath": "api/Lohn/calc",
-    "HttpMethod": "POST",
+    "Method": "DownloadLohnausweisPdf",
+    "RelativePath": "api/Lohn/lohnausweis/{employeeId}/pdf",
+    "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "request",
-        "Type": "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto",
+        "Name": "employeeId",
+        "Type": "System.Int32",
         "IsRequired": true
+      },
+      {
+        "Name": "year",
+        "Type": "System.Int32",
+        "IsRequired": false
       }
     ],
-    "ReturnTypes": [
-      {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Payroll.PayrollResponseDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "CalculateAndSave",
-    "RelativePath": "api/Lohn/calc-and-save",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "request",
-        "Type": "SwissLohnSystem.API.DTOs.Payroll.PayrollRequestDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "SwissLohnSystem.API.Controllers.LohnController",
-    "Method": "FinalizePayroll",
-    "RelativePath": "api/Lohn/finalize",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "dto",
-        "Type": "SwissLohnSystem.API.DTOs.Lohn.LohnCalculateDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Lohn.LohnDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
+    "ReturnTypes": []
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.LookupsController",
-    "Method": "GetQstTariffs",
-    "RelativePath": "api/Lookups/qst-tariffs",
+    "Method": "GetQstCodes",
+    "RelativePath": "api/Lookups/qst-codes",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
       {
         "Name": "canton",
         "Type": "System.String",
         "IsRequired": false
       },
       {
-        "Name": "permit",
+        "Name": "permitType",
         "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "Get",
+    "RelativePath": "api/Settings",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[SwissLohnSystem.API.DTOs.Setting.SettingDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "UpsertBulk",
+    "RelativePath": "api/Settings",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "church",
-        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
-        "IsRequired": false
+        "Name": "items",
+        "Type": "System.Collections.Generic.List\u00601[[SwissLohnSystem.API.DTOs.Setting.SettingUpsertDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Qst.QstTariffDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -641,22 +668,22 @@
     ]
   },
   {
-    "ContainingType": "SettingsController",
-    "Method": "GetAll",
-    "RelativePath": "api/Settings",
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "GetBvgPlans",
+    "RelativePath": "api/Settings/bvg-plans",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "prefix",
-        "Type": "System.String",
+        "Name": "companyId",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Setting.SettingDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[SwissLohnSystem.API.DTOs.Setting.BvgPlanListItemDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -667,100 +694,84 @@
     ]
   },
   {
-    "ContainingType": "SettingsController",
-    "Method": "BulkUpsert",
-    "RelativePath": "api/Settings",
-    "HttpMethod": "PUT",
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "CreateOrUpdateBvg",
+    "RelativePath": "api/Settings/bvg-plans",
+    "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "dtos",
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Setting.SettingDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "SettingsController",
-    "Method": "GetOne",
-    "RelativePath": "api/Settings/{name}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "name",
-        "Type": "System.String",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "SwissLohnSystem.API.DTOs.Setting.SettingDto",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "SettingsController",
-    "Method": "UpsertOne",
-    "RelativePath": "api/Settings/{name}",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "name",
-        "Type": "System.String",
-        "IsRequired": true
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
       },
       {
         "Name": "dto",
-        "Type": "SwissLohnSystem.API.DTOs.Setting.SettingDto",
+        "Type": "SwissLohnSystem.API.DTOs.Setting.CreateOrUpdateBvgPlanDto",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
-    "ContainingType": "SettingsController",
-    "Method": "GetQstTariffs",
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "GetBvgPlan",
+    "RelativePath": "api/Settings/bvg-plans/{planCode}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "planCode",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Setting.BvgPlanDetailDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "GetQst",
     "RelativePath": "api/Settings/qst-tariffs",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "canton",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "code",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "permit",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "church",
-        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Name": "companyId",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Qst.QstTariffDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[SwissLohnSystem.API.DTOs.Qst.QstTariffDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -771,40 +782,70 @@
     ]
   },
   {
-    "ContainingType": "SettingsController",
-    "Method": "UpsertQstTariff",
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "CreateQst",
     "RelativePath": "api/Settings/qst-tariffs",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
+      {
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
       {
         "Name": "dto",
         "Type": "SwissLohnSystem.API.DTOs.Qst.QstTariffDto",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.Qst.QstTariffDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
-    "ContainingType": "SettingsController",
-    "Method": "BulkUpsertQstTariffs",
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "SaveQst",
     "RelativePath": "api/Settings/qst-tariffs",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "dtos",
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.DTOs.Qst.QstTariffDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Name": "companyId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "items",
+        "Type": "System.Collections.Generic.List\u00601[[SwissLohnSystem.API.DTOs.Qst.QstTariffDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
-    "ContainingType": "SettingsController",
-    "Method": "DeleteQstTariff",
+    "ContainingType": "SwissLohnSystem.API.Controllers.SettingsController",
+    "Method": "DeleteQst",
     "RelativePath": "api/Settings/qst-tariffs/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
@@ -814,25 +855,24 @@
         "Name": "id",
         "Type": "System.Int32",
         "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "SettingsController",
-    "Method": "ImportQstTariffsCsv",
-    "RelativePath": "api/Settings/qst-tariffs/import",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
+      },
       {
-        "Name": "File",
-        "Type": "Microsoft.AspNetCore.Http.IFormFile",
+        "Name": "companyId",
+        "Type": "System.Int32",
         "IsRequired": false
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[System.Object, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SwissLohnSystem.API.Controllers.WorkDayController",
@@ -995,7 +1035,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "SwissLohnSystem.API.DTOs.WorkDay.WorkDaySummaryDto",
+        "Type": "SwissLohnSystem.API.Responses.ApiResponse\u00601[[SwissLohnSystem.API.DTOs.WorkDay.WorkDaySummaryDto, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -1004,26 +1044,5 @@
         "StatusCode": 200
       }
     ]
-  },
-  {
-    "ContainingType": "SwissLohnSystem.API.Controllers.WeatherForecastController",
-    "Method": "Get",
-    "RelativePath": "WeatherForecast",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.IEnumerable\u00601[[SwissLohnSystem.API.WeatherForecast, SwissLohnSystem.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ],
-    "EndpointName": "GetWeatherForecast"
   }
 ]

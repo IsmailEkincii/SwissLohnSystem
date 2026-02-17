@@ -8,9 +8,13 @@ using System.Net.Http.Headers;
 
 namespace SwissLohnSystem.UI.Services
 {
-    public class ApiClient
+    public sealed class ApiClient
     {
         private readonly HttpClient _http;
+        private static readonly JsonSerializerOptions JsonOpts = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
 
         public string BaseUrl { get; }
 
@@ -19,121 +23,89 @@ namespace SwissLohnSystem.UI.Services
             _http = http;
 
             BaseUrl = config["Api:BaseUrl"]?.TrimEnd('/') ?? string.Empty;
-
             if (!string.IsNullOrWhiteSpace(BaseUrl))
-            {
                 _http.BaseAddress = new System.Uri(BaseUrl);
-            }
         }
 
-        public async Task<(bool ok, T? data, string? message)> GetAsync<T>(string url) where T : class
+        public async Task<(bool ok, T? data, string? message)> GetAsync<T>(string url)
         {
-            var resMsg = await _http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            return await ParseEnvelope<T>(resMsg);
+            var res = await _http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            return await ParseEnvelope<T>(res);
         }
 
-        public async Task<(bool ok, T? data, string? message)> PostAsync<T>(string url, object body) where T : class
+        public async Task<(bool ok, T? data, string? message)> PostAsync<T>(string url, object body)
         {
-            var resMsg = await _http.PostAsJsonAsync(url, body);
-            return await ParseEnvelope<T>(resMsg);
+            var res = await _http.PostAsJsonAsync(url, body);
+            return await ParseEnvelope<T>(res);
         }
 
-        public async Task<(bool ok, T? data, string? message)> PutAsync<T>(string url, object body) where T : class
+        public async Task<(bool ok, T? data, string? message)> PutAsync<T>(string url, object body)
         {
-            var resMsg = await _http.PutAsJsonAsync(url, body);
-            return await ParseEnvelope<T>(resMsg);
+            var res = await _http.PutAsJsonAsync(url, body);
+            return await ParseEnvelope<T>(res);
         }
 
-        public async Task<(bool ok, T? data, string? message)> DeleteAsync<T>(string url) where T : class
+        public async Task<(bool ok, T? data, string? message)> DeleteAsync<T>(string url)
         {
-            var resMsg = await _http.DeleteAsync(url);
-            return await ParseEnvelope<T>(resMsg);
+            var res = await _http.DeleteAsync(url);
+            return await ParseEnvelope<T>(res);
         }
 
-        /// <summary>
-        /// CSV import gibi multipart/form-data upload işlemleri için.
-        /// </summary>
         public async Task<(bool ok, T? data, string? message)> PostMultipartAsync<T>(
             string url,
             IFormFile file,
-            string formFieldName = "File") where T : class
+            string formFieldName = "File")
         {
             if (file is null || file.Length == 0)
-                return (false, null, "Datei ist leer oder fehlt.");
+                return (false, default, "Datei ist leer oder fehlt.");
 
             using var form = new MultipartFormDataContent();
 
             await using var stream = file.OpenReadStream();
-            var fileContent = new StreamContent(stream);
-            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType ?? "text/csv");
+            using var fileContent = new StreamContent(stream);
 
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType ?? "text/csv");
             form.Add(fileContent, formFieldName, file.FileName);
 
-            var resMsg = await _http.PostAsync(url, form);
-            return await ParseEnvelope<T>(resMsg);
+            var res = await _http.PostAsync(url, form);
+            return await ParseEnvelope<T>(res);
         }
 
-        private static async Task<(bool ok, T? data, string? message)> ParseEnvelope<T>(HttpResponseMessage resMsg) where T : class
+        private static async Task<(bool ok, T? data, string? message)> ParseEnvelope<T>(HttpResponseMessage res)
         {
-            string? raw = null;
-
-            try
-            {
-                raw = await resMsg.Content.ReadAsStringAsync();
-            }
-            catch
-            {
-            }
+            string raw;
+            try { raw = await res.Content.ReadAsStringAsync(); }
+            catch { return (res.IsSuccessStatusCode, default, res.ReasonPhrase); }
 
             if (string.IsNullOrWhiteSpace(raw))
-            {
-                var ok = resMsg.IsSuccessStatusCode;
-                return (ok, null, resMsg.ReasonPhrase);
-            }
+                return (res.IsSuccessStatusCode, default, res.ReasonPhrase);
 
-            var trimmed = raw.TrimStart();
-
-            var jsonOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            if (trimmed.StartsWith("["))
-            {
-                try
-                {
-                    var direct = JsonSerializer.Deserialize<T>(raw, jsonOptions);
-                    return (resMsg.IsSuccessStatusCode, direct, resMsg.IsSuccessStatusCode ? null : resMsg.ReasonPhrase);
-                }
-                catch (Exception ex)
-                {
-                    return (false, null, $"JSON parse error (array): {ex.Message}");
-                }
-            }
-
+            // 1) ApiResponse<T> envelope dene
             try
             {
-                var env = JsonSerializer.Deserialize<ApiEnvelope<T>>(raw, jsonOptions);
-
-                if (env is not null)
+                var env = JsonSerializer.Deserialize<ApiEnvelope<T>>(raw, JsonOpts);
+                if (env is not null && (env.Success || !string.IsNullOrWhiteSpace(env.Message) || env.Data is not null))
                 {
-                    var success = resMsg.IsSuccessStatusCode && env.Success;
-                    var msg = env.Message ?? resMsg.ReasonPhrase;
-                    return (success, env.Data, msg);
+                    // success flag + http status birlikte
+                    var ok = res.IsSuccessStatusCode && env.Success;
+                    var msg = env.Message ?? (ok ? null : res.ReasonPhrase);
+                    return (ok, env.Data, msg);
                 }
             }
             catch
             {
+                // ignore -> direct parse dene
             }
 
+            // 2) Direct T parse
             try
             {
-                var direct = JsonSerializer.Deserialize<T>(raw, jsonOptions);
-                return (resMsg.IsSuccessStatusCode, direct, resMsg.IsSuccessStatusCode ? null : resMsg.ReasonPhrase);
+                var direct = JsonSerializer.Deserialize<T>(raw, JsonOpts);
+                return (res.IsSuccessStatusCode, direct, res.IsSuccessStatusCode ? null : res.ReasonPhrase);
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
-                return (false, null, $"JSON parse error: {ex.Message}");
+                return (false, default, $"JSON parse error: {ex.Message}");
             }
         }
 

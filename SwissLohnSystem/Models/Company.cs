@@ -14,6 +14,8 @@ namespace SwissLohnSystem.API.Models
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? TaxNumber { get; set; }
+        [MaxLength(100)]
+        public string? DefaultBvgPlanCode { get; set; }  // örn: "PK_ZURICH_STD_2026"
 
         public ICollection<Employee> Employees { get; set; } = new List<Employee>();
     }

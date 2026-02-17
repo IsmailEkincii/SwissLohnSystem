@@ -1,9 +1,19 @@
-﻿namespace SwissLohnSystem.API.DTOs.Setting;
-
-public sealed class SettingDto
+﻿namespace SwissLohnSystem.API.DTOs.Setting
 {
-    public int Id { get; set; }                 // <-- EKLİ
-    public string Name { get; set; } = null!;
-    public decimal Value { get; set; }
-    public string? Description { get; set; }
+    public class SettingDto
+    {
+        public int Id { get; set; }
+        public int CompanyId { get; set; }
+        public string Name { get; set; } = null!;
+        public string? Value { get; set; } = "";      // ✅ string
+        public string? Description { get; set; }
+    }
+
+    public class SettingUpsertDto
+    {
+        public int? Id { get; set; }
+        public string Name { get; set; } = null!;
+        public string? Value { get; set; } = "";         // ✅ string
+        public string? Description { get; set; }
+    }
 }

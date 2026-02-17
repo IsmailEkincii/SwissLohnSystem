@@ -10,5 +10,7 @@
         public string Canton { get; set; } = "";
         public string? Email { get; set; }
         public int? EmployeeCount { get; set; } // opsiyonel: liste sayfasında göstermek için
+        public string? DefaultBvgPlanCode { get; set; }
+
     }
 }

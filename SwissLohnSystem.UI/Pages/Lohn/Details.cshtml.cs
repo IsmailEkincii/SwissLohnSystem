@@ -1,12 +1,15 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+Ôªøusing Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SwissLohnSystem.UI.DTOs.Companies;
 using SwissLohnSystem.UI.DTOs.Employees;
 using SwissLohnSystem.UI.DTOs.Lohn;
+using SwissLohnSystem.UI.DTOs.Setting;
 using SwissLohnSystem.UI.Services;
 using SwissLohnSystem.UI.Services.Mapping;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
 
 namespace SwissLohnSystem.UI.Pages.Lohn
 {
@@ -22,8 +25,10 @@ namespace SwissLohnSystem.UI.Pages.Lohn
         [BindProperty(SupportsGet = true)]
         public int Id { get; set; }
 
-        /// <summary>Lohn + Employee + Company birle˛mi˛ detay DTOísu</summary>
+        /// <summary>Lohn + Employee + Company birle≈ümi≈ü detay DTO‚Äôsu</summary>
         public LohnDetailsDto? Lohn { get; private set; }
+        public CompanyDto? Company { get; private set; }
+        public EmployeeDto? Employee { get; private set; }
 
         public string? Error { get; private set; }
 
@@ -31,10 +36,10 @@ namespace SwissLohnSystem.UI.Pages.Lohn
         {
             Id = id;
 
-            // JS iÁin BaseUrl
+            // JS i√ßin BaseUrl
             ViewData["ApiBaseUrl"] = _api.BaseUrl?.TrimEnd('/');
 
-            // 1) Lohn kayd˝n˝ Áek
+            // 1) Lohn kaydƒ±nƒ± √ßek
             var lohnRes = await _api.GetAsync<LohnDto>($"/api/Lohn/{id}");
             if (!lohnRes.ok || lohnRes.data is null)
             {
@@ -45,7 +50,7 @@ namespace SwissLohnSystem.UI.Pages.Lohn
 
             var lohn = lohnRes.data;
 
-            // 2) Mitarbeiter detaylar˝
+            // 2) Mitarbeiter detaylarƒ±
             EmployeeDto? emp = null;
             CompanyDto? comp = null;
 
@@ -62,10 +67,41 @@ namespace SwissLohnSystem.UI.Pages.Lohn
                 }
             }
 
-            // 4) UI DTOísu
-            Lohn = ApiToUiMapper.ToDetails(lohn, emp, comp);
+            // ? 4) Settings oranlarƒ±nƒ± √ßek (Name -> Value)
+            var rateByName = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
+
+            // ‚ùó Mutlaka companyId ile √ßaƒüƒ±r
+            var settingsRes = await _api.GetAsync<List<SettingDto>>($"/api/Settings?companyId={comp?.Id ?? 0}");
+
+            if (settingsRes.ok && settingsRes.data is not null)
+            {
+                foreach (var s in settingsRes.data)
+                {
+                    if (!string.IsNullOrWhiteSpace(s.Name))
+                        rateByName[s.Name] = ParseDecimalFlexible(s.Value);
+                }
+            }
+
+
+            // ? 5) UI DTO‚Äôsu (Rate destekli overload)
+            Lohn = ApiToUiMapper.ToDetails(lohn, emp, comp, rateByName);
 
             return Page();
         }
+        private static decimal ParseDecimalFlexible(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return 0m;
+
+            var s = raw.Trim();
+
+            if (decimal.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var a)) return a;
+            if (decimal.TryParse(s, NumberStyles.Number, CultureInfo.GetCultureInfo("de-CH"), out var b)) return b;
+
+            s = s.Replace(',', '.');
+            if (decimal.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var c)) return c;
+
+            return 0m;
+        }
+
     }
 }

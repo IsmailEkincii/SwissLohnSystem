@@ -33,6 +33,11 @@ namespace SwissLohnSystem.API.Models
 
         public int ChildCount { get; set; }
 
+        // ✅ NEW: Gender (m/w) - KTG rate seçimi için
+        // "M" | "F"
+        [Required, MaxLength(1)]
+        public string Gender { get; set; } = "M";
+
         // ---- Gehalt ----
         // "Monthly" | "Hourly"
         [Required, MaxLength(20)]
@@ -77,6 +82,7 @@ namespace SwissLohnSystem.API.Models
         public bool ApplyBVG { get; set; } = true;
         public bool ApplyFAK { get; set; } = true;
         public bool ApplyQST { get; set; }
+        public bool ApplyKTG { get; set; } // ✅ NEW
 
         // ---- Steuer / Kanton ----
         [MaxLength(5)]

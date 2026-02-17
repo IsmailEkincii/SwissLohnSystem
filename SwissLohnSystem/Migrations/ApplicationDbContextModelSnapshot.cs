@@ -43,6 +43,74 @@ namespace SwissLohnSystem.API.Migrations
                     b.ToTable("Admins");
                 });
 
+            modelBuilder.Entity("SwissLohnSystem.API.Models.BvgPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CoordinationDedAnnual")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EntryThresholdAnnual")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PlanBaseCode")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("PlanCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<decimal>("Rate25_34_Employee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rate25_34_Employer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rate35_44_Employee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rate35_44_Employer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rate45_54_Employee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rate45_54_Employer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rate55_65_Employee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Rate55_65_Employer")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("UpperLimitAnnual")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "PlanCode")
+                        .IsUnique();
+
+                    b.ToTable("BvgPlans");
+                });
+
             modelBuilder.Entity("SwissLohnSystem.API.Models.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -57,6 +125,10 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<string>("Canton")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DefaultBvgPlanCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -110,6 +182,9 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<bool>("ApplyFAK")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("ApplyKTG")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("ApplyNBU")
                         .HasColumnType("bit");
 
@@ -155,6 +230,11 @@ namespace SwissLohnSystem.API.Migrations
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
 
                     b.Property<bool>("HolidayEligible")
                         .HasColumnType("bit");
@@ -255,6 +335,9 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<bool>("ApplyFAK")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("ApplyKTG")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("ApplyNBU")
                         .HasColumnType("bit");
 
@@ -267,18 +350,18 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<decimal>("BruttoSalary")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<decimal?>("BvgCoordinationDeductionAnnual")
+                    b.Property<string>("BvgPlanCodeUsed")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("CanteenDailyRate")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<decimal?>("BvgEmployeeRate")
-                        .HasColumnType("decimal(18,4)");
+                    b.Property<int>("CanteenDays")
+                        .HasColumnType("int");
 
-                    b.Property<decimal?>("BvgEmployerRate")
+                    b.Property<decimal>("CanteenDeduction")
                         .HasColumnType("decimal(18,4)");
-
-                    b.Property<string>("BvgPlanName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Canton")
                         .HasMaxLength(5)
@@ -296,10 +379,16 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("EffectiveExpenses")
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("EmployeeAhvIvEo")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<decimal>("EmployeeAlv")
+                    b.Property<decimal>("EmployeeAlv1")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployeeAlv2")
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("EmployeeBvg")
@@ -307,6 +396,9 @@ namespace SwissLohnSystem.API.Migrations
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("EmployeeKtg")
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("EmployeeNbu")
                         .HasColumnType("decimal(18,4)");
@@ -317,7 +409,10 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<decimal>("EmployerAhvIvEo")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<decimal>("EmployerAlv")
+                    b.Property<decimal>("EmployerAlv1")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployerAlv2")
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("EmployerBu")
@@ -329,20 +424,34 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<decimal>("EmployerFak")
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<decimal>("EmployerKtg")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("EmployerVk")
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("ExtraAllowance")
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<DateTime?>("FinalizedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
 
                     b.Property<decimal>("HolidayAllowance")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<bool>("HolidayEligible")
+                    b.Property<bool>("Include13thSalary")
                         .HasColumnType("bit");
-
-                    b.Property<decimal?>("HolidayRate")
-                        .HasColumnType("decimal(18,4)");
 
                     b.Property<bool>("IsFinal")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("ManualAdjustment")
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("Month")
                         .HasColumnType("int");
@@ -362,9 +471,21 @@ namespace SwissLohnSystem.API.Migrations
                     b.Property<decimal>("OvertimePay")
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<decimal>("PauschalExpenses")
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<string>("PermitType")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("PrivateBenefitAmount")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("ShortTimeWorkDeduction")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("ThirteenthSalaryAmount")
+                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("TotalDeductions")
                         .HasColumnType("decimal(18,4)");
@@ -407,6 +528,9 @@ namespace SwissLohnSystem.API.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("IncomeFrom")
                         .HasColumnType("decimal(18,2)");
 
@@ -427,9 +551,10 @@ namespace SwissLohnSystem.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Canton", "Code", "PermitType", "ChurchMember");
+                    b.HasIndex("CompanyId", "Canton", "Code", "PermitType", "ChurchMember");
 
-                    b.HasIndex("Canton", "Code", "PermitType", "IncomeFrom", "IncomeTo");
+                    b.HasIndex("CompanyId", "Canton", "Code", "PermitType", "ChurchMember", "IncomeFrom", "IncomeTo")
+                        .IsUnique();
 
                     b.ToTable("QstTariffs", (string)null);
                 });
@@ -442,6 +567,9 @@ namespace SwissLohnSystem.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -451,12 +579,22 @@ namespace SwissLohnSystem.API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .HasMaxLength(200)
+                        .HasPrecision(18, 6)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Settings");
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("CompanyId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Settings", (string)null);
                 });
 
             modelBuilder.Entity("SwissLohnSystem.API.Models.WorkDay", b =>

@@ -42,7 +42,7 @@ namespace SwissLohnSystem.UI.Pages.Companies
             if (!okCompany || company is null)
             {
                 // İstersen burada Companies/Index'e geri de yönlendirebiliriz
-                TempData["ToastError"] = companyMsg ?? "Firma konnte nicht geladen werden.";
+                TempData["Error"] = companyMsg ?? "Firma konnte nicht geladen werden.";
                 return RedirectToPage("/Companies/Index");
             }
 

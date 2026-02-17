@@ -1,4 +1,5 @@
 ﻿@page "{id:int}"
+@using SwissLohnSystem.UI.DTOs.Lohn
 @model SwissLohnSystem.UI.Pages.Lohn.DetailsModel
 @{
     ViewData["Title"] = "Lohnabrechnung";
@@ -48,9 +49,34 @@
             var l = Model.Lohn!;
             var periodText = $"{l.Month:00}.{l.Year}";
 
+            var employerTotal =
+            l.EmployerAhvIvEo +
+            l.EmployerAlv +
+            l.EmployerBu +
+            l.EmployerBvg +
+            l.EmployerFak;
+
+            var items = l.Items ?? new List<LohnSlipItemDto>();
+
+            var earnings = items.Where(x => x.Group == LohnSlipGroup.Earnings).OrderBy(x => x.SortOrder).ToList();
+            var deductionsEmployee = items.Where(x => x.Group == LohnSlipGroup.DeductionsEmployee).OrderBy(x => x.SortOrder).ToList();
+            var contributionsEmployer = items.Where(x => x.Group == LohnSlipGroup.ContributionsEmployer).OrderBy(x => x.SortOrder).ToList();
+
+            string FormatBase(decimal? v) => v.HasValue ? v.Value.ToString("N2") : "—";
+
+            string FormatRate(LohnSlipItemDto it)
+            {
+                if (!string.IsNullOrWhiteSpace(it.RateText))
+                    return it.RateText!;
+
+                return it.Rate.HasValue
+                ? (it.Rate.Value.ToString("N2") + " %")
+                : "—";
+            }
+
             <div class="row">
-                <!-- SOL KART: Mitarbeiter -->
-                <div class="col-md-4">
+                <!-- Sol kart print'te görünmesin -->
+                <div class="col-md-4 d-print-none">
                     <div class="card card-outline card-primary">
                         <div class="card-header">
                             <h3 class="card-title mb-0">Mitarbeiter</h3>
@@ -58,49 +84,37 @@
                         <div class="card-body">
                             <dl class="row mb-0">
                                 <dt class="col-5">Name</dt>
-                                <dd class="col-7" id="employeeName">@l.EmployeeName</dd>
+                                <dd class="col-7">@l.EmployeeName</dd>
 
                                 <dt class="col-5">Firma</dt>
-                                <dd class="col-7" id="companyName">@l.CompanyName</dd>
+                                <dd class="col-7">@l.CompanyName</dd>
 
                                 <dt class="col-5">Periode</dt>
-                                <dd class="col-7" id="period">@periodText</dd>
+                                <dd class="col-7">@periodText</dd>
 
                                 <dt class="col-5">Status</dt>
                                 <dd class="col-7">
-                                    <span id="badgeStatus"
-                                          class="badge @(l.IsFinal ? "badge-success" : "badge-warning")">
+                                    <span class="badge @(l.IsFinal ? "badge-success" : "badge-warning")">
                                         @(l.IsFinal ? "Final" : "Entwurf")
                                     </span>
                                 </dd>
 
                                 <dt class="col-5">Erstellt am</dt>
-                                <dd class="col-7" id="createdAt">
-                                    @l.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                                <dd class="col-7">
+                                    @@(item.Rate.HasValue ? item.Rate.Value.ToString("0.00") : "")
                                 </dd>
 
                                 <dt class="col-5">Monatsstunden</dt>
-                                <dd class="col-7" id="labelMonthlyHours">
-                                    @($"{l.MonthlyHours:N2} h")
-                                </dd>
+                                <dd class="col-7">@($"{l.MonthlyHours:N2} h")</dd>
 
                                 <dt class="col-5">Überstunden</dt>
-                                <dd class="col-7" id="labelMonthlyOvertime">
-                                    @($"{l.MonthlyOvertimeHours:N2} h")
-                                </dd>
-
-                                <dt class="col-5">Gearbeitete Tage</dt>
-                                <dd class="col-7" id="labelWorkedDays">
-                                    wird geladen…
-                                </dd>
+                                <dd class="col-7">@($"{l.MonthlyOvertimeHours:N2} h")</dd>
 
                                 <dt class="col-5">Quellensteuer</dt>
                                 <dd class="col-7">
                                     @if (l.ApplyQST)
                                     {
-                                        <span>
-                                            Aktiv (@l.WithholdingTaxCode / @l.Canton)
-                                        </span>
+                                        <span>Aktiv (@l.WithholdingTaxCode / @l.Canton)</span>
                                     }
                                     else
                                     {
@@ -109,9 +123,7 @@
                                 </dd>
 
                                 <dt class="col-5">Kirchensteuer</dt>
-                                <dd class="col-7">
-                                    @(l.ChurchMember ? "Kirchensteuerpflichtig" : "Keine Kirchensteuer")
-                                </dd>
+                                <dd class="col-7">@(l.ChurchMember ? "Kirchensteuerpflichtig" : "Keine Kirchensteuer")</dd>
                             </dl>
 
                             <div class="mt-3">
@@ -119,6 +131,7 @@
                                    href="~/Employees/Details/@l.EmployeeId">
                                     <i class="fas fa-user"></i> Mitarbeiter öffnen
                                 </a>
+
                                 @if (l.CompanyId != null)
                                 {
                                     <a class="btn btn-outline-secondary btn-sm ml-1"
@@ -131,124 +144,229 @@
                     </div>
                 </div>
 
-                <!-- SAĞ KART: Zusammenfassung + Slip -->
                 <div class="col-md-8">
                     <div class="card card-outline card-success">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title mb-0">Zusammenfassung</h3>
+                        <!-- Üst başlık print'te görünmesin -->
+                        <div class="card-header d-flex justify-content-between align-items-center d-print-none">
+                            <h3 class="card-title mb-0">
+                                Zusammenfassung
+                                <small class="text-muted">(@periodText)</small>
+                            </h3>
                             <div class="btn-group">
                                 @if (!l.IsFinal)
                                 {
-                                    <button id="btnFinalize"
-                                            type="button"
-                                            class="btn btn-sm btn-outline-primary">
+                                    <button type="button"
+                                            class="btn btn-sm btn-success d-print-none"
+                                            id="btnFinalize">
                                         <i class="fas fa-check"></i> Finalisieren
                                     </button>
                                 }
+                                @if (l.IsFinal)
+                                {
+                                    <a class="btn btn-sm btn-primary d-print-none"
+                                       href="@( (ViewData["ApiBaseUrl"] ?? "").ToString()?.TrimEnd('/') + $"/api/Lohn/{l.Id}/pdf")"
+                                       target="_blank">
+                                        <i class="fas fa-file-pdf"></i> PDF herunterladen
+                                    </a>
+                                }
                                 <button type="button"
-                                        class="btn btn-sm btn-outline-secondary ml-1"
-                                        id="btnLdmPrint">
+                                        class="btn btn-sm btn-outline-secondary d-print-none"
+                                        id="btnLdmPrint"
+                                        onclick="window.print();">
                                     <i class="fas fa-print"></i> Drucken / PDF
                                 </button>
                             </div>
                         </div>
-                        <div class="card-body">
 
-                            <!-- Özet kutular -->
-                            <div class="row text-center mb-3">
+                        <div class="card-body">
+                            <!-- Özet kutular print'te görünmesin -->
+                            <div class="row text-center mb-3 d-print-none">
                                 <div class="col-md-3 mb-2">
-                                    <div class="border rounded p-2">
-                                        <div class="text-muted small">Bruttolohn</div>
-                                        <div class="h5 mb-0" id="cardGross">
-                                            @l.BruttoSalary.ToString("N2") CHF
+                                    <div class="small-box bg-light">
+                                        <div class="inner">
+                                            <small class="text-muted">Bruttolohn</small>
+                                            <h5 class="mb-0">@l.BruttoSalary.ToString("N2") CHF</h5>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-3 mb-2">
-                                    <div class="border rounded p-2">
-                                        <div class="text-muted small">Abzüge (AN)</div>
-                                        <div class="h5 mb-0" id="cardEmpTotal">
-                                            @l.TotalDeductions.ToString("N2") CHF
+                                    <div class="small-box bg-light">
+                                        <div class="inner">
+                                            <small class="text-muted">Abzüge (AN)</small>
+                                            <h5 class="mb-0">@l.TotalDeductions.ToString("N2") CHF</h5>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-3 mb-2">
-                                    <div class="border rounded p-2">
-                                        <div class="text-muted small">AG-Kosten</div>
-                                        <div class="h5 mb-0" id="cardErTotal">
-                                            wird geladen…
+                                    <div class="small-box bg-light">
+                                        <div class="inner">
+                                            <small class="text-muted">AG-Kosten</small>
+                                            <h5 class="mb-0">@employerTotal.ToString("N2") CHF</h5>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-3 mb-2">
-                                    <div class="border rounded p-2">
-                                        <div class="text-muted small">Netto</div>
-                                        <div class="h5 mb-0" id="cardNet">
-                                            @l.NetSalary.ToString("N2") CHF
+                                    <div class="small-box bg-success">
+                                        <div class="inner text-white">
+                                            <small>Netto</small>
+                                            <h5 class="mb-0">@l.NetSalary.ToString("N2") CHF</h5>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Printable SLIP -->
-                            <div id="lohnDetailPrintable" class="p-2 border rounded">
-                                <div class="row mb-3 small">
-                                    <div class="col-sm-6">
-                                        <strong>@l.CompanyName</strong><br />
-                                        <!-- İstersen ileride CompanyAddress vs. buraya ekleriz -->
+                            <!-- ================= PRINT AREA / SLIP ================= -->
+                            <div id="lohnDetailPrintable" class="p-2 border rounded print-area">
+
+                                <!-- PRINT LETTERHEAD (sadece print) -->
+                                <div class="d-none d-print-block mb-3">
+                                    <div class="row mb-2">
+                                        <div class="col-6 small">
+                                            <strong>@l.CompanyName</strong><br />
+
+                                            @if (!string.IsNullOrWhiteSpace(l.CompanyAddress))
+                                            {
+                                                @l.CompanyAddress
+                                        
+                                                <br />
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(l.CompanyPhone))
+                                            {
+                                                @l.CompanyPhone
+                                        
+                                                <br />
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(l.CompanyEmail))
+                                            {
+                                                @l.CompanyEmail
+                                        
+                                                <br />
+                                            }
+                                        </div>
+
+                                        <div class="col-6 small text-right">
+                                            @DateTime.Today.ToString("dd.MM.yyyy")<br /><br />
+
+                                            <strong>Mitarbeiter</strong><br />
+                                            @l.EmployeeName<br />
+                                            @l.EmployeeAhvNumber<br />
+
+                                            @if (!string.IsNullOrWhiteSpace(l.EmployeeAddress))
+                                            {
+                                                @l.EmployeeAddress
+                                        
+                                                <br />
+
+                                                @if (!string.IsNullOrWhiteSpace(l.EmployeeZip) || !string.IsNullOrWhiteSpace(l.EmployeeCity))
+                                                {
+                                                    @($"{l.EmployeeZip} {l.EmployeeCity}".Trim())
+                                        
+                                                    <br />
+                                                }
+                                            }
+
+                                            @if (!string.IsNullOrWhiteSpace(l.EmployeePhone))
+                                            {
+                                                @l.EmployeePhone
+                                        
+                                                <br />
+                                            }
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6 text-right">
-                                        @DateTime.Today.ToString("dd.MM.yyyy")<br />
-                                        <br />
-                                        <strong>Mitarbeiter</strong><br />
-                                        @l.EmployeeName
+
+                                    <h5 class="mb-2 lohn-title">
+                                        Lohnabrechnung <span class="text-muted">@periodText</span>
+                                    </h5>
+
+                                    <div class="row mb-2">
+                                        <div class="col-6 small">
+                                            <strong>Gesamtstunden im Monat:</strong> @($"{l.MonthlyHours:N2} h")
+                                        </div>
+                                        <div class="col-6 small text-right">
+                                            <strong>Überstunden im Monat:</strong> @($"{l.MonthlyOvertimeHours:N2} h")
+                                        </div>
                                     </div>
                                 </div>
 
-                                <h5 class="mb-2">
-                                    Lohnabrechnung
-                                    <span id="ldmPeriodHeader" class="text-muted">
-                                        @($"{l.Month:00}.{l.Year}")
-                                    </span>
-                                </h5>
-
-                                <div class="row mb-2 small">
-                                    <div class="col-sm-6">
-                                        <strong>Gesamtstunden im Monat:</strong>
-                                        <span id="ldmMonthlyHours">@($"{l.MonthlyHours:N2} h")</span>
-                                    </div>
-                                    <div class="col-sm-6 text-right">
-                                        <strong>Überstunden im Monat:</strong>
-                                        <span id="ldmMonthlyOvertime">@($"{l.MonthlyOvertimeHours:N2} h")</span>
-                                    </div>
-                                </div>
-
+                                <!-- TABLE -->
                                 <div class="table-responsive">
                                     <table class="table table-sm table-bordered" id="ldmSlipTable">
                                         <thead class="thead-light">
                                             <tr>
-                                                <th style="width:40%;">Legende</th>
-                                                <th style="width:10%;" class="text-right">%</th>
-                                                <th style="width:15%;" class="text-right">Menge</th>
-                                                <th style="width:15%;" class="text-right">Ansatz</th>
-                                                <th style="width:20%;" class="text-right">Betrag</th>
+                                                <th style="width:52%;">Legende</th>
+                                                <th style="width:16%;" class="text-right">Basis</th>
+                                                <th style="width:14%;" class="text-right">Satz</th>
+                                                <th style="width:18%;" class="text-right">Betrag (CHF)</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="ldmSlipBody">
-                                            <tr>
-                                                <td colspan="5" class="text-center text-muted">
-                                                    Wird geladen…
-                                                </td>
+                                        <tbody>
+                                            @foreach (var it in earnings)
+                                            {
+                                                <tr class="font-weight-bold">
+                                                    <td>@it.Title</td>
+                                                    <td class="text-right">@FormatBase(it.Base)</td>
+                                                    <td class="text-right">@FormatRate(it)</td>
+                                                    <td class="text-right">@it.Amount.ToString("N2")</td>
+                                                </tr>
+                                            }
+
+                                            @if (deductionsEmployee.Any())
+                                            {
+                                                <tr class="table-secondary">
+                                                    <td colspan="4"><strong>Abzüge Arbeitnehmer (AN)</strong></td>
+                                                </tr>
+
+                                                @foreach (var it in deductionsEmployee)
+                                                {
+                                                    <tr>
+                                                        <td>@it.Title</td>
+                                                        <td class="text-right">@FormatBase(it.Base)</td>
+                                                        <td class="text-right">@FormatRate(it)</td>
+                                                        <td class="text-right">@it.Amount.ToString("N2")</td>
+                                                    </tr>
+                                                }
+                                            }
+
+                                            @if (contributionsEmployer.Any())
+                                            {
+                                                <tr class="table-secondary">
+                                                    <td colspan="4"><strong>Beiträge Arbeitgeber (AG)</strong></td>
+                                                </tr>
+
+                                                @foreach (var it in contributionsEmployer)
+                                                {
+                                                    <tr>
+                                                        <td>@it.Title</td>
+                                                        <td class="text-right">@FormatBase(it.Base)</td>
+                                                        <td class="text-right">@FormatRate(it)</td>
+                                                        <td class="text-right">@it.Amount.ToString("N2")</td>
+                                                    </tr>
+                                                }
+                                            }
+
+                                            <tr class="font-weight-bold table-success">
+                                                <td>Nettoauszahlung</td>
+                                                <td class="text-right">—</td>
+                                                <td class="text-right">—</td>
+                                                <td class="text-right">@l.NetSalary.ToString("N2")</td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
 
-                            <p class="text-muted small mt-3 mb-0">
-                                Hinweis: Die Detailpositionen (AN/AG) stammen aus der aktuellen Berechnung
-                                des Payroll-Motors für diesen Monat. Die zusammengefassten Beträge sind
-                                zusätzlich als Snapshot in der Lohnabrechnung gespeichert.
+                                @* Print Totals + Signature (istersen)
+                                <div class="print-totals d-none d-print-block">...</div>
+                                <div class="print-footer d-none d-print-block">...</div>
+                                *@
+
+                            </div>
+                            <!-- ================= END PRINT AREA ================= -->
+
+                            <p class="text-muted small mt-3 mb-0 d-print-none">
+                                Hinweis: Diese Ansicht zeigt die gespeicherten Snapshot-Beträge der Lohnabrechnung.
                             </p>
                         </div>
                     </div>
@@ -260,14 +378,8 @@
 
 @section Scripts {
     <script>
-        window.API_BASE_URL      = '@(ViewData["ApiBaseUrl"] ?? "")';
-        window.LOHN_EMPLOYEE_ID  = @((Model.Lohn?.EmployeeId ?? 0));
-        window.LOHN_MONTH        = @((Model.Lohn?.Month ?? 0));
-        window.LOHN_YEAR         = @((Model.Lohn?.Year ?? 0));
-
-        window.LOHN_BRUTTO       = @((Model.Lohn?.BruttoSalary ?? 0m));
-        window.LOHN_NETTO        = @((Model.Lohn?.NetSalary ?? 0m));
-        window.LOHN_TOTAL_DEDU   = @((Model.Lohn?.TotalDeductions ?? 0m));
+        window.API_BASE_URL = '@(ViewData["ApiBaseUrl"] ?? "")';
+        window.LOHN_ID = @Model.Id;
     </script>
     <script src="~/js/lohne-details.js"></script>
 }

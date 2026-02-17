@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using SwissLohnSystem.API.DTOs.Payroll;
 
 namespace SwissLohnSystem.API.DTOs.Lohn
 {
-    /// <summary>
-    /// Lohn detay modal/sayfası için genişletilmiş DTO.
-    /// </summary>
     public class LohnDetailsDto
     {
         public int Id { get; set; }
@@ -16,32 +14,44 @@ namespace SwissLohnSystem.API.DTOs.Lohn
         public decimal BruttoSalary { get; set; }
         public decimal TotalDeductions { get; set; }
         public decimal NetSalary { get; set; }
+
         public decimal ChildAllowance { get; set; }
         public decimal HolidayAllowance { get; set; }
         public decimal OvertimePay { get; set; }
 
-        // Ek brüt kalemleri
+        public decimal MonthlyHours { get; set; }
+        public decimal MonthlyOvertimeHours { get; set; }
+
         public decimal Bonus { get; set; }
         public decimal ExtraAllowance { get; set; }
         public decimal UnpaidDeduction { get; set; }
         public decimal OtherDeduction { get; set; }
 
-        // Aylık çalışma saatleri
-        public decimal MonthlyHours { get; set; }
-        public decimal MonthlyOvertimeHours { get; set; }
+        public decimal PrivateBenefitAmount { get; set; }
+        public decimal ManualAdjustment { get; set; }
 
         public DateTime CreatedAt { get; set; }
         public bool IsFinal { get; set; }
+        public DateTime? FinalizedAt { get; set; }
 
         // UI enrichments
         public string? EmployeeName { get; set; }
         public int? CompanyId { get; set; }
         public string? CompanyName { get; set; }
 
-        // İleride kalem dökümü için (şimdilik opsiyonel)
-        public List<LohnItemDto> Items { get; set; } = new();
+        // Excel fields
+        public decimal PauschalExpenses { get; set; }
+        public decimal EffectiveExpenses { get; set; }
+        public decimal ShortTimeWorkDeduction { get; set; }
 
-        // --- Snapshot parametreler (Lohn tablosundan) ---
+        public bool Include13thSalary { get; set; }
+        public decimal ThirteenthSalaryAmount { get; set; }
+
+        public int CanteenDays { get; set; }
+        public decimal CanteenDailyRate { get; set; }
+        public decimal CanteenDeduction { get; set; }
+
+        // Flags
         public bool ApplyAHV { get; set; }
         public bool ApplyALV { get; set; }
         public bool ApplyBVG { get; set; }
@@ -49,33 +59,38 @@ namespace SwissLohnSystem.API.DTOs.Lohn
         public bool ApplyBU { get; set; }
         public bool ApplyFAK { get; set; }
         public bool ApplyQST { get; set; }
+        public bool ApplyKTG { get; set; }
 
+        public string Gender { get; set; } = "M";
         public string? PermitType { get; set; }
         public string? Canton { get; set; }
         public bool ChurchMember { get; set; }
         public string? WithholdingTaxCode { get; set; }
 
-        public decimal? HolidayRate { get; set; }
-        public bool HolidayEligible { get; set; }
-
         public string? Comment { get; set; }
+        public string? BvgPlanCodeUsed { get; set; }
 
-        // --- Arbeitnehmer-Abzüge Snapshot (AHV/ALV/NBU/BVG/QST) ---
+        // AN snapshot
         public decimal EmployeeAhvIvEo { get; set; }
-        public decimal EmployeeAlv { get; set; }
+        public decimal EmployeeAlv1 { get; set; }
+        public decimal EmployeeAlv2 { get; set; }
         public decimal EmployeeNbu { get; set; }
         public decimal EmployeeBvg { get; set; }
+        public decimal EmployeeKtg { get; set; }
         public decimal EmployeeQst { get; set; }
-    }
 
-    public class LohnItemDto
-    {
-        public string Code { get; set; } = "";
-        public string Title { get; set; } = "";
-        public string Type { get; set; } = "info";
-        public string Basis { get; set; } = "";
-        public decimal Rate { get; set; }
-        public decimal Amount { get; set; }
-        public string Side { get; set; } = "employee";
+        // AG snapshot
+        public decimal EmployerAhvIvEo { get; set; }
+        public decimal EmployerAlv1 { get; set; }
+        public decimal EmployerAlv2 { get; set; }
+        public decimal EmployerBu { get; set; }
+        public decimal EmployerBvg { get; set; }
+        public decimal EmployerKtg { get; set; }
+        public decimal EmployerFak { get; set; }
+
+        // ✅ NEW
+        public decimal EmployerVk { get; set; }
+
+        public List<PayrollItemDto> Items { get; set; } = new();
     }
 }

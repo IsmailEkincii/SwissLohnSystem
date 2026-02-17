@@ -13,7 +13,8 @@ namespace SwissLohnSystem.API.Mappings
                 c.Canton,
                 c.Email,
                 c.Phone,
-                c.TaxNumber
+                c.TaxNumber,
+                c.DefaultBvgPlanCode // ✅ EKLENDİ
             );
 
         public static Company ToEntity(this CompanyCreateDto dto) =>
@@ -24,7 +25,9 @@ namespace SwissLohnSystem.API.Mappings
                 Address = dto.Address?.Trim(),
                 Email = dto.Email?.Trim(),
                 Phone = dto.Phone?.Trim(),
-                TaxNumber = dto.TaxNumber?.Trim()
+                TaxNumber = dto.TaxNumber?.Trim(),
+                // İstersen create sırasında default set edebilirsin:
+                // DefaultBvgPlanCode = null
             };
 
         public static void Apply(this Company entity, CompanyUpdateDto dto)
@@ -35,6 +38,12 @@ namespace SwissLohnSystem.API.Mappings
             entity.Email = dto.Email?.Trim();
             entity.Phone = dto.Phone?.Trim();
             entity.TaxNumber = dto.TaxNumber?.Trim();
+
+            // ✅ FIX
+            entity.DefaultBvgPlanCode = string.IsNullOrWhiteSpace(dto.DefaultBvgPlanCode)
+                ? null
+                : dto.DefaultBvgPlanCode.Trim();
         }
+
     }
 }

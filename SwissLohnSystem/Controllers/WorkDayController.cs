@@ -150,18 +150,17 @@ namespace SwissLohnSystem.API.Controllers
 
         // GET: api/WorkDay/summary?employeeId=1&year=2025&month=11
         [HttpGet("summary")]
-        public async Task<ActionResult<WorkDaySummaryDto>> GetSummary(int employeeId, int year, int month)
+        public async Task<ActionResult<ApiResponse<WorkDaySummaryDto>>> GetSummary(int employeeId, int year, int month)
         {
             if (employeeId <= 0 || year <= 0 || month <= 0 || month > 12)
-                return BadRequest("Ungültige Parameter.");
+                return BadRequest(ApiResponse<WorkDaySummaryDto>.Fail("Ungültige Parameter."));
 
             var from = new DateTime(year, month, 1);
             var to = from.AddMonths(1);
 
             var query = _context.WorkDays
-                .Where(w => w.EmployeeId == employeeId
-                            && w.Date >= from
-                            && w.Date < to);
+                .AsNoTracking()
+                .Where(w => w.EmployeeId == employeeId && w.Date >= from && w.Date < to);
 
             var totalHours = await query.SumAsync(w => (decimal?)w.HoursWorked) ?? 0m;
             var totalOvertime = await query.SumAsync(w => (decimal?)w.OvertimeHours) ?? 0m;
@@ -175,7 +174,8 @@ namespace SwissLohnSystem.API.Controllers
                 TotalOvertimeHours = totalOvertime
             };
 
-            return Ok(dto);
+            return Ok(ApiResponse<WorkDaySummaryDto>.Ok(dto, "Summary loaded."));
         }
+
     }
 }

@@ -11,5 +11,6 @@ namespace SwissLohnSystem.API.DTOs.Companies
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? TaxNumber { get; set; }
+        public string? DefaultBvgPlanCode { get; set; }
     }
 }

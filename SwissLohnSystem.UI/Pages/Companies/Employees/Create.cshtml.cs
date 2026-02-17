@@ -21,46 +21,38 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
         [BindProperty(SupportsGet = true)]
         public int CompanyId { get; set; }
 
-        /// <summary>
-        /// API'deki EmployeeCreateDto ile bire bir aynı DTO.
-        /// </summary>
         [BindProperty]
         public EmployeeCreateDto Input { get; set; } = new();
 
-        [TempData] public string? Toast { get; set; }
+        [BindProperty]
+        public bool UseCompanyBvgPlan { get; set; } = true;
 
-        // QST / Bewilligung dropdown’ları
         public List<SelectListItem> PermitTypes { get; private set; } = new();
-        public List<SelectListItem> QstTariffCodes { get; private set; } = new();
+        public List<SelectListItem> BvgPlans { get; private set; } = new();
 
-        // ==============================
-        // GET
-        // ==============================
+        public string ApiBaseUrl => _api.BaseUrl?.TrimEnd('/') ?? string.Empty;
+
         public async Task OnGetAsync(int companyId)
         {
             CompanyId = companyId;
+            ViewData["ApiBaseUrl"] = ApiBaseUrl;
 
-            // Varsayılanları tek yerde dolduralım
             Input = new EmployeeCreateDto
             {
                 CompanyId = companyId,
                 StartDate = DateTime.Today,
                 Active = true,
 
-                // Gehaltsart
+                // defaultlar
                 SalaryType = "Monthly",
-
-                // Arbeitszeit
                 WeeklyHours = 42,
                 PensumPercent = 100m,
 
-                // Kanton / Steuer
                 Canton = "ZH",
                 PermitType = "B",
                 ApplyQST = false,
                 ChurchMember = false,
 
-                // Sozialversicherungen (default: hepsi açık)
                 ApplyAHV = true,
                 ApplyALV = true,
                 ApplyNBU = true,
@@ -68,37 +60,32 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
                 ApplyBVG = true,
                 ApplyFAK = true,
 
-                // Lohnparameter default’ları
                 HolidayEligible = true,
                 ThirteenthEligible = false,
-                ThirteenthProrated = false
+                ThirteenthProrated = false,
+
+                // Gender boş kalsın (UI’da seçtireceğiz)
+                Gender = null
             };
 
-            // Dropdown kaynakları
+            UseCompanyBvgPlan = true;
+            Input.BVGPlan = null;
+
             PermitTypes = QstUiLookups.GetPermitTypes();
-            await LoadQstTariffsAsync(Input.Canton);
+            await LoadBvgPlansAsync();
         }
 
-        // ==============================
-        // POST
-        // ==============================
         public async Task<IActionResult> OnPostAsync()
         {
-            // Dropdown’lar ModelState hatasında kaybolmasın
+            ViewData["ApiBaseUrl"] = ApiBaseUrl;
+
             PermitTypes = QstUiLookups.GetPermitTypes();
-            await LoadQstTariffsAsync(Input.Canton);
+            await LoadBvgPlansAsync();
 
             if (!ModelState.IsValid)
                 return Page();
 
-            // Gehaltsart zorunlu
-            if (string.IsNullOrWhiteSpace(Input.SalaryType))
-            {
-                ModelState.AddModelError(nameof(Input.SalaryType), "Gehaltsart ist erforderlich.");
-                return Page();
-            }
-
-            // Basit AHV format kontrolü
+            // AHV format
             if (!string.IsNullOrWhiteSpace(Input.AHVNumber))
             {
                 var ok = Regex.IsMatch(Input.AHVNumber.Trim(), @"^(756\.\d{4}\.\d{4}\.\d{2}|756\d{10})$");
@@ -109,41 +96,47 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
                 }
             }
 
-            // Trim’ler
-            Input.FirstName = Input.FirstName?.Trim() ?? "";
-            Input.LastName = Input.LastName?.Trim() ?? "";
+            // QST kapalıysa code null
+            if (!Input.ApplyQST)
+                Input.WithholdingTaxCode = null;
+
+            // BVG: Firmen-Standard mı?
+            if (UseCompanyBvgPlan)
+                Input.BVGPlan = null;
+            else
+                Input.BVGPlan = string.IsNullOrWhiteSpace(Input.BVGPlan) ? null : Input.BVGPlan.Trim();
+
+            // trims
+            Input.FirstName = (Input.FirstName ?? "").Trim();
+            Input.LastName = (Input.LastName ?? "").Trim();
+
             Input.Email = string.IsNullOrWhiteSpace(Input.Email) ? null : Input.Email.Trim();
             Input.Position = string.IsNullOrWhiteSpace(Input.Position) ? null : Input.Position.Trim();
-            Input.MaritalStatus = string.IsNullOrWhiteSpace(Input.MaritalStatus) ? null : Input.MaritalStatus;
+            Input.MaritalStatus = string.IsNullOrWhiteSpace(Input.MaritalStatus) ? null : Input.MaritalStatus.Trim();
+
             Input.AHVNumber = string.IsNullOrWhiteSpace(Input.AHVNumber) ? null : Input.AHVNumber.Trim();
             Input.Krankenkasse = string.IsNullOrWhiteSpace(Input.Krankenkasse) ? null : Input.Krankenkasse.Trim();
-            Input.BVGPlan = string.IsNullOrWhiteSpace(Input.BVGPlan) ? null : Input.BVGPlan.Trim();
+
             Input.Address = string.IsNullOrWhiteSpace(Input.Address) ? null : Input.Address.Trim();
             Input.Zip = string.IsNullOrWhiteSpace(Input.Zip) ? null : Input.Zip.Trim();
             Input.City = string.IsNullOrWhiteSpace(Input.City) ? null : Input.City.Trim();
             Input.Phone = string.IsNullOrWhiteSpace(Input.Phone) ? null : Input.Phone.Trim();
-            Input.Canton = string.IsNullOrWhiteSpace(Input.Canton)
-                ? "ZH"
-                : Input.Canton.Trim().ToUpperInvariant();
 
-            // PermitType boş gelirse default B
-            if (string.IsNullOrWhiteSpace(Input.PermitType))
-                Input.PermitType = "B";
+            Input.Canton = string.IsNullOrWhiteSpace(Input.Canton) ? "ZH" : Input.Canton.Trim().ToUpperInvariant();
+            Input.PermitType = string.IsNullOrWhiteSpace(Input.PermitType) ? "B" : Input.PermitType.Trim().ToUpperInvariant();
 
-            // QST seçildiyse Bewilligung + Tarif zorunlu
+            // Gender normalize (UI tarafı)
+            if (!string.IsNullOrWhiteSpace(Input.Gender))
+                Input.Gender = Input.Gender.Trim().ToUpperInvariant();
+
+            // QST açık ise validation
             if (Input.ApplyQST)
             {
                 if (string.IsNullOrWhiteSpace(Input.PermitType))
-                {
-                    ModelState.AddModelError(nameof(Input.PermitType),
-                        "Bitte eine Bewilligung auswählen.");
-                }
+                    ModelState.AddModelError(nameof(Input.PermitType), "Bitte eine Bewilligung auswählen.");
 
                 if (string.IsNullOrWhiteSpace(Input.WithholdingTaxCode))
-                {
-                    ModelState.AddModelError(nameof(Input.WithholdingTaxCode),
-                        "Bitte einen Quellensteuer-Tarif auswählen.");
-                }
+                    ModelState.AddModelError(nameof(Input.WithholdingTaxCode), "Bitte einen Quellensteuer-Tarif auswählen.");
 
                 if (!ModelState.IsValid)
                     return Page();
@@ -152,53 +145,46 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
             var (success, createdEmployee, message) =
                 await _api.PostAsync<EmployeeDto>("/api/Employee", Input);
 
-            if (!success)
+            if (!success || createdEmployee is null)
             {
-                ModelState.AddModelError(string.Empty, message ?? "Erstellung fehlgeschlagen.");
+                TempData["Error"] = message ?? "Erstellung fehlgeschlagen.";
                 return Page();
             }
 
-            TempData["Alert"] = $"Mitarbeiter \"{Input.FirstName} {Input.LastName}\" wurde erfolgreich erstellt.";
+            TempData["Toast"] = $"Mitarbeiter \"{createdEmployee.FirstName} {createdEmployee.LastName}\" wurde erstellt.";
             return RedirectToPage("/Companies/Details", new { id = Input.CompanyId });
         }
 
-        // Ek UI doğrulamaları (SalaryType/Brutto/Hourly)
         public IEnumerable<ValidationResult> Validate(ValidationContext ctx)
         {
+            // Salary validation
             if (Input.SalaryType == "Hourly")
             {
                 if (Input.HourlyRate <= 0)
-                    yield return new ValidationResult(
-                        "Stundenlohn ist erforderlich und muss größer als 0 sein.",
-                        new[] { nameof(Input.HourlyRate) });
+                    yield return new ValidationResult("Stundenlohn ist erforderlich und muss größer als 0 sein.", new[] { nameof(Input.HourlyRate) });
             }
             else if (Input.SalaryType == "Monthly")
             {
                 if (Input.BruttoSalary <= 0)
-                    yield return new ValidationResult(
-                        "Bruttolohn ist erforderlich und muss größer als 0 sein.",
-                        new[] { nameof(Input.BruttoSalary) });
+                    yield return new ValidationResult("Bruttolohn ist erforderlich und muss größer als 0 sein.", new[] { nameof(Input.BruttoSalary) });
             }
 
+            // Date validation
             if (Input.EndDate.HasValue && Input.EndDate.Value < Input.StartDate)
+                yield return new ValidationResult("Enddatum darf nicht vor dem Startdatum liegen.", new[] { nameof(Input.EndDate) });
+
+            // Gender validation (optional field)
+            if (!string.IsNullOrWhiteSpace(Input.Gender))
             {
-                yield return new ValidationResult(
-                    "Enddatum darf nicht vor dem Startdatum liegen.",
-                    new[] { nameof(Input.EndDate) });
+                var g = Input.Gender.Trim().ToUpperInvariant();
+                if (g != "M" && g != "F" && g != "X")
+                    yield return new ValidationResult("Geschlecht muss M, F oder X sein.", new[] { nameof(Input.Gender) });
             }
         }
 
-        // ==============================
-        // QST tariflerini API'den yükleyen helper
-        // ==============================
-        private async Task LoadQstTariffsAsync(string? canton)
+        private async Task LoadBvgPlansAsync()
         {
-            var c = string.IsNullOrWhiteSpace(canton)
-                ? "ZH"
-                : canton.Trim().ToUpperInvariant();
-
-            var (ok, data, msg) =
-                await _api.GetAsync<List<QstTariffLookupDto>>($"/api/Lookups/qst-tariffs?canton={c}");
+            var (ok, data, msg) = await _api.GetAsync<List<BvgPlanListItemDto>>("/api/Settings/bvg-plans");
 
             var list = new List<SelectListItem>
             {
@@ -207,17 +193,15 @@ namespace SwissLohnSystem.UI.Pages.Companies.Employees
 
             if (ok && data is not null)
             {
-                foreach (var t in data)
+                foreach (var p in data)
                 {
-                    list.Add(new SelectListItem
-                    {
-                        Value = t.Code,
-                        Text = $"{t.Code} – {t.Description}"
-                    });
+                    var text = p.Code;
+                    if (p.Year.HasValue) text = $"{p.Code} ({p.Year})";
+                    list.Add(new SelectListItem { Value = p.Code, Text = text });
                 }
             }
 
-            QstTariffCodes = list;
+            BvgPlans = list;
         }
     }
 }

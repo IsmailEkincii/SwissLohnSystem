@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "XqQ34QI6nD8=",
+  "dgSpecHash": "/fd40ipElJM=",
   "success": true,
   "projectFilePath": "C:\\Users\\Smale\\source\\repos\\SwissLohnSystem\\SwissLohnSystem.UI\\SwissLohnSystem.UI.csproj",
   "expectedPackageFiles": [
@@ -38,6 +38,7 @@
     "C:\\Users\\Smale\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "C:\\Users\\Smale\\.nuget\\packages\\newtonsoft.json\\13.0.4\\newtonsoft.json.13.0.4.nupkg.sha512",
     "C:\\Users\\Smale\\.nuget\\packages\\openai\\2.6.0\\openai.2.6.0.nupkg.sha512",
+    "C:\\Users\\Smale\\.nuget\\packages\\questpdf\\2025.12.0\\questpdf.2025.12.0.nupkg.sha512",
     "C:\\Users\\Smale\\.nuget\\packages\\swashbuckle.aspnetcore\\6.6.2\\swashbuckle.aspnetcore.6.6.2.nupkg.sha512",
     "C:\\Users\\Smale\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.6.2\\swashbuckle.aspnetcore.swagger.6.6.2.nupkg.sha512",
     "C:\\Users\\Smale\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.6.2\\swashbuckle.aspnetcore.swaggergen.6.6.2.nupkg.sha512",

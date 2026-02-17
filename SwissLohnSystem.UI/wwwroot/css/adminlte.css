@@ -12837,6 +12837,190 @@ textarea.form-control-lg {
     transform: none;
   }
 }
+
+@media print {
+
+    /* =========================
+     GLOBAL PRINT RESET
+     ========================= */
+    body {
+        background: #fff !important;
+        color: #111 !important;
+        font-size: 10.5pt;
+        line-height: 1.25;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* =========================
+     UI ELEMENTLERİNİ GİZLE
+     ========================= */
+    footer,
+    .main-footer,
+    .navbar,
+    .main-header,
+    .main-sidebar,
+    .breadcrumb,
+    .btn,
+    .btn-group,
+    .alert {
+        display: none !important;
+    }
+
+    /* =========================
+     PRINT ALANI – ORTALAMA
+     ========================= */
+    #lohnDetailPrintable {
+        position: static !important;
+        width: 180mm !important; /* A4 iç genişlik */
+        max-width: 180mm !important;
+        margin: 0 auto !important; /* ortala */
+        padding: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+    }
+
+    /* =========================
+     HEADER / BAŞLIK
+     ========================= */
+    .lohn-title {
+        font-size: 14pt !important;
+        font-weight: 700 !important;
+        margin: 2mm 0 2mm 0 !important;
+    }
+
+    h5 {
+        margin: 0 0 2mm 0 !important;
+        font-size: 12pt !important;
+    }
+
+    .print-header {
+        margin-bottom: 2.5mm !important;
+    }
+
+    .print-sep {
+        margin-bottom: 3mm !important;
+    }
+
+    /* =========================
+     TABLE
+     ========================= */
+    .table-responsive {
+        overflow: visible !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 10pt;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    .thead-light {
+        background: transparent !important;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    th {
+        font-weight: 700;
+        border-bottom: 1px solid #111 !important;
+        padding: 2.2mm 2mm !important;
+        text-align: left;
+    }
+
+    td {
+        border-bottom: 1px solid #ddd !important;
+        padding: 2mm 2mm !important;
+        vertical-align: top;
+    }
+
+        th.text-right,
+        td.text-right {
+            text-align: right !important;
+            font-variant-numeric: tabular-nums; /* rakam hizası */
+        }
+
+        th.text-center,
+        td.text-center {
+            text-align: center !important;
+        }
+
+    /* Grup başlıkları */
+    tr.table-secondary td {
+        border-bottom: 1px solid #111 !important;
+        font-weight: 700;
+        padding-top: 3mm !important;
+        padding-bottom: 2mm !important;
+    }
+
+    /* Netto satırı */
+    tr.table-success td {
+        border-top: 1px solid #111 !important;
+        border-bottom: 1px solid #111 !important;
+        font-weight: 800;
+    }
+
+    /* =========================
+     TOTALS (opsiyonel)
+     ========================= */
+    .print-totals {
+        margin-top: 6mm;
+        margin-left: auto;
+        width: 70mm;
+        border: 1px solid #111;
+        padding: 3mm 4mm;
+    }
+
+    .totals-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 1mm 0;
+    }
+
+        .totals-row.strong {
+            font-weight: 800;
+        }
+
+    /* =========================
+     SIGNATURE
+     ========================= */
+    .print-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10mm;
+        gap: 12mm;
+    }
+
+    .sign {
+        width: 48%;
+    }
+
+        .sign .line {
+            border-top: 1px solid #111;
+            margin-bottom: 2mm;
+        }
+
+        .sign .caption {
+            font-size: 9pt;
+            color: #333;
+        }
+
+    /* =========================
+     PAGE SETUP
+     ========================= */
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+}
+
+
 :root,
 [data-bs-theme=light] {
   --lte-sidebar-width: 250px;

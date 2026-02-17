@@ -2069,6 +2069,7 @@ wwwroot\js\adminlte.min.js.map
 wwwroot\js\loehne-tab.js
 wwwroot\js\lohne-details.js
 wwwroot\js\lohnverlauf-detail.js
+wwwroot\js\qst-codes.js
 wwwroot\js\site.js
 wwwroot\js\workdays.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css

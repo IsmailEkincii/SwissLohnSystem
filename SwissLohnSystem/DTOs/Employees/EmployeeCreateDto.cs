@@ -18,21 +18,25 @@ namespace SwissLohnSystem.API.DTOs.Employees
         public string? Email { get; set; }
 
         public string? Position { get; set; }
-
         public DateTime? BirthDate { get; set; }
         public string? MaritalStatus { get; set; }
         public int ChildCount { get; set; }
 
+        // ✅ NEW
+        [Required, MaxLength(1)]
+        public string Gender { get; set; } = "M"; // "M" | "F"
+
         [Required]
         public string SalaryType { get; set; } = "Monthly"; // "Monthly" | "Hourly"
+
         public decimal HourlyRate { get; set; }
         public int MonthlyHours { get; set; }
         public decimal BruttoSalary { get; set; }
 
         [Required]
         public DateTime StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
 
+        public DateTime? EndDate { get; set; }
         public bool Active { get; set; } = true;
 
         public int WeeklyHours { get; set; } = 42;
@@ -51,6 +55,9 @@ namespace SwissLohnSystem.API.DTOs.Employees
         public bool ApplyBVG { get; set; } = true;
         public bool ApplyFAK { get; set; } = true;
         public bool ApplyQST { get; set; }
+
+        // ✅ NEW
+        public bool ApplyKTG { get; set; }
 
         public string PermitType { get; set; } = "B";
         public bool ChurchMember { get; set; }

@@ -28,9 +28,9 @@
         {
             <div class="alert alert-danger">@err</div>
         }
-        @if (TempData["Alert"] is string alert && !string.IsNullOrWhiteSpace(alert))
+        @if (TempData["Toast"] is string toast && !string.IsNullOrWhiteSpace(toast))
         {
-            <div class="alert alert-info">@alert</div>
+            <div class="alert alert-success">@toast</div>
         }
 
         <div class="card">
@@ -60,12 +60,27 @@
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
+                            <label asp-for="Input.Gender">Geschlecht</label>
+                            <select asp-for="Input.Gender" class="form-control">
+                                <option value="">-- bitte wählen --</option>
+                                <option value="M">Männlich (M)</option>
+                                <option value="F">Weiblich (F)</option>
+                                <option value="X">Divers (X)</option>
+                            </select>
+                            <span asp-validation-for="Input.Gender" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                Quellensteuer/KTG kann abhängig vom Geschlecht sein.
+                            </small>
+                        </div>
+
+                        <div class="form-group col-md-4">
                             <label asp-for="Input.Email">E-Mail</label>
                             <input asp-for="Input.Email" class="form-control" />
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
-                        <div class="form-group col-md-6">
+
+                        <div class="form-group col-md-4">
                             <label asp-for="Input.Position">Position</label>
                             <input asp-for="Input.Position" class="form-control" />
                             <span asp-validation-for="Input.Position" class="text-danger"></span>
@@ -153,42 +168,55 @@
                             <input asp-for="Input.Krankenkasse" class="form-control" />
                             <span asp-validation-for="Input.Krankenkasse" class="text-danger"></span>
                         </div>
+
                         <div class="form-group col-md-4">
-                            <label asp-for="Input.BVGPlan">BVG-Plan</label>
-                            <input asp-for="Input.BVGPlan" class="form-control" />
-                            <span class="form-text text-muted">
-                                Freitext (z.B. Standard / Kader / Kein BVG).
-                            </span>
+                            <label>BVG-Plan (PK)</label>
+
+                            <div class="form-check mb-2">
+                                <input asp-for="UseCompanyBvgPlan" class="form-check-input" id="useCompanyBvgPlanChk" />
+                                <label class="form-check-label" for="useCompanyBvgPlanChk">
+                                    Firmen-Standard verwenden
+                                </label>
+                            </div>
+
+                            <select asp-for="Input.BVGPlan"
+                                    class="form-control"
+                                    asp-items="Model.BvgPlans"
+                                    id="bvgPlanSelect">
+                            </select>
+
+                            <small class="form-text text-muted">
+                                Wenn Firmen-Standard aktiv ist, wird kein Plan gespeichert (Fallback auf Company Default).
+                            </small>
                             <span asp-validation-for="Input.BVGPlan" class="text-danger"></span>
                         </div>
                     </div>
 
-                    <!-- Quellensteuer / Steuer-Settings -->
-                    <hr />
                     <h5>Quellensteuer (QST)</h5>
 
                     <div class="form-row">
                         <div class="form-group col-md-3">
                             <div class="form-check mt-4">
-                                <input asp-for="Input.ApplyQST" class="form-check-input" />
-                                <label asp-for="Input.ApplyQST" class="form-check-label">Quellensteuer anwenden</label>
+                                <input asp-for="Input.ApplyQST" class="form-check-input" id="applyQstCheck" />
+                                <label class="form-check-label">Quellensteuer anwenden</label>
                             </div>
                         </div>
 
                         <div class="form-group col-md-3">
-                            <label asp-for="Input.PermitType">Bewilligung</label>
+                            <label asp-for="Input.PermitType"></label>
                             <select asp-for="Input.PermitType"
                                     class="form-control"
-                                    asp-items="Model.PermitTypes">
+                                    asp-items="Model.PermitTypes"
+                                    id="Input_PermitType">
                             </select>
-                            <span asp-validation-for="Input.PermitType" class="text-danger"></span>
                         </div>
 
                         <div class="form-group col-md-3">
-                            <label asp-for="Input.WithholdingTaxCode">QST-Code (z.B. A0, C0)</label>
+                            <label asp-for="Input.WithholdingTaxCode">QST-Code</label>
                             <select asp-for="Input.WithholdingTaxCode"
                                     class="form-control"
-                                    asp-items="Model.QstTariffCodes">
+                                    id="Input_WithholdingTaxCode">
+                                <option value="">-- bitte wählen --</option>
                             </select>
                             <span asp-validation-for="Input.WithholdingTaxCode" class="text-danger"></span>
                         </div>
@@ -196,11 +224,10 @@
                         <div class="form-group col-md-3">
                             <div class="form-check mt-4">
                                 <input asp-for="Input.ChurchMember" class="form-check-input" />
-                                <label asp-for="Input.ChurchMember" class="form-check-label">Kirchensteuerpflichtig</label>
+                                <label class="form-check-label">Kirchensteuerpflichtig</label>
                             </div>
                         </div>
                     </div>
-
 
                     <!-- Adresse & Kontakt -->
                     <hr />
@@ -209,7 +236,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-3">
                             <label asp-for="Input.Canton">Kanton</label>
-                            <select asp-for="Input.Canton" class="form-control">
+                            <select asp-for="Input.Canton" class="form-control" id="Input_Canton">
                                 <option value="">--</option>
                                 <option value="AG">Aargau (AG)</option>
                                 <option value="AI">Appenzell Innerrhoden (AI)</option>
@@ -237,7 +264,6 @@
                                 <option value="VS">Valais / Wallis (VS)</option>
                                 <option value="ZG">Zug (ZG)</option>
                                 <option value="ZH">Zürich (ZH)</option>
-
                             </select>
                             <span asp-validation-for="Input.Canton" class="text-danger"></span>
                         </div>
@@ -284,29 +310,8 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        (function () {
-            const select = document.getElementById('salaryTypeSelect');
-            const hourly = document.getElementById('Input_HourlyRate');
-            const brutto = document.getElementById('Input_BruttoSalary');
-
-            function updateReq() {
-                if (!select || !hourly || !brutto) return;
-                const v = select.value;
-                if (v === 'Hourly') {
-                    hourly.setAttribute('required', 'required');
-                    brutto.removeAttribute('required');
-                } else if (v === 'Monthly') {
-                    brutto.setAttribute('required', 'required');
-                    hourly.removeAttribute('required');
-                } else {
-                    hourly.removeAttribute('required');
-                    brutto.removeAttribute('required');
-                }
-            }
-            if (select) {
-                select.addEventListener('change', updateReq);
-                updateReq();
-            }
-        })();
+        window.API_BASE_URL = "@(ViewData["ApiBaseUrl"] ?? "")";
+        window.COMPANY_ID = @Model.CompanyId;
     </script>
+    <script src="~/js/qst-codes.js"></script>
 }

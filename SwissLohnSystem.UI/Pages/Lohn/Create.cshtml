@@ -8,9 +8,7 @@
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Neue Lohnabrechnung</h1>
-            </div>
+            <div class="col-sm-6"><h1>Neue Lohnabrechnung</h1></div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="~/">Dashboard</a></li>
@@ -46,9 +44,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="card card-outline card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title mb-0">Mitarbeiter</h3>
-                        </div>
+                        <div class="card-header"><h3 class="card-title mb-0">Mitarbeiter</h3></div>
                         <div class="card-body">
                             <dl class="row mb-0">
                                 <dt class="col-5">Name</dt>
@@ -75,10 +71,7 @@
 
                 <div class="col-md-8">
                     <div class="card card-outline card-success">
-                        <div class="card-header">
-                            <h3 class="card-title mb-0">Lohnparameter</h3>
-                        </div>
-
+                        <div class="card-header"><h3 class="card-title mb-0">Lohnparameter</h3></div>
                         <div class="card-body">
                             <form method="post">
                                 @Html.AntiForgeryToken()
@@ -87,12 +80,6 @@
                                 <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
                                 <h5>Periode &amp; Grundlohn</h5>
-
-                                <div class="alert alert-info">
-                                    <strong>Arbeitszeiten im Monat:</strong>
-                                    <span id="wdSummary">wird geladen…</span>
-                                </div>
-
                                 <div class="form-row">
                                     <div class="form-group col-md-4">
                                         <label asp-for="Input.Period">Abrechnungsmonat</label>
@@ -106,28 +93,8 @@
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label asp-for="Input.WeeklyHours">Wochenstunden</label>
-                                        <input asp-for="Input.WeeklyHours" type="number" min="1" max="60" step="0.5" class="form-control" />
+                                        <input asp-for="Input.WeeklyHours" type="number" min="1" max="60" step="1" class="form-control" />
                                         <span asp-validation-for="Input.WeeklyHours" class="text-danger"></span>
-                                    </div>
-                                </div>
-
-                                <hr />
-                                <h5>Arbeitstage &amp; Abwesenheiten (optional)</h5>
-                                <div class="form-row">
-                                    <div class="form-group col-md-4">
-                                        <label asp-for="Input.WorkedDays">Gearbeitete Tage</label>
-                                        <input asp-for="Input.WorkedDays" type="number" min="0" max="31" step="0.5" class="form-control" />
-                                        <span asp-validation-for="Input.WorkedDays" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label asp-for="Input.SickDays">Krankheitstage</label>
-                                        <input asp-for="Input.SickDays" type="number" min="0" max="31" step="0.5" class="form-control" />
-                                        <span asp-validation-for="Input.SickDays" class="text-danger"></span>
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label asp-for="Input.UnpaidDays">Unbezahlte Tage</label>
-                                        <input asp-for="Input.UnpaidDays" type="number" min="0" max="31" step="0.5" class="form-control" />
-                                        <span asp-validation-for="Input.UnpaidDays" class="text-danger"></span>
                                     </div>
                                 </div>
 
@@ -153,12 +120,12 @@
                                 </div>
 
                                 <hr />
-                                <h5>Sozialversicherungen (AN/AG Beiträge anwenden)</h5>
+                                <h5>Sozialversicherungen</h5>
                                 <div class="form-row">
                                     <div class="form-group col-md-2">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" name="Input.ApplyAHV" value="true" @(Model.Input.ApplyAHV ? "checked" : "") />
-                                            <label class="form-check-label">AHV/IV/EO</label>
+                                            <label class="form-check-label">AHV</label>
                                         </div>
                                     </div>
                                     <div class="form-group col-md-2">
@@ -194,31 +161,28 @@
                                 </div>
 
                                 <hr />
-                                <h5>Quellensteuer &amp; Kanton</h5>
+                                <h5>Quellensteuer</h5>
                                 <div class="form-row">
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.PermitType">Bewilligung</label>
                                         <select asp-for="Input.PermitType" class="form-control" asp-items="Model.PermitTypes"></select>
-                                        <span asp-validation-for="Input.PermitType" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label asp-for="Input.Canton">Kanton</label>
                                         <input asp-for="Input.Canton" class="form-control" maxlength="2" />
-                                        <span asp-validation-for="Input.Canton" class="text-danger"></span>
                                     </div>
                                     <div class="form-group col-md-3">
-                                        <label asp-for="Input.WithholdingTaxCode">Quellensteuer-Tarif</label>
-                                        <select asp-for="Input.WithholdingTaxCode" class="form-control" asp-items="Model.QstTariffCodes" id="QstTarifSelect"></select>
-                                        <span asp-validation-for="Input.WithholdingTaxCode" class="text-danger"></span>
+                                        <label asp-for="Input.WithholdingTaxCode">QST-Tarif</label>
+                                        <select asp-for="Input.WithholdingTaxCode" class="form-control" asp-items="Model.QstTariffCodes"></select>
                                     </div>
                                     <div class="form-group col-md-3">
                                         <div class="form-check mt-4">
-                                            <input class="form-check-input" type="checkbox" id="ApplyQstCheckbox" name="Input.ApplyQST" value="true" @(Model.Input.ApplyQST ? "checked" : "") />
-                                            <label class="form-check-label" for="ApplyQstCheckbox">Quellensteuer anwenden</label>
+                                            <input class="form-check-input" type="checkbox" name="Input.ApplyQST" value="true" @(Model.Input.ApplyQST ? "checked" : "") />
+                                            <label class="form-check-label">QST anwenden</label>
                                         </div>
                                         <div class="form-check mt-1">
                                             <input class="form-check-input" type="checkbox" name="Input.ChurchMember" value="true" @(Model.Input.ChurchMember ? "checked" : "") />
-                                            <label class="form-check-label">Kirchensteuerpflichtig</label>
+                                            <label class="form-check-label">Kirchensteuer</label>
                                         </div>
                                     </div>
                                 </div>
@@ -240,43 +204,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
-    <script>
-        (function () {
-            const qstCheckbox = document.getElementById('ApplyQstCheckbox');
-            const qstSelect = document.getElementById('QstTarifSelect');
-
-            function toggleQstSelect() {
-                if (!qstCheckbox || !qstSelect) return;
-                qstSelect.disabled = !qstCheckbox.checked;
-            }
-
-            document.addEventListener('DOMContentLoaded', toggleQstSelect);
-            if (qstCheckbox) qstCheckbox.addEventListener('change', toggleQstSelect);
-        })();
-    </script>
-
-    <script>
-        (async function () {
-            const wdSummary = document.getElementById("wdSummary");
-            const periodInput = document.getElementById("Input_Period");
-            if (!wdSummary || !periodInput) return;
-
-            const empId = @Model.Employee.Id;
-            const period = periodInput.value;
-            if (!period) { wdSummary.innerText = "—"; return; }
-
-            const d = new Date(period);
-            const url = `/api/WorkDay/summary?employeeId=${empId}&year=${d.getFullYear()}&month=${d.getMonth()+1}`;
-
-            try {
-                const res = await fetch(url);
-                if (!res.ok) { wdSummary.innerText = "—"; return; }
-                const data = await res.json();
-                wdSummary.innerText = `${data.totalHours} h, Überstunden: ${data.totalOvertimeHours} h`;
-            } catch {
-                wdSummary.innerText = "—";
-            }
-        })();
-    </script>
 }

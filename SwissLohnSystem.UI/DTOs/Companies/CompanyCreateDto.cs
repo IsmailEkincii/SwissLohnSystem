@@ -24,5 +24,6 @@ namespace SwissLohnSystem.UI.DTOs.Companies
 
         [MaxLength(100)]
         public string? TaxNumber { get; set; }
+        public string? DefaultBvgPlanCode { get; set; }
     }
 }

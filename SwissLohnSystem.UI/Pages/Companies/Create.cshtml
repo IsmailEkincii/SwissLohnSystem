@@ -56,6 +56,18 @@
                         <span asp-validation-for="Input.Canton" class="text-danger"></span>
                     </div>
 
+                    <!-- ✅ Default BVG Plan -->
+                    <div class="form-group">
+                        <label asp-for="Input.DefaultBvgPlanCode">Default BVG-Plan (PK)</label>
+                        <select asp-for="Input.DefaultBvgPlanCode"
+                                class="form-control"
+                                asp-items="Model.BvgPlans">
+                        </select>
+                        <span class="form-text text-muted">
+                            Wird verwendet, wenn ein Mitarbeiter keinen eigenen BVG-Plan hat.
+                        </span>
+                    </div>
+
                     <div class="form-group">
                         <label asp-for="Input.Address">Adresse</label>
                         <input asp-for="Input.Address" class="form-control" />

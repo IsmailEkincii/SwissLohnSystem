@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SwissLohnSystem.API.Data;
-using SwissLohnSystem.API.DTOs.Qst;
+using SwissLohnSystem.API.Responses;
 
 namespace SwissLohnSystem.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class LookupsController : ControllerBase
+    [Route("api/[controller]")]
+    public sealed class LookupsController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
 
@@ -21,56 +17,41 @@ namespace SwissLohnSystem.API.Controllers
         }
 
         // =====================================================
-        // GET /api/Lookups/qst-tariffs?canton=ZH&permit=B&church=true
-        // UI veya diğer servisler için "lookup" tarzı hafif endpoint
+        // GET: api/lookups/qst-codes?companyId=1&canton=ZH&permitType=B
         // =====================================================
-        [HttpGet("qst-tariffs")]
-        public async Task<ActionResult<IEnumerable<QstTariffDto>>> GetQstTariffs(
-            [FromQuery] string? canton = null,
-            [FromQuery] string? permit = null,
-            [FromQuery] bool? church = null,
-            CancellationToken ct = default)
+        [HttpGet("qst-codes")]
+        public async Task<ActionResult<ApiResponse<List<string>>>> GetQstCodes(
+            [FromQuery] int companyId,
+            [FromQuery] string canton,
+            [FromQuery] string permitType,
+            CancellationToken ct)
         {
-            var q = _db.QstTariffs.AsNoTracking();
+            if (companyId <= 0)
+                return BadRequest(ApiResponse<List<string>>.Fail("companyId is required."));
 
-            if (!string.IsNullOrWhiteSpace(canton))
-            {
-                var c = canton.Trim().ToUpperInvariant();
-                q = q.Where(t => t.Canton == c);
-            }
+            if (string.IsNullOrWhiteSpace(canton))
+                return BadRequest(ApiResponse<List<string>>.Fail("canton is required."));
 
-            if (!string.IsNullOrWhiteSpace(permit))
-            {
-                var p = permit.Trim().ToUpperInvariant();
-                q = q.Where(t => t.PermitType == p);
-            }
+            if (string.IsNullOrWhiteSpace(permitType))
+                return BadRequest(ApiResponse<List<string>>.Fail("permitType is required."));
 
-            if (church.HasValue)
-            {
-                q = q.Where(t => t.ChurchMember == church.Value);
-            }
+            canton = canton.Trim().ToUpperInvariant();
+            permitType = permitType.Trim().ToUpperInvariant();
 
-            var list = await q
-                .OrderBy(t => t.Canton)
-                .ThenBy(t => t.Code)
-                .ThenBy(t => t.PermitType)
-                .ThenBy(t => t.ChurchMember)
-                .ThenBy(t => t.IncomeFrom)
-                .Select(t => new QstTariffDto
-                {
-                    Id = t.Id,
-                    Canton = t.Canton,
-                    Code = t.Code,
-                    PermitType = t.PermitType,
-                    ChurchMember = t.ChurchMember,
-                    IncomeFrom = t.IncomeFrom,
-                    IncomeTo = t.IncomeTo,
-                    Rate = t.Rate,
-                    Remark = t.Remark
-                })
+            var codes = await _db.QstTariffs
+                .AsNoTracking()
+                .Where(t =>
+                    t.CompanyId == companyId &&
+                    t.Canton == canton &&
+                    t.PermitType == permitType &&
+                    t.Code != null && t.Code != "")
+                .Select(t => t.Code)
+                .Distinct()
+                .OrderBy(x => x)
                 .ToListAsync(ct);
 
-            return Ok(list);
+            return ApiResponse<List<string>>.Ok(codes);
         }
+
     }
 }

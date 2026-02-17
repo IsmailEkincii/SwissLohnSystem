@@ -217,9 +217,11 @@
                     </div>
 
                     <!-- Einstellungen -->
-                    <div class="tab-pane fade" id="settings" role="tabpanel">
-                        <p class="text-muted">(Später: firmenspezifische Einstellungen)</p>
-                    </div>
+                    <a class="btn btn-primary btn-sm"
+                       asp-page="/Companies/Settings/Index"
+                       asp-route-companyId="@Model.Id">
+                        <i class="fas fa-cog"></i> Firmeneinstellungen öffnen
+                    </a>
 
                 </div>
             </div>
@@ -269,17 +271,17 @@
     <!-- Toast mesajları (Create/Edit sonrası) -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            @if (TempData["ToastSuccess"] is string toastSuccess && !string.IsNullOrWhiteSpace(toastSuccess))
-            {
-                    <text>toastr.success("@toastSuccess");</text>
-            }
-
-            @if (TempData["ToastError"] is string toastError && !string.IsNullOrWhiteSpace(toastError))
-            {
-                    <text>toastr.error("@toastError");</text>
-            }
+          @if (TempData["Toast"] is string toast && !string.IsNullOrWhiteSpace(toast))
+          {
+                  <text>toastr.success(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(toast)));</text>
+          }
+          @if (TempData["Error"] is string toastErr && !string.IsNullOrWhiteSpace(toastErr))
+          {
+                  <text>toastr.error(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(toastErr)));</text>
+          }
         });
     </script>
+
 
     <script src="~/js/loehne-tab.js"></script>
 }

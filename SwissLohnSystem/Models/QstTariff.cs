@@ -7,6 +7,7 @@ namespace SwissLohnSystem.API.Models
     {
         [Key]
         public int Id { get; set; }
+        public int CompanyId { get; set; }
 
         [MaxLength(2)]
         public string Canton { get; set; } = "ZH";   // ZH, AG, VD ...

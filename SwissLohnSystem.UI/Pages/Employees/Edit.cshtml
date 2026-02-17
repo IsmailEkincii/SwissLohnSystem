@@ -114,10 +114,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label asp-for="Input.HourlyRate">Stundenlohn</label>
-                            <input asp-for="Input.HourlyRate"
-                                   type="number"
-                                   step="0.01"
-                                   class="form-control" />
+                            <input asp-for="Input.HourlyRate" type="number" step="0.01" class="form-control" />
                             <span asp-validation-for="Input.HourlyRate" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-4">
@@ -130,10 +127,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label asp-for="Input.BruttoSalary">Bruttolohn (Monat)</label>
-                            <input asp-for="Input.BruttoSalary"
-                                   type="number"
-                                   step="0.01"
-                                   class="form-control" />
+                            <input asp-for="Input.BruttoSalary" type="number" step="0.01" class="form-control" />
                             <span asp-validation-for="Input.BruttoSalary" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-4">
@@ -163,54 +157,67 @@
                             <input asp-for="Input.Krankenkasse" class="form-control" />
                             <span asp-validation-for="Input.Krankenkasse" class="text-danger"></span>
                         </div>
+
+                        <!-- ✅ BVG dropdown -->
                         <div class="form-group col-md-4">
-                            <label asp-for="Input.BVGPlan">BVG-Plan</label>
-                            <input asp-for="Input.BVGPlan" class="form-control" />
+                            <label>BVG-Plan (PK)</label>
+
+                            <div class="form-check mb-2">
+                                <input asp-for="UseCompanyBvgPlan" class="form-check-input" id="useCompanyBvgPlanChk" />
+                                <label class="form-check-label" for="useCompanyBvgPlanChk">
+                                    Firmen-Standard verwenden
+                                </label>
+                            </div>
+
+                            <select asp-for="Input.BVGPlan"
+                                    class="form-control"
+                                    asp-items="Model.BvgPlans"
+                                    id="bvgPlanSelect">
+                            </select>
+
                             <span class="form-text text-muted">
-                                Freitext (z.B. Standard / Kader / Kein BVG).
+                                Wenn Firmen-Standard aktiv ist, wird kein Plan gespeichert (Fallback auf Company Default).
                             </span>
                             <span asp-validation-for="Input.BVGPlan" class="text-danger"></span>
                         </div>
                     </div>
 
-                    <!-- Quellensteuer / Steuer-Settings -->
-                    <hr />
                     <h5>Quellensteuer (QST)</h5>
 
                     <div class="form-row">
                         <div class="form-group col-md-3">
                             <div class="form-check mt-4">
-                                <input asp-for="Input.ApplyQST" class="form-check-input" />
-                                <label asp-for="Input.ApplyQST" class="form-check-label">Quellensteuer anwenden</label>
+                                <input asp-for="Input.ApplyQST"
+                                       class="form-check-input"
+                                       id="applyQstCheck" />
+                                <label class="form-check-label">Quellensteuer anwenden</label>
                             </div>
                         </div>
 
                         <div class="form-group col-md-3">
-                            <label asp-for="Input.PermitType">Bewilligung</label>
+                            <label asp-for="Input.PermitType"></label>
                             <select asp-for="Input.PermitType"
                                     class="form-control"
                                     asp-items="Model.PermitTypes">
                             </select>
-                            <span asp-validation-for="Input.PermitType" class="text-danger"></span>
                         </div>
 
                         <div class="form-group col-md-3">
-                            <label asp-for="Input.WithholdingTaxCode">QST-Code (z.B. A0, C0)</label>
+                            <label asp-for="Input.WithholdingTaxCode">QST-Code</label>
                             <select asp-for="Input.WithholdingTaxCode"
                                     class="form-control"
-                                    asp-items="Model.QstTariffCodes">
+                                    id="Input_WithholdingTaxCode">
+                                <option value="">-- bitte wählen --</option>
                             </select>
-                            <span asp-validation-for="Input.WithholdingTaxCode" class="text-danger"></span>
                         </div>
 
                         <div class="form-group col-md-3">
                             <div class="form-check mt-4">
                                 <input asp-for="Input.ChurchMember" class="form-check-input" />
-                                <label asp-for="Input.ChurchMember" class="form-check-label">Kirchensteuerpflichtig</label>
+                                <label class="form-check-label">Kirchensteuerpflichtig</label>
                             </div>
                         </div>
                     </div>
-
                     <!-- Adresse & Kontakt -->
                     <hr />
                     <h5>Adresse &amp; Kontakt</h5>
@@ -218,7 +225,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-3">
                             <label asp-for="Input.Canton">Kanton</label>
-                            <select asp-for="Input.Canton" class="form-control">
+                            <select asp-for="Input.Canton" class="form-control" id="Input_Canton">
                                 <option value="">--</option>
                                 <option value="AG">Aargau (AG)</option>
                                 <option value="AI">Appenzell Innerrhoden (AI)</option>
@@ -293,31 +300,56 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         (function () {
-            const select = document.getElementById('salaryTypeSelect');
-            const hourly = document.getElementById('Input_HourlyRate');
-            const brutto = document.getElementById('Input_BruttoSalary');
+            const cantonSelect = document.getElementById('Input_Canton');
+            const qstSelect = document.getElementById('Input_WithholdingTaxCode');
+            const applyQst = document.getElementById('applyQstCheck');
 
-            function updateReq() {
-                if (!select || !hourly || !brutto) return;
-                const v = select.value;
-                if (v === 'Hourly') {
-                    hourly.setAttribute('required', 'required');
-                    brutto.removeAttribute('required');
-                } else if (v === 'Monthly') {
-                    brutto.setAttribute('required', 'required');
-                    hourly.removeAttribute('required');
-                } else {
-                    hourly.removeAttribute('required');
-                    brutto.removeAttribute('required');
+            if (!cantonSelect || !qstSelect || !applyQst) return;
+
+            async function reloadTariffs(clearSelection) {
+                const canton = (cantonSelect.value || 'ZH').toUpperCase();
+                const previous = qstSelect.value;
+
+                qstSelect.innerHTML = '<option value="">-- bitte wählen --</option>';
+
+                try {
+                    const res = await fetch(`/ui-api/lookups/qst-tariffs?canton=${encodeURIComponent(canton)}`);
+                    if (!res.ok) throw new Error(res.status);
+
+                    const list = await res.json(); // 🔑 ARRAY BEKLENİYOR
+
+                    for (const t of list) {
+                        qstSelect.appendChild(
+                            new Option(`${t.code} – ${t.description ?? ''}`, t.code)
+                        );
+                    }
+
+                    if (!clearSelection && previous) {
+                        const exists = Array.from(qstSelect.options)
+                            .some(o => o.value === previous);
+                        if (exists) qstSelect.value = previous;
+                    }
                 }
+                catch (e) {
+                    console.error('QST load failed', e);
+                }
+
+                qstSelect.disabled = !applyQst.checked;
+                if (!applyQst.checked) qstSelect.value = '';
             }
 
-            if (select) {
-                select.addEventListener('change', updateReq);
-                updateReq();
-            }
+            cantonSelect.addEventListener('change', () => reloadTariffs(true));
+            applyQst.addEventListener('change', () => reloadTariffs(false));
+
+            // ilk yükleme
+            reloadTariffs(false);
         })();
     </script>
+    <script>
+        console.log("✅ Create page QST script loaded");
+    </script>
+
 }

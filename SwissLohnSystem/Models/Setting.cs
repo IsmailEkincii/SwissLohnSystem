@@ -6,12 +6,20 @@ namespace SwissLohnSystem.API.Models
     {
         public int Id { get; set; }
 
-        [Required, MaxLength(100)] // 👈 ekledik
-        public string Name { get; set; } = string.Empty;
+        [Required]
+        public int CompanyId { get; set; }
 
-        public decimal Value { get; set; }
+        [Required, MaxLength(120)]
+        public string Name { get; set; } = null!;
 
-        [MaxLength(255)]
+        // ✅ string olmalı (UI text input + 0.053 / 5,3 destek)
+        [MaxLength(200)]
+        public string? Value { get; set; }
+
+        [MaxLength(400)]
         public string? Description { get; set; }
+
+        // ✅ sende yoktu, Seeder/Mapping bunu kullanıyor
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -1,0 +1,544 @@
+﻿@page "/Companies/{companyId:int}/Settings"
+@model SwissLohnSystem.UI.Pages.Companies.Settings.IndexModel
+@{
+    ViewData["Title"] = "Einstellungen (Firma)";
+    var editMode = !string.IsNullOrWhiteSpace(Model.SelectedBvgPlanCode);
+}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <h3 class="mb-0">Einstellungen – @Model.CompanyName</h3>
+                <small class="text-muted">Firma-ID: @Model.CompanyId</small>
+            </div>
+
+            <a class="btn btn-outline-secondary btn-sm"
+               href="~/Companies/Details/@Model.CompanyId#settings">
+                <i class="fas fa-arrow-left"></i> Zurück zur Firma
+            </a>
+        </div>
+
+        @if (TempData["Error"] is string err && !string.IsNullOrWhiteSpace(err))
+        {
+            <div class="alert alert-danger">@err</div>
+        }
+        @if (TempData["Toast"] is string toast && !string.IsNullOrWhiteSpace(toast))
+        {
+            <div class="alert alert-success">@toast</div>
+        }
+
+        <div class="card card-outline card-primary">
+            <div class="card-header p-0 pt-1 border-bottom-0">
+                <ul class="nav nav-tabs" id="settings-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="pill" href="#tab-settings" role="tab">Payroll Einstellungen</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="pill" href="#tab-qst" role="tab">QST Tarife</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="pill" href="#tab-bvg" role="tab">BVG Plans</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body">
+                <div class="tab-content">
+
+                    <!-- TAB 1: SETTINGS -->
+                    <div class="tab-pane fade show active" id="tab-settings" role="tabpanel">
+                        <form method="post" asp-page-handler="SaveSettings">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="CompanyId" />
+
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered align-middle">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th style="width:40%">Schlüssel (Name)</th>
+                                            <th style="width:20%">Wert</th>
+                                            <th>Beschreibung</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.Settings.Count; i++)
+                                        {
+                                            <tr>
+                                                <td class="font-monospace">
+                                                    @Model.Settings[i].Name
+                                                    <input type="hidden" asp-for="Settings[@i].Id" />
+                                                    <input type="hidden" asp-for="Settings[@i].Name" />
+                                                </td>
+                                                <td>
+                                                    <input asp-for="Settings[@i].Value"
+                                                           type="text"
+                                                           class="form-control form-control-sm" />
+                                                </td>
+                                                <td>
+                                                    <input asp-for="Settings[@i].Description"
+                                                           class="form-control form-control-sm" />
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-save"></i> Speichern
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- TAB 2: QST -->
+                    <div class="tab-pane fade" id="tab-qst" role="tabpanel">
+
+                        <!-- CSV IMPORT -->
+                        <form method="post" asp-page-handler="ImportQstCsv" enctype="multipart/form-data" class="mb-3">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="CompanyId" />
+
+                            <div class="form-group mb-2">
+                                <label>CSV import</label>
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        <input asp-for="QstCsvFile" id="QstCsvFile" type="file" class="custom-file-input" accept=".csv,text/csv" required />
+                                        <label class="custom-file-label" for="QstCsvFile">CSV auswählen...</label>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-upload"></i> Importieren
+                                        </button>
+                                    </div>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Spalten: Canton;Code;PermitType;ChurchMember;IncomeFrom;IncomeTo;Rate;Remark
+                                </small>
+                            </div>
+                        </form>
+
+                        <!-- INLINE LIST + SAVE + DELETE (tek form, handler button ile seçiliyor) -->
+                        <form method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="CompanyId" />
+
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered align-middle">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Kanton</th>
+                                            <th>Code</th>
+                                            <th>Bewilligung</th>
+                                            <th>Kirche?</th>
+                                            <th>Income From</th>
+                                            <th>Income To</th>
+                                            <th style="min-width:180px;">Rate (so wie eingegeben)</th>
+                                            <th>Bemerkung</th>
+                                            <th style="width:70px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.QstTariffs != null && Model.QstTariffs.Count > 0)
+                                        {
+                                            for (int i = 0; i < Model.QstTariffs.Count; i++)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @Model.QstTariffs[i].Id
+                                                        <input type="hidden" asp-for="QstTariffs[@i].Id" />
+                                                    </td>
+
+                                                    <td>
+                                                        <select asp-for="QstTariffs[@i].Canton" class="form-control form-control-sm">
+                                                            <option value="">--</option>
+                                                            <option>AG</option>
+                                                            <option>AI</option>
+                                                            <option>AR</option>
+                                                            <option>BE</option>
+                                                            <option>BL</option>
+                                                            <option>BS</option>
+                                                            <option>FR</option>
+                                                            <option>GE</option>
+                                                            <option>GL</option>
+                                                            <option>GR</option>
+                                                            <option>JU</option>
+                                                            <option>LU</option>
+                                                            <option>NE</option>
+                                                            <option>NW</option>
+                                                            <option>OW</option>
+                                                            <option>SG</option>
+                                                            <option>SH</option>
+                                                            <option>SZ</option>
+                                                            <option>SO</option>
+                                                            <option>TG</option>
+                                                            <option>TI</option>
+                                                            <option>UR</option>
+                                                            <option>VD</option>
+                                                            <option>VS</option>
+                                                            <option>ZG</option>
+                                                            <option>ZH</option>
+                                                        </select>
+                                                    </td>
+
+                                                    <td>
+                                                        <select asp-for="QstTariffs[@i].Code" class="form-control form-control-sm">
+                                                            <option value="">--</option>
+                                                            <option>A0N</option>
+                                                            <option>A0Y</option>
+                                                            <option>A1N</option>
+                                                            <option>B0N</option>
+                                                            <option>B2Y</option>
+                                                            <option>C0N</option>
+                                                            <option>C2N</option>
+                                                            <option>C2Y</option>
+                                                        </select>
+                                                    </td>
+
+                                                    <td>
+                                                        <select asp-for="QstTariffs[@i].PermitType" class="form-control form-control-sm">
+                                                            <option value="">--</option>
+                                                            <option>B</option>
+                                                            <option>L</option>
+                                                            <option>F</option>
+                                                            <option>N</option>
+                                                            <option>C</option>
+                                                        </select>
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        <input asp-for="QstTariffs[@i].ChurchMember" type="checkbox" class="form-check-input mt-2" />
+                                                    </td>
+
+                                                    <td>
+                                                        <input asp-for="QstTariffs[@i].IncomeFrom" type="text" inputmode="decimal" class="form-control form-control-sm" />
+                                                    </td>
+
+                                                    <td>
+                                                        <input asp-for="QstTariffs[@i].IncomeTo" type="text" inputmode="decimal" class="form-control form-control-sm" />
+                                                    </td>
+
+                                                    <td>
+                                                        <!-- ✅ string raw: 0,14 / 0.14 / 5 -->
+                                                        <input asp-for="QstRateRaws[@i]"
+                                                               type="text"
+                                                               inputmode="decimal"
+                                                               class="form-control form-control-sm"
+                                                               placeholder="0,14 / 0.14 / 5" />
+                                                    </td>
+
+                                                    <td>
+                                                        <input asp-for="QstTariffs[@i].Remark" class="form-control form-control-sm" />
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        <button type="submit"
+                                                                class="btn btn-danger btn-sm"
+                                                                asp-page-handler="DeleteQst"
+                                                                asp-route-id="@Model.QstTariffs[i].Id"
+                                                                onclick="return confirm('Diesen QST-Tarif löschen?');"
+                                                                title="Löschen">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="10" class="text-center text-muted">
+                                                    Keine QST-Tarife vorhanden.
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-sm mt-2" asp-page-handler="SaveQst">
+                                <i class="fas fa-save"></i> Änderungen speichern
+                            </button>
+                        </form>
+
+                        <hr />
+
+                        <!-- CREATE NEW QST -->
+                        <h6 class="mt-3">Neuer QST-Tarif</h6>
+
+                        <form method="post" asp-page-handler="CreateQst" class="mt-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="CompanyId" />
+
+                            <div class="form-row">
+                                <div class="form-group col-md-2">
+                                    <label asp-for="NewQst.Canton">Kanton</label>
+                                    <select asp-for="NewQst.Canton" class="form-control form-control-sm">
+                                        <option value="">--</option>
+                                        <option>AG</option>
+                                        <option>AI</option>
+                                        <option>AR</option>
+                                        <option>BE</option>
+                                        <option>BL</option>
+                                        <option>BS</option>
+                                        <option>FR</option>
+                                        <option>GE</option>
+                                        <option>GL</option>
+                                        <option>GR</option>
+                                        <option>JU</option>
+                                        <option>LU</option>
+                                        <option>NE</option>
+                                        <option>NW</option>
+                                        <option>OW</option>
+                                        <option>SG</option>
+                                        <option>SH</option>
+                                        <option>SZ</option>
+                                        <option>SO</option>
+                                        <option>TG</option>
+                                        <option>TI</option>
+                                        <option>UR</option>
+                                        <option>VD</option>
+                                        <option>VS</option>
+                                        <option>ZG</option>
+                                        <option>ZH</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                    <label asp-for="NewQst.Code">Code</label>
+                                    <select asp-for="NewQst.Code" class="form-control form-control-sm">
+                                        <option value="">--</option>
+                                        <option>A0N</option>
+                                        <option>A0Y</option>
+                                        <option>A1N</option>
+                                        <option>B0N</option>
+                                        <option>B2Y</option>
+                                        <option>C0N</option>
+                                        <option>C2N</option>
+                                        <option>C2Y</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                    <label asp-for="NewQst.PermitType">Bewilligung</label>
+                                    <select asp-for="NewQst.PermitType" class="form-control form-control-sm">
+                                        <option value="">--</option>
+                                        <option>B</option>
+                                        <option>L</option>
+                                        <option>F</option>
+                                        <option>N</option>
+                                        <option>C</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                    <label asp-for="NewQst.ChurchMember">Kirche?</label>
+                                    <div class="form-check mt-1">
+                                        <input asp-for="NewQst.ChurchMember" class="form-check-input" type="checkbox" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                    <label asp-for="NewQst.IncomeFrom">Income From</label>
+                                    <input asp-for="NewQst.IncomeFrom" type="text" inputmode="decimal" class="form-control form-control-sm" />
+                                </div>
+
+                                <div class="form-group col-md-2">
+                                    <label asp-for="NewQst.IncomeTo">Income To</label>
+                                    <input asp-for="NewQst.IncomeTo" type="text" inputmode="decimal" class="form-control form-control-sm" />
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-2">
+                                    <label>Rate (so wie eingegeben)</label>
+                                    <input asp-for="NewQstRateRaw"
+                                           type="text"
+                                           inputmode="decimal"
+                                           class="form-control form-control-sm"
+                                           placeholder="0,14 / 0.14 / 5" />
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label asp-for="NewQst.Remark">Bemerkung</label>
+                                    <input asp-for="NewQst.Remark" class="form-control form-control-sm" />
+                                </div>
+
+                                <div class="form-group col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fas fa-plus"></i> Hinzufügen
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+
+                    <!-- TAB 3: BVG -->
+                    <div class="tab-pane fade" id="tab-bvg" role="tabpanel">
+
+                        <div class="row">
+                            <!-- LEFT: list -->
+                            <div class="col-md-4">
+                                <div class="card card-outline card-secondary">
+                                    <div class="card-header">
+                                        <strong>Pläne</strong>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Jahr</th>
+                                                    <th>Code</th>
+                                                    <th style="width:70px;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.BvgPlans.Count > 0)
+                                                {
+                                                    foreach (var p in Model.BvgPlans)
+                                                    {
+                                                        var isActive = string.Equals(Model.SelectedBvgPlanCode, p.Code, StringComparison.OrdinalIgnoreCase);
+                                                        <tr class="@(isActive ? "table-active" : "")">
+                                                            <td>@p.Year</td>
+                                                            <td class="font-monospace">@p.Code</td>
+                                                            <td class="text-right">
+                                                                <form method="post" asp-page-handler="SelectBvg">
+                                                                    @Html.AntiForgeryToken()
+                                                                    <input type="hidden" asp-for="CompanyId" />
+                                                                    <input type="hidden" name="planCode" value="@p.Code" />
+                                                                    <button class="btn btn-outline-primary btn-sm" type="submit" title="Bearbeiten">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td colspan="3" class="text-center text-muted p-3">Keine BVG-Pläne vorhanden.</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- RIGHT: form -->
+                            <div class="col-md-8">
+                                <div class="card card-outline card-primary">
+                                    <div class="card-header">
+                                        <strong>@(string.IsNullOrWhiteSpace(Model.SelectedBvgPlanCode) ? "Neuer Plan" : $"Plan bearbeiten: {Model.SelectedBvgPlanCode}")</strong>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <form method="post" asp-page-handler="SaveBvg">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" asp-for="CompanyId" />
+
+                                            <div class="form-row">
+                                                <div class="form-group col-md-6">
+                                                    <label asp-for="BvgForm.PlanBaseCode">PlanBaseCode</label>
+                                                    <input asp-for="BvgForm.PlanBaseCode" class="form-control form-control-sm" placeholder="z.B. PK_STD" />
+                                                </div>
+                                                <div class="form-group col-md-3">
+                                                    <label asp-for="BvgForm.Year">Year</label>
+                                                    <input asp-for="BvgForm.Year" class="form-control form-control-sm" type="number" min="2000" max="2100" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-row">
+                                                <div class="form-group col-md-4">
+                                                    <label asp-for="BvgForm.CoordinationDedAnnual">Coordination Deduction</label>
+                                                    <input asp-for="BvgForm.CoordinationDedAnnual" class="form-control form-control-sm" type="number" step="0.01" />
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label asp-for="BvgForm.EntryThresholdAnnual">Entry Threshold</label>
+                                                    <input asp-for="BvgForm.EntryThresholdAnnual" class="form-control form-control-sm" type="number" step="0.01" />
+                                                </div>
+                                                <div class="form-group col-md-4">
+                                                    <label asp-for="BvgForm.UpperLimitAnnual">Upper Limit</label>
+                                                    <input asp-for="BvgForm.UpperLimitAnnual" class="form-control form-control-sm" type="number" step="0.01" />
+                                                </div>
+                                            </div>
+
+                                            <hr />
+                                            <h6>Beiträge (Sätze)</h6>
+
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered">
+                                                    <thead class="thead-light">
+                                                        <tr>
+                                                            <th>Alter</th>
+                                                            <th>AN</th>
+                                                            <th>AG</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>25–34</td>
+                                                            <td><input asp-for="BvgForm.Rate25_34_Employee" class="form-control form-control-sm" type="number" step="0.0001" /></td>
+                                                            <td><input asp-for="BvgForm.Rate25_34_Employer" class="form-control form-control-sm" type="number" step="0.0001" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>35–44</td>
+                                                            <td><input asp-for="BvgForm.Rate35_44_Employee" class="form-control form-control-sm" type="number" step="0.0001" /></td>
+                                                            <td><input asp-for="BvgForm.Rate35_44_Employer" class="form-control form-control-sm" type="number" step="0.0001" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>45–54</td>
+                                                            <td><input asp-for="BvgForm.Rate45_54_Employee" class="form-control form-control-sm" type="number" step="0.0001" /></td>
+                                                            <td><input asp-for="BvgForm.Rate45_54_Employer" class="form-control form-control-sm" type="number" step="0.0001" /></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>55–65</td>
+                                                            <td><input asp-for="BvgForm.Rate55_65_Employee" class="form-control form-control-sm" type="number" step="0.0001" /></td>
+                                                            <td><input asp-for="BvgForm.Rate55_65_Employer" class="form-control form-control-sm" type="number" step="0.0001" /></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-save"></i> Speichern
+                                            </button>
+                                        </form>
+
+                                        <small class="text-muted d-block mt-2">
+                                            Hinweis: BVG Rates API tarafında direkt decimal saklanır (0..n). Burada sen ne girersen o gider.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- tab-bvg -->
+
+                </div><!-- tab-content -->
+            </div><!-- card-body -->
+        </div><!-- card -->
+
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var input = document.getElementById("QstCsvFile");
+            if (input) {
+                input.addEventListener("change", function () {
+                    if (input.files && input.files.length > 0) {
+                        var label = input.nextElementSibling;
+                        if (label) label.innerText = input.files[0].name;
+                    }
+                });
+            }
+        });
+    </script>
+}

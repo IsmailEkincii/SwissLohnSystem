@@ -7,6 +7,8 @@
         string Canton,
         string? Email,
         string? Phone,
-        string? TaxNumber
+        string? TaxNumber,
+        string? DefaultBvgPlanCode
+
     );
 }

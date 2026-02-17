@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SwissLohnSystem.API.Data;
 using SwissLohnSystem.API.Models;
+using System;
 
 namespace SwissLohnSystem.API.Services.Payroll
 {
@@ -9,76 +10,78 @@ namespace SwissLohnSystem.API.Services.Payroll
         private readonly ApplicationDbContext _db;
         public EfSettingsProvider(ApplicationDbContext db) => _db = db;
 
-        public PayrollSettingsSnapshot GetEffectiveSettings(string canton)
+        public EffectivePayrollSettings GetEffectiveSettings(int companyId, string canton, string? bvgPlanCode)
         {
-            var dict = _db.Settings.AsNoTracking().ToDictionary(s => s.Name, s => s.Value);
+            var dict = _db.Settings
+                .AsNoTracking()
+                .Where(x => x.CompanyId == companyId)
+                .ToDictionary(x => x.Name, x => x.Value, StringComparer.OrdinalIgnoreCase);
 
-            decimal GetRate(string key, decimal def)
-                => dict.TryGetValue(key, out var v) ? (v > 1m ? v / 100m : v) : def;
-
-            decimal GetDec(string key, decimal def)
-                => dict.TryGetValue(key, out var v) ? v : def;
-
-            int GetInt(string key, int def)
-                => dict.TryGetValue(key, out var v) ? (int)decimal.Round(v, 0) : def;
-
-            return new PayrollSettingsSnapshot
+            decimal GetDec(string key, decimal fallback = 0m)
             {
-                IntermediateRoundingStep = GetDec("Rounding.Intermediate", 0.01m),
-                FinalRoundingStep = GetDec("Rounding.Final", 0.05m),
-                WithholdingRoundingStep = GetDec("Rounding.Withholding", 0.05m),
+                if (!dict.TryGetValue(key, out var v) || string.IsNullOrWhiteSpace(v))
+                    return fallback;
 
-                AhvEmployee = GetRate("AHV.Employee", 0.053m),
-                AhvEmployer = GetRate("AHV.Employer", 0.053m),
+                var s = v.Trim().Replace(',', '.');
 
-                AlvRateTotal = GetRate("ALV.Total", 0.022m),
-                AlvEmployeeShare = GetDec("ALV.Split.Employee", 0.5m),
-                AlvEmployerShare = GetDec("ALV.Split.Employer", 0.5m),
-                AlvAnnualCap = GetDec("ALV.CapAnnual", 148_200m),
+                if (decimal.TryParse(s, System.Globalization.NumberStyles.Any,
+                    System.Globalization.CultureInfo.InvariantCulture, out var d))
+                    return d;
 
-                UvgBuEmployerRate = GetRate("UVG.BU.Employer", 0.0125m),
-                UvgNbuEmployeeRate = GetRate("UVG.NBU.Employee", 0.009m),
-                UvgNbuMinWeeklyHours = GetInt("UVG.NBU.MinWeeklyHours", 8),
+                return fallback;
+            }
 
-                BvgEntryThresholdAnnual = GetDec("BVG.EntryThresholdAnnual", 22_680m),
-                BvgCoordinationDedAnnual = GetDec("BVG.CoordinationDedAnnual", 26_460m),
-                BvgUpperLimitAnnual = GetDec("BVG.UpperLimitAnnual", 90_720m),
-                BvgEmployeeRate = GetRate("BVG.EmployeeRate", 0.04m),
-                BvgEmployerRate = GetRate("BVG.EmployerRate", 0.05m),
+            var cfg = new EffectivePayrollSettings
+            {
+                AhvEmployee = GetDec("AHV_AN_RATE", 0.0435m),
+                AhvEmployer = GetDec("AHV_AG_RATE", 0.0435m),
 
-                FakEmployerRate = GetRate("FAK.EmployerRate", 0.012m),
+                AlvRateTotal = GetDec("ALV_TOTAL_RATE", 0.022m),
+                AlvEmployeeShare = GetDec("ALV_AN_SHARE", 0.5m),
+                AlvEmployerShare = GetDec("ALV_AG_SHARE", 0.5m),
+                AlvAnnualCap = GetDec("ALV_ANNUAL_CAP", 148200m),
+
+                UvgCapAnnual = GetDec("UVG_CAP_ANNUAL", 148200m),
+                UvgNbuMinWeeklyHours = GetDec("UVG_NBU_MIN_WEEKLY_HOURS", 8m),
+                UvgNbuEmployeeRate = GetDec("NBU_AN_RATE", 0.012m),
+                UvgBuEmployerRate = GetDec("BU_AG_RATE", 0.008m),
+
+                FakEmployerRate = GetDec("FAK_AG_RATE", 0.02m),
+
+                KtgMEmployeeRate = GetDec("KTG_M_AN_RATE", 0m),
+                KtgMEmployerRate = GetDec("KTG_M_AG_RATE", 0m),
+                KtgFEmployeeRate = GetDec("KTG_F_AN_RATE", 0m),
+                KtgFEmployerRate = GetDec("KTG_F_AG_RATE", 0m),
+
+                AhvAdminCostRate = GetDec("AHV_ADMIN_COST_RATE", 0m),
+
+                IntermediateRoundingStep = GetDec("ROUND_INTERMEDIATE_STEP", 0.01m),
+                WithholdingRoundingStep = GetDec("ROUND_WITHHOLDING_STEP", 0.05m),
+                FinalRoundingStep = GetDec("ROUND_FINAL_STEP", 0.01m),
             };
+
+            // canton/bvgPlanCode şu an config üzerinde ayrıca override etmiyoruz.
+            // İstersen ileride canton bazlı settings key prefix yaparız.
+
+            return cfg;
         }
 
-        // QST tarifini DB’den bul
-        public QstTariff? GetQstTariff(
-            string canton,
-            string? code,
-            string permitType,
-            bool churchMember,
-            decimal grossMonthly)
+        public QstTariff? GetQstTariff(int companyId, string canton, string code, string permitType, bool churchMember, decimal income)
         {
-            if (string.IsNullOrWhiteSpace(code))
-                return null;
+            canton = (canton ?? "ZH").Trim().ToUpperInvariant();
+            code = code.Trim().ToUpperInvariant();
+            permitType = permitType.Trim().ToUpperInvariant();
 
-            canton = canton.ToUpperInvariant();
-            code = code.ToUpperInvariant();
-            permitType = permitType.ToUpperInvariant();
-
-            // ✅ Kritik fix:
-            // Aynı grupta birden fazla band varsa, "grossMonthly" için en yakın alt bandı seçmek için
-            // IncomeFrom'u DESC sıralıyoruz.
             return _db.QstTariffs
                 .AsNoTracking()
-                .Where(t =>
-                    t.Canton == canton &&
-                    t.Code == code &&
-                    t.PermitType == permitType &&
-                    t.ChurchMember == churchMember &&
-                    t.IncomeFrom <= grossMonthly &&
-                    t.IncomeTo >= grossMonthly)
-                .OrderByDescending(t => t.IncomeFrom)
-                .ThenBy(t => t.IncomeTo)
+                .Where(x => x.CompanyId == companyId
+                            && x.Canton == canton
+                            && x.Code == code
+                            && x.PermitType == permitType
+                            && x.ChurchMember == churchMember
+                            && x.IncomeFrom <= income
+                            && x.IncomeTo >= income)
+                .OrderByDescending(x => x.IncomeFrom)
                 .FirstOrDefault();
         }
     }
